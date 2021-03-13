@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+combine_as_imports = true
+
+[tool.pytest.ini_options]
+# pytest looks for configuration from pyproject.toml
+# only from version 6.0
+minversion = "6.0"
+addopts = "--doctest-modules"
