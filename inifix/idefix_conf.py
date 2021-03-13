@@ -1,8 +1,11 @@
 import re
+
 from more_itertools import always_iterable
 
 from inifix.enotation import ENotationIO
+
 SECTION_REGEXP = re.compile(r"\[\w+\]\s*")
+
 
 class IdefixConf(dict):
     def __init__(self, dict_or_path_or_buffer):

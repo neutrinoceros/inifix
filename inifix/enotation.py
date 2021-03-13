@@ -1,7 +1,8 @@
-
 import re
 
 ENOTATION_REGEXP = re.compile(r"\d+(\.\d*)?e[+-]?\d+?")
+
+
 class ENotationIO:
     """A small class to encode/decode real numbers to and from
     e-notation formatted strings.
