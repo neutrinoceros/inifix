@@ -12,9 +12,8 @@
 
 ## Installation
 
-From the top level of the repo, run
 ```shell
-$ python3 -m pip install -u -e .
+$ pip install inifix
 ```
 
 ## Usage
