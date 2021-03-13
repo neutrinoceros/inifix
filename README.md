@@ -18,6 +18,9 @@ $ pip install inifix
 
 ## Usage
 
+The API is similar to that of `toml` and stdlib `json`, though intentionally
+simplified, and consists in two user-facing functions: `inifix.load` and `inifix.dump`.
+
 ```python
 import inifix
 
@@ -31,6 +34,12 @@ conf["Time"].update({"CFL": 0.1})
 inifix.dump(conf, "pluto-mod.ini")
 ```
 
+`inifix.load` supports loading a from an open file
+```python
+with open("pluto.ini") as fh:
+    conf = inifix.load(fh)
+```
+or from a str/os.Pathlike object representing a file.
 ## Contribution guidelines
 
 We use the [pre-commit](https://pre-commit.com) framework to automatically lint for code
