@@ -3,6 +3,7 @@ import re
 from more_itertools import always_iterable
 
 from inifix.enotation import ENotationIO
+from inifix.validation import validate_inifile_schema
 
 SECTION_REGEXP = re.compile(r"\[\w+\]\s*")
 
@@ -17,6 +18,7 @@ class IdefixConf(dict):
         dict_filepath_or_buffer: dict, os.Pathlike or str or a readable file handle.
         """
         if isinstance(dict_or_path_or_buffer, dict):
+            validate_inifile_schema(dict_or_path_or_buffer)
             super(IdefixConf, self).__init__(dict_or_path_or_buffer)
             return
         self.from_file(dict_or_path_or_buffer)
