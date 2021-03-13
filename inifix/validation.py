@@ -1,7 +1,11 @@
 from more_itertools import always_iterable
 
 
-def validate_inifile_schema(d: dict) -> None:
+def validate_inifile_schema(d: dict, /) -> None:
+    """
+    Raise `ValueError` if and only if the argument is not a
+    valid configuration according to Pluto's specifications.
+    """
     err = ValueError("Invalid schema detected.")
     for section, content in d.items():
         if not isinstance(section, str):
