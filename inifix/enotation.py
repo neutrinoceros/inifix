@@ -64,6 +64,31 @@ class ENotationIO:
         return int(float(s))
 
     @staticmethod
+    def simplify(s: str, /):
+        """
+        Simplify exponents and trailing zeros in decimals.
+        This is a helper function to `ENotationIO.encode`.
+
+        >>> ENotationIO.simplify('1e-00')
+        '1e0'
+        >>> ENotationIO.simplify('1e+00')
+        '1e0'
+        >>> ENotationIO.simplify('1e-01')
+        '1e-1'
+        >>> ENotationIO.simplify('1e+01')
+        '1e1'
+        >>> ENotationIO.simplify('1e+10')
+        '1e10'
+        >>> ENotationIO.simplify('1.000e+00')
+        '1e0'
+        >>> ENotationIO.simplify('1.100e+00')
+        '1.1e0'
+        """
+        s = re.sub(r"\.?0*(e[+-]?)0", r"\1", s)
+        s = re.sub(r"(e-0)$", "e0", s)
+        return s.replace("+", "")
+
+    @staticmethod
     def encode(r, /):
         """
         Convert a real number `r` to string, using scientific notation.
@@ -95,14 +120,22 @@ class ENotationIO:
         '5.6e-3'
         >>> ENotationIO.encode(3.141592653589793)
         '3.141592653589793e0'
+        >>> ENotationIO.encode(1e-15)
+        '1e-15'
+        >>> ENotationIO.encode(0.0)
+        '0'
+        >>> ENotationIO.encode(0)
+        '0'
         """
-        max_ndigit = len(str(r).replace(".", "")) - 1
+        base = str(r)
+        if "e" in base:
+            return ENotationIO.simplify(base)
+        if not base.strip(".0"):
+            return "0"
+        max_ndigit = len(base.replace(".", "")) - 1
         fmt = ".{}e".format(max_ndigit)
-        s = "{:^{}}".format(r, fmt).replace("+", "")
-        ret = re.sub(r"\.?0*(e-?)0", r"\1", s)
-        if ret.endswith("-"):
-            ret = ret.replace("-", "0")
-        return ret
+        s = "{:^{}}".format(r, fmt)
+        return ENotationIO.simplify(s)
 
     @staticmethod
     def encode_preferential(r, /):
