@@ -13,3 +13,8 @@ combine_as_imports = true
 # only from version 6.0
 minversion = "6.0"
 addopts = "--doctest-modules"
+
+[tool.coverage.run]
+omit = [
+  "setup.py",
+]
