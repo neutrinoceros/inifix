@@ -6,10 +6,16 @@ from inifix.io import dump, load
 def test_load(inifile):
     conf = load(inifile)
 
+    # check section parsing
     assert all([isinstance(name, str) for name in conf])
+
+    assert all(["[" not in name and "]" not in name for name in conf])
     assert all([isinstance(body, dict) for body in conf.values()])
+
+    # check parameters parsing
     for body in conf.values():
         assert all([isinstance(param, str) for param in body])
+        assert all([not param.startswith("[") for param in body])
 
 
 @pytest.mark.parametrize(

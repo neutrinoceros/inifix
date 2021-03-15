@@ -9,7 +9,7 @@ def test_pluto_disk_planet(datadir):
         "Time",
         "Solver",
         "Boundary",
-        "Static_Grid Output",
+        "Static Grid Output",
         "Chombo HDF5 output",
         "Parameters",
     ]
