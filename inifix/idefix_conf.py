@@ -5,7 +5,7 @@ from more_itertools import always_iterable
 from inifix.enotation import ENotationIO
 from inifix.validation import validate_inifile_schema
 
-SECTION_REGEXP = re.compile(r"\[\w+\]\s*")
+SECTION_REGEXP = re.compile(r"\[.+\]\s*")
 
 
 class IdefixConf(dict):
