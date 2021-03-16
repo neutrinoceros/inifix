@@ -8,7 +8,77 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
 
-`inifix` in a small Python library with I/O methods to read and write Idefix (or Pluto) inifiles as Python dictionaries.
+`inifix` in a small Python library with I/O methods to read and write Pluto/Idefix inifiles as Python dictionaries.
+
+Its primary goal is to support Idefix's model (which is intended as identical to Pluto's), but
+it has enough flexibility to support other (section-free) configuration files.
+## File format specifications
+
+- parameter names are strings
+- parameter names and values are separated by white spaces
+- values can be an integers, floats, booleans, or strings
+- a parameter can be associated to a single value or a set of space-separated value
+- optionally, the file can be separated into sections, whose names match this regexp `"$[\.+]"`
+- comments start with `#` and are ignored
+
+Using the following Python's `typing` notations
+```python
+from typing import Union, Mapping
+Scalar = Union[str, float, bool, int]
+InifixConf = Mapping[str, Union[Scalar, Mapping[str, Scalar]]
+```
+A configuration file is considered valid if it can be parsed as an `InifixConf` object.
+
+### Examples
+The following content is considered valid
+```ini
+# My awesome experiment
+[Grid]
+x   1 2 "u" 10    # a comment
+y   4 5 "l" 100
+[Time Integrator]
+CFL  1e-3
+tstop 1E3
+```
+and maps to
+```json
+{
+    "Grid": {
+        "x": [1, 2, "u", 10],
+        "y": [4, 5, "l", 100]
+    },
+    "Time Integrator": {
+        "CFL": 0.001,
+        "tstop": 1000
+    }
+}
+```
+The following is also considered valid
+```ini
+mode   fargo
+
+# Time integrator
+CFL    1e-3
+tstop  1e3
+```
+and maps to
+```json
+{
+    "mode": "fargo",
+    "CFL": 0.001,
+    "tstop": 1000
+}
+```
+Note that strings using e-notation (e.g. `1e-3` or `1E3` here) are decoded as
+numbers. They are cast to `int` if no precision loss ensues, and `float`
+otherwise. Reversly, when writing files, numbers are re-encoded using e-notation
+if it leads to a more compact representation. For instance, `100000` is encoded
+as `1e5`, but `10` is left unchanged because `1e1` also uses one more character.
+In case where both reprensations are equally compact (e.g. `100` VS `1e2`),
+e-notation is prefered in encoding.
+
+While decoding, `e` can be lower or upper case, but they are also encoded as
+lower case.
 
 ## Installation
 
