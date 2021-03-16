@@ -3,21 +3,6 @@ import pytest
 from inifix.io import dump, load
 
 
-def test_load(inifile):
-    conf = load(inifile)
-
-    # check section parsing
-    assert all([isinstance(name, str) for name in conf])
-
-    assert all(["[" not in name and "]" not in name for name in conf])
-    assert all([isinstance(body, dict) for body in conf.values()])
-
-    # check parameters parsing
-    for body in conf.values():
-        assert all([isinstance(param, str) for param in body])
-        assert all([not param.startswith("[") for param in body])
-
-
 @pytest.mark.parametrize(
     "mode,expected_err",
     [("rt", FileNotFoundError), ("rb", FileNotFoundError), ("wb", TypeError)],
@@ -39,8 +24,9 @@ def test_dump_to_file_descriptor(inifile, tmp_path):
 
     # a little weak but better than just testing that the file isn't empty
     new_body = file.read_text()
-    for section_name in conf:
-        assert f"[{section_name}]\n" in new_body
+    for key, val in conf.items():
+        if isinstance(val, dict):
+            assert f"[{key}]\n" in new_body
 
 
 def test_dump_to_file_path(inifile, tmp_path):
@@ -57,5 +43,6 @@ def test_dump_to_file_path(inifile, tmp_path):
     body2 = open(file2).read()
 
     assert body1 == body2
-    for section_name in conf:
-        assert f"[{section_name}]\n" in body1
+    for key, val in conf.items():
+        if isinstance(val, dict):
+            assert f"[{key}]\n" in body2

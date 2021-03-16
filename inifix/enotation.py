@@ -43,7 +43,7 @@ class ENotationIO:
         ValueError
 
         """
-        s = s.lower()  # assuming Idefix knows how to read "1e3" as well as "1E3"
+        s = s.lower()
 
         if not re.match(ENOTATION_REGEXP, s):
             raise ValueError

@@ -1,17 +1,20 @@
 import re
+from collections import defaultdict
+from io import TextIOWrapper
 
-from more_itertools import always_iterable
+from more_itertools import always_iterable, mark_ends
 
+from inifix._typing import IterableOrSingle, Scalar
 from inifix.enotation import ENotationIO
 from inifix.validation import validate_inifile_schema
 
 SECTION_REGEXP = re.compile(r"\[.+\]\s*")
 
 
-class IdefixConf(dict):
+class IniConf(dict):
     def __init__(self, dict_or_path_or_buffer):
         """
-        Parse a .ini idefix configuration from a file, or a dict.
+        Parse a .ini configuration from a file, or a dict.
 
         Parameters
         ----------
@@ -19,32 +22,32 @@ class IdefixConf(dict):
         """
         if isinstance(dict_or_path_or_buffer, dict):
             validate_inifile_schema(dict_or_path_or_buffer)
-            super(IdefixConf, self).__init__(dict_or_path_or_buffer)
+            super(IniConf, self).__init__(dict_or_path_or_buffer)
             return
         self.from_file(dict_or_path_or_buffer)
 
     def from_file(self, filepath_or_buffer):
-        _dict = {}
+        _dict = defaultdict(dict)
+
         try:
             data = filepath_or_buffer.read()
         except AttributeError:
             # this is a path
             with open(filepath_or_buffer, mode="rt") as fh:
                 data = fh.read()
-        lines = IdefixConf.normalize_data(data)
+        lines = IniConf.normalize_data(data)
 
+        target = _dict
         for line in lines:
-            section = re.match(SECTION_REGEXP, line)
-            if section is not None:
-                current_section = section.group().strip("[]")
-                _dict[current_section] = {}
+            if (match := re.match(SECTION_REGEXP, line)) is not None:
+                target = _dict[match.group().strip("[]")]
                 continue
 
-            key, values = IdefixConf.tokenize_line(line)
+            key, values = IniConf.tokenize_line(line)
             if len(values) == 1:
                 values = values[0]
-            _dict[current_section][key] = values
-        super(IdefixConf, self).__init__(_dict)
+            target[key] = values
+        super(IniConf, self).__init__(_dict)
 
     @staticmethod
     def normalize_data(data):
@@ -83,28 +86,29 @@ class IdefixConf(dict):
 
         return key, values
 
-    def write_to_buffer(self, buffer):
-        is_first = True
-        for section, data in self.items():
-            if not is_first:
-                buffer.write("\n\n")
-            lines = []
-            buffer.write("[{}]\n\n".format(section))
-            for key, val in data.items():
-                line = "{}  ".format(key)
-                str_val = []
-                for v in always_iterable(val):
-                    if isinstance(v, (float, int)):
-                        str_v = ENotationIO.encode_preferential(v)
-                    else:
-                        str_v = str(v)
-                    str_val.append(str_v)
-                val = "  ".join([v for v in str_val])
-                line += str(val)
-                lines.append(line)
+    @staticmethod
+    def encode(v: Scalar) -> str:
+        if isinstance(v, (float, int)):
+            return ENotationIO.encode_preferential(v)
+        return str(v)
 
-            buffer.write("\n".join(lines) + "\n")
-            is_first = False
+    @staticmethod
+    def _write_line(
+        key: str, values: IterableOrSingle[Scalar], buffer: TextIOWrapper
+    ) -> None:
+        val_repr = [IniConf.encode(v) for v in always_iterable(values)]
+        buffer.write(f"{key} {'  '.join([v for v in val_repr])}\n")
+
+    def write_to_buffer(self, buffer):
+        for _is_first, is_last, (key, val) in mark_ends(self.items()):
+            if not isinstance(val, dict):
+                self._write_line(key, val, buffer)
+                continue
+            buffer.write("[{}]\n".format(key))
+            for k, v in val.items():
+                self._write_line(k, v, buffer)
+            if not is_last:
+                buffer.write("\n")
 
     def write_to_file(self, filepath):
         with open(filepath, mode="wt") as fh:
