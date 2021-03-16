@@ -29,7 +29,7 @@ import inifix
 conf = inifix.load("pluto.ini")
 
 # patch
-conf["Time"].update({"CFL": 0.1})
+conf["Time"]["CFL"] = 0.1
 
 # write back
 inifix.dump(conf, "pluto-mod.ini")
