@@ -1,6 +1,6 @@
 # `inifix`
 
-![PyPI](https://img.shields.io/pypi/v/inifix)
+[![PyPI](https://img.shields.io/pypi/v/inifix)](https://pypi.org/project/inifix/)
 ![PyPI](https://img.shields.io/pypi/pyversions/inifix?logo=python&logoColor=white&label=Python)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
