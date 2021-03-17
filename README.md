@@ -110,7 +110,7 @@ inifix.dump(conf, "pluto-mod.ini")
 with open("pluto.ini") as fh:
     conf = inifix.load(fh)
 ```
-or from a str/os.Pathlike object representing a file.
+or from a str/os.PathLike object representing a file.
 
 
 ### Schema Validation
