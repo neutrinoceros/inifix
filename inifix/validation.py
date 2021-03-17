@@ -4,7 +4,7 @@ from typing import Sequence
 def validate_inifile_schema(d: dict, /) -> None:
     """
     Raise `ValueError` if and only if the argument is not a
-    valid configuration according to `inifix.IniConf` specifications.
+    valid configuration according to `inifix.InifixConf` specifications.
     """
     scalar_types = (int, float, bool, str)
     err = ValueError("Invalid schema detected.")

@@ -11,7 +11,7 @@ from inifix.validation import validate_inifile_schema
 SECTION_REGEXP = re.compile(r"\[.+\]\s*")
 
 
-class IniConf(dict):
+class InifixConf(dict):
     def __init__(self, dict_or_path_or_buffer):
         """
         Parse a .ini configuration from a file, or a dict.
@@ -22,7 +22,7 @@ class IniConf(dict):
         """
         if isinstance(dict_or_path_or_buffer, dict):
             validate_inifile_schema(dict_or_path_or_buffer)
-            super(IniConf, self).__init__(dict_or_path_or_buffer)
+            super(InifixConf, self).__init__(dict_or_path_or_buffer)
             return
         self.from_file(dict_or_path_or_buffer)
 
@@ -35,7 +35,7 @@ class IniConf(dict):
             # this is a path
             with open(filepath_or_buffer, mode="rt") as fh:
                 data = fh.read()
-        lines = IniConf.normalize_data(data)
+        lines = InifixConf.normalize_data(data)
 
         target = _dict
         for line in lines:
@@ -43,11 +43,11 @@ class IniConf(dict):
                 target = _dict[match.group().strip("[]")]
                 continue
 
-            key, values = IniConf.tokenize_line(line)
+            key, values = InifixConf.tokenize_line(line)
             if len(values) == 1:
                 values = values[0]
             target[key] = values
-        super(IniConf, self).__init__(_dict)
+        super(InifixConf, self).__init__(_dict)
 
     @staticmethod
     def normalize_data(data):
@@ -96,7 +96,7 @@ class IniConf(dict):
     def _write_line(
         key: str, values: IterableOrSingle[Scalar], buffer: TextIOWrapper
     ) -> None:
-        val_repr = [IniConf.encode(v) for v in always_iterable(values)]
+        val_repr = [InifixConf.encode(v) for v in always_iterable(values)]
         buffer.write(f"{key} {'  '.join([v for v in val_repr])}\n")
 
     def write_to_buffer(self, buffer):
