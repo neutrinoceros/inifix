@@ -1,6 +1,7 @@
+# TODO: rename this file inifixconf.py
 import re
 from collections import defaultdict
-from typing import Callable, List, TextIO, Tuple, Union
+from typing import Callable, List, Optional, TextIO, Tuple, Union
 
 from more_itertools import always_iterable, mark_ends
 
@@ -13,7 +14,9 @@ SECTION_REGEXP = re.compile(r"\[.+\]\s*")
 
 class InifixConf(dict):
     def __init__(
-        self, dict_or_path_or_buffer: Union[InifixParsable, PathLike, TextIO]
+        self,
+        dict_or_path_or_buffer: Union[InifixParsable, PathLike, TextIO],
+        comments: Optional[InifixParsable] = None,
     ) -> None:
         """
         Parse a .ini configuration from a file, or a dict.
@@ -24,6 +27,7 @@ class InifixConf(dict):
         """
         if isinstance(dict_or_path_or_buffer, dict):
             validate_inifile_schema(dict_or_path_or_buffer)
+            self._comments = comments
             super(InifixConf, self).__init__(dict_or_path_or_buffer)
             return
         self._from_file(dict_or_path_or_buffer)
@@ -31,6 +35,7 @@ class InifixConf(dict):
     def _from_file(self, filepath_or_buffer: Union[PathLike, TextIO]) -> None:
 
         _dict: InifixParsable = defaultdict(dict)
+        _comments: InifixParsable = defaultdict(dict)
 
         try:
             data = filepath_or_buffer.read()
@@ -40,33 +45,34 @@ class InifixConf(dict):
                 data = fh.read()
         lines = InifixConf.normalize_data(data)
 
-        target: Union[InifixParsable, Section] = _dict
-        for line in lines:
-            if (match := re.match(SECTION_REGEXP, line)) is not None:
+        dtarget: Union[InifixParsable, Section] = _dict
+        ctarget: Union[InifixParsable, Section] = _comments
+        for content, comment in lines:
+            if (match := re.match(SECTION_REGEXP, content)) is not None:
                 section: Section = _dict[match.group().strip("[]")]
-                target = section
+                dtarget = ctarget = section
                 continue
-
-            key, values = InifixConf.tokenize_line(line)
+            key, values = InifixConf.tokenize_line(content)
             if len(values) == 1:
                 values = values[0]
-            target[key] = values
-        super(InifixConf, self).__init__(_dict)
+            dtarget[key] = values
+            if comment:
+                ctarget[key] = comment
+
+        super(InifixConf, self).__init__(_dict, _comments)
 
     @staticmethod
-    def normalize_data(data: str) -> List[str]:
-        # normalize text body `data` to parsable text lines
+    def normalize_data(data: str) -> List[Tuple[str, str]]:
+        # normalize text body `data` to parsable content + comments
         lines = []
         for line in data.splitlines():
-            if "#" in line:
-                # remove comments
-                line = line[: line.index("#")]
+            # normalize whitespace and separate content from comments
+            content, _, comment = [
+                re.sub(r"\s", " ", e).strip() for e in line.partition("#")
+            ]
 
-            # normalize whitespace
-            line = line.strip()
-            line = re.sub(r"\s", " ", line)
-            if line != "":
-                lines.append(line)
+            if content:
+                lines.append((content, comment))
         return lines
 
     @staticmethod
