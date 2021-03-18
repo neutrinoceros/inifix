@@ -59,7 +59,7 @@ class InifixConf(dict):
             if comment:
                 ctarget[key] = comment
 
-        super(InifixConf, self).__init__(_dict, _comments)
+        self.__init__(_dict, _comments)
 
     @staticmethod
     def normalize_data(data: str) -> List[Tuple[str, str]]:
@@ -71,7 +71,7 @@ class InifixConf(dict):
                 re.sub(r"\s", " ", e).strip() for e in line.partition("#")
             ]
 
-            if content:
+            if content or comment:
                 lines.append((content, comment))
         return lines
 
