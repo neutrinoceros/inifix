@@ -134,7 +134,7 @@ class ENotationIO:
         if not base.strip(".0"):
             return "0"
         max_ndigit = len(base.replace(".", "")) - 1
-        fmt = ".{}e".format(max_ndigit)
+        fmt = f".{max_ndigit}e"
         s = "{:^{}}".format(r, fmt)
         return ENotationIO.simplify(s)
 

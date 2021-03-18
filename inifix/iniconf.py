@@ -24,7 +24,7 @@ class InifixConf(dict):
         """
         if isinstance(dict_or_path_or_buffer, dict):
             validate_inifile_schema(dict_or_path_or_buffer)
-            super(InifixConf, self).__init__(dict_or_path_or_buffer)
+            super().__init__(dict_or_path_or_buffer)
             return
         self._from_file(dict_or_path_or_buffer)
 
@@ -51,7 +51,7 @@ class InifixConf(dict):
             if len(values) == 1:
                 values = values[0]
             target[key] = values
-        super(InifixConf, self).__init__(_dict)
+        super().__init__(_dict)
 
     @staticmethod
     def normalize_data(data: str) -> List[str]:
@@ -107,7 +107,7 @@ class InifixConf(dict):
             if not isinstance(val, dict):
                 self._write_line(key, val, buffer)
                 continue
-            buffer.write("[{}]\n".format(key))
+            buffer.write(f"[{key}]\n")
             for k, v in val.items():
                 self._write_line(k, v, buffer)
             if not is_last:
