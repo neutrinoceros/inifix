@@ -122,6 +122,22 @@ will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
 inifix.validate_inifile_schema(data)
 ```
 
+### File formatter
+
+A small command line tool is shipped with the package to format compatible inifiles.
+
+This will print a formatted verison of the input file to `stdout`
+```shell
+$ inifix-format pluto.ini
+```
+In can be redirected as
+```shell
+$ inifix-format pluto.ini > pluto-formatted.ini
+```
+Use the `-i/--inplace` flag to write back to the source file.
+Note that comments are preserved in all cases.
+
+
 ## Contribution guidelines
 
 We use the [pre-commit](https://pre-commit.com) framework to automatically lint for code
