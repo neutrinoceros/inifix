@@ -39,15 +39,20 @@ class InifixConf(dict):
             with open(filepath_or_buffer, mode="rt") as fh:
                 data = fh.read()
         lines = InifixConf.normalize_data(data)
-
+        if not "".join(lines):
+            raise ValueError(f"{filepath_or_buffer} appears to be emtpy.")
         target: Union[InifixParsable, Section] = _dict
-        for line in lines:
+        for line_number, line in enumerate(lines, start=1):
+            if not line:
+                continue
             if (match := re.match(SECTION_REGEXP, line)) is not None:
                 section: Section = _dict[match.group().strip("[]")]
                 target = section
                 continue
 
-            key, values = InifixConf.tokenize_line(line)
+            key, values = InifixConf.tokenize_line(
+                line, filename=filepath_or_buffer, line_number=line_number
+            )
             if len(values) == 1:
                 values = values[0]
             target[key] = values
@@ -65,15 +70,16 @@ class InifixConf(dict):
             # normalize whitespace
             line = line.strip()
             line = re.sub(r"\s", " ", line)
-            if line != "":
-                lines.append(line)
+            lines.append(line)
         return lines
 
     @staticmethod
-    def tokenize_line(line: str) -> Tuple[str, List[Scalar]]:
+    def tokenize_line(
+        line: str, filename: str, line_number: int
+    ) -> Tuple[str, List[Scalar]]:
         key, *raw_values = line.split()
         if not raw_values:
-            raise ValueError(f"Could not parse invalid line\n{line}")
+            raise ValueError(f"Failed to parse {filename}:{line_number}:\n{line}")
 
         values = []
         for val in raw_values:

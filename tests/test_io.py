@@ -46,3 +46,10 @@ def test_dump_to_file_path(inifile, tmp_path):
     for key, val in conf.items():
         if isinstance(val, dict):
             assert f"[{key}]\n" in body2
+
+
+def test_load_empty_file(capsys, tmp_path):
+    target = tmp_path / "empty_file"
+    target.touch()
+    with pytest.raises(ValueError):
+        load(target)
