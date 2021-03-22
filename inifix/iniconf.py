@@ -36,7 +36,7 @@ class InifixConf(dict):
             data = filepath_or_buffer.read()
         except AttributeError:
             # this is a path
-            with open(filepath_or_buffer, mode="rt") as fh:
+            with open(filepath_or_buffer) as fh:
                 data = fh.read()
         lines = InifixConf.normalize_data(data)
         if not "".join(lines):
