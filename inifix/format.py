@@ -25,7 +25,7 @@ def _tidy(data: str) -> str:
 
     # comment_col = max(80, len(max(contents)) + 10)
     max_name_size = max(
-        [len(c.split()[0]) for c in contents if c and not c.startswith("[")]
+        len(c.split()[0]) for c in contents if c and not c.startswith("[")
     )
     name_col_size = max(max_name_size + 4, NAME_COL_MINSIZE)
     new_lines = []
