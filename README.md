@@ -105,18 +105,18 @@ conf["Time"]["CFL"] = 0.1
 inifix.dump(conf, "pluto-mod.ini")
 ```
 
-`inifix.load` supports loading a from an open file
+`inifix.load` supports loading from an open file
 ```python
 with open("pluto.ini") as fh:
     conf = inifix.load(fh)
 ```
-or from a str/os.PathLike object representing a file.
+or from a `str/os.PathLike` object representing a file.
 
 
 ### Schema Validation
 
 `inifix.validate_inifile_schema` can be used to validate an aribitrary
-dictionnary as writable to an inifile, following Pluto/Idefix's format. This
+dictionary as writable to an inifile, following Pluto/Idefix's format. This
 will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
 ```python
 inifix.validate_inifile_schema(data)
