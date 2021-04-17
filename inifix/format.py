@@ -14,7 +14,7 @@ def _normalize_whitespace(s: str) -> str:
     return re.sub(r"\s", " ", s).strip()
 
 
-def _tidy(data: str) -> str:
+def iniformat(data: str) -> str:
     lines = data.splitlines()
     contents = []
     comments = []
@@ -68,7 +68,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
         with open(file) as fh:
             data = fh.read()
-        fmted_data = _tidy(data)
+        fmted_data = iniformat(data)
 
         if args.inplace:
             try:
