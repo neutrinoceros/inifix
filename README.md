@@ -8,10 +8,16 @@
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
 
-`inifix` in a small Python library with I/O methods to read and write Pluto/Idefix inifiles as Python dictionaries.
+`inifix` in a small Python library with I/O methods to read and write
+Pluto/Idefix inifiles as Python dictionaries.
 
-Its primary goal is to support Idefix's model (which is intended as identical to Pluto's), but
-it has enough flexibility to support other (section-free) configuration files.
+Its primary goal is to support Idefix's model (which is intended as identical to
+Pluto's), though the following file format specification is intended as a
+superset of the one used in Pluto and Idefix. Namely, while Pluto and Idefix
+require that each and every (key, value) pair be part of a section, `inifix`
+supports section-free definitions.
+
+
 ## File format specifications
 
 - parameter names are strings
