@@ -11,6 +11,15 @@ from inifix.validation import validate_inifile_schema
 SECTION_REGEXP = re.compile(r"\[.+\]\s*")
 
 
+def bool_caster(s: str) -> bool:
+    s = s.lower()
+    if s in ("true", "t"):
+        return True
+    elif s in ("false", "f"):
+        return False
+    raise ValueError
+
+
 class InifixConf(dict):
     def __init__(
         self, dict_or_path_or_buffer: Union[InifixParsable, PathLike, TextIO]
@@ -85,7 +94,7 @@ class InifixConf(dict):
         for val in raw_values:
             # remove period and trailing zeros to cast to int when possible
             val = re.sub(r"\.0+$", "", val)
-            casters: List[Callable] = [int, ENotationIO.decode, float, str]
+            casters: List[Callable] = [int, ENotationIO.decode, float, bool_caster, str]
             for caster in casters:
                 # cast to types from stricter to most permissive
                 # `str` will always succeed since it is the input type
