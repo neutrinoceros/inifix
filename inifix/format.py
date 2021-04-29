@@ -46,6 +46,8 @@ def iniformat(data: str) -> str:
     res = re.sub("\n+", "\n", res)
     res = re.sub(r"(.?)\n\[", r"\1\n\n\n[", res)
     res = re.sub(r"\]\n+", r"]\n\n", res)
+    # ensure there's exactly one newline at the EOF
+    res = res.rstrip("\n")
     res += "\n"
     return res
 
@@ -68,9 +70,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
         with open(file) as fh:
             data = fh.read()
-        fmted_data = iniformat(data)
+
+        if (fmted_data := iniformat(data)) == data:
+            continue
 
         if args.inplace:
+            print(f"Fixing {file}", file=sys.stderr)
             try:
                 with open(file, "w") as fh:
                     fh.write(fmted_data)

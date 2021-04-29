@@ -147,7 +147,7 @@ This program can also be used as a hook for `pre-commit`. Simply add the followi
 project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.4.3
+    rev: v0.4.4
     hooks:
       - id: inifix-format
 ```
