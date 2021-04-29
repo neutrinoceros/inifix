@@ -143,7 +143,14 @@ $ inifix-format pluto.ini > pluto-formatted.ini
 Use the `-i/--inplace` flag to write back to the source file.
 Note that comments are preserved in all cases.
 
-
+This program can also be used as a hook for `pre-commit`. Simply add the following to your
+project's `.pre-commit-config.yaml`
+```yaml
+  - repo: https://github.com/neutrinoceros/inifix.git
+    rev: v0.4.3
+    hooks:
+      - id: inifix-format
+```
 ## Contribution guidelines
 
 We use the [pre-commit](https://pre-commit.com) framework to automatically lint for code
