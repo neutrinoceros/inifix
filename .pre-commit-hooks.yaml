@@ -1,0 +1,7 @@
+- id: inifix-format
+  name: Format .ini files
+  language: python
+  entry: inifix-format
+  description: Format configuration files with inifix-format
+  files: '(\.ini)$'
+  args: [--inplace]
