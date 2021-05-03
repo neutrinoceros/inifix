@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.0.1
     hooks:
       - id: trailing-whitespace
       - id: check-toml
@@ -12,7 +12,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.13.0
+    rev: v2.21.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -23,19 +23,19 @@ repos:
       - id: setup-cfg-fmt
 
   - repo: https://github.com/psf/black
-    rev: 21.4b0
+    rev: 21.6b0
     hooks:
       - id: black
         language_version: python3
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.8.0
+    rev: 5.9.2
     hooks:
       - id: isort
         additional_dependencies: [toml]
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 3.9.1
+    rev: 3.9.2
     hooks:
       - id: flake8
         additional_dependencies: [flake8-bugbear]
