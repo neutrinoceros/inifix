@@ -69,14 +69,9 @@ class InifixConf(dict):
         # normalize text body `data` to parsable text lines
         lines = []
         for line in data.splitlines():
-            if "#" in line:
-                # remove comments
-                line = line[: line.index("#")]
-
-            # normalize whitespace
-            line = line.strip()
-            line = re.sub(r"\s", " ", line)
-            lines.append(line)
+            # remove comments and normalize whitespace
+            line, _, _comment = line.partition("#")
+            lines.append(re.sub(r"\s", " ", line.strip()))
         return lines
 
     @staticmethod
