@@ -55,7 +55,7 @@ def test_empty_file(capsys, tmp_path):
     assert ret != 0
     out, err = capsys.readouterr()
     assert out == ""
-    assert f"Error: {target} appears to be emtpy.\n" in err
+    assert "Error: input stream appears to be empty.\n" in err
 
 
 def test_error_read_only_file(inifile, capsys, tmp_path):

@@ -1,5 +1,7 @@
 import re
 from collections import defaultdict
+from functools import singledispatchmethod
+from io import TextIOBase
 from typing import Callable, List, TextIO, Tuple, Union
 
 from more_itertools import always_iterable, mark_ends
@@ -21,35 +23,32 @@ def bool_caster(s: str) -> bool:
 
 
 class InifixConf(dict):
-    def __init__(
-        self, dict_or_path_or_buffer: Union[InifixParsable, PathLike, TextIO]
-    ) -> None:
+    @singledispatchmethod
+    def __init__(self, input_: PathLike, /) -> None:
         """
         Parse a .ini configuration from a file, or a dict.
 
         Parameters
         ----------
-        dict_filepath_or_buffer: dict, os.PathLike or str or a readable file handle.
+        input_: dict, os.PathLike or str or a readable file handle.
         """
-        if isinstance(dict_or_path_or_buffer, dict):
-            validate_inifile_schema(dict_or_path_or_buffer)
-            super().__init__(dict_or_path_or_buffer)
-            return
-        self._from_file(dict_or_path_or_buffer)
+        with open(input_) as fh:
+            self.__init__(fh)
 
-    def _from_file(self, filepath_or_buffer: Union[PathLike, TextIO]) -> None:
+    @__init__.register
+    def _(self, input_: dict, /) -> None:
+        validate_inifile_schema(input_)
+        super().__init__(input_)
 
-        _dict: InifixParsable = defaultdict(dict)
+    @__init__.register
+    def _(self, input_: TextIOBase, /) -> None:
+        data = input_.read()
 
-        try:
-            data = filepath_or_buffer.read()
-        except AttributeError:
-            # this is a path
-            with open(filepath_or_buffer) as fh:
-                data = fh.read()
         lines = InifixConf.normalize_data(data)
         if not "".join(lines):
-            raise ValueError(f"{filepath_or_buffer} appears to be emtpy.")
+            raise ValueError("input stream appears to be empty.")
+
+        _dict: InifixParsable = defaultdict(dict)
         target: Union[InifixParsable, Section] = _dict
         for line_number, line in enumerate(lines, start=1):
             if not line:
@@ -59,13 +58,11 @@ class InifixConf(dict):
                 target = section
                 continue
 
-            key, values = InifixConf.tokenize_line(
-                line, filename=filepath_or_buffer, line_number=line_number
-            )
+            key, values = InifixConf.tokenize_line(line, line_number=line_number)
             if len(values) == 1:
                 values = values[0]
             target[key] = values
-        super().__init__(_dict)
+        self.__init__(_dict)
 
     @staticmethod
     def normalize_data(data: str) -> List[str]:
@@ -83,12 +80,10 @@ class InifixConf(dict):
         return lines
 
     @staticmethod
-    def tokenize_line(
-        line: str, filename: str, line_number: int
-    ) -> Tuple[str, List[Scalar]]:
+    def tokenize_line(line: str, line_number: int) -> Tuple[str, List[Scalar]]:
         key, *raw_values = line.split()
         if not raw_values:
-            raise ValueError(f"Failed to parse {filename}:{line_number}:\n{line}")
+            raise ValueError(f"Failed to parse {line_number}:\n{line}")
 
         values = []
         for val in raw_values:
