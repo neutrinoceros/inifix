@@ -12,7 +12,7 @@ from inifix.iniconf import InifixConf
 )
 def test_tokenizer(invalid_data):
     with pytest.raises(ValueError):
-        InifixConf.tokenize_line(invalid_data, filename="fake_filename", line_number=-1)
+        InifixConf.tokenize_line(invalid_data, line_number=-1)
 
 
 def test_unit_read(inifile):
