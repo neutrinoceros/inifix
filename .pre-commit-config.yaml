@@ -12,7 +12,7 @@ repos:
       - id: debug-statements
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.19.0
+    rev: v2.21.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -23,13 +23,13 @@ repos:
       - id: setup-cfg-fmt
 
   - repo: https://github.com/psf/black
-    rev: 21.5b2
+    rev: 21.6b0
     hooks:
       - id: black
         language_version: python3
 
   - repo: https://github.com/PyCQA/isort
-    rev: 5.8.0
+    rev: 5.9.2
     hooks:
       - id: isort
         additional_dependencies: [toml]
