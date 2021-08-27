@@ -54,7 +54,8 @@ class InifixConf(dict):
         for line_number, line in enumerate(lines, start=1):
             if not line:
                 continue
-            if (match := re.match(SECTION_REGEXP, line)) is not None:
+            match = re.match(SECTION_REGEXP, line)
+            if match is not None:
                 section: Section = _dict[match.group().strip("[]")]
                 target = section
                 continue

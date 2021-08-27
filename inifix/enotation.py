@@ -11,7 +11,7 @@ class ENotationIO:
     """
 
     @staticmethod
-    def decode(s: str, /) -> int:
+    def decode(s: str) -> int:
         """
         Cast an 'e' formatted string `s` to integer if such a conversion can
         be perfomed without loss of data. Raise ValueError otherwise.
@@ -65,7 +65,7 @@ class ENotationIO:
         return int(float(s))
 
     @staticmethod
-    def simplify(s: str, /) -> str:
+    def simplify(s: str) -> str:
         """
         Simplify exponents and trailing zeros in decimals.
         This is a helper function to `ENotationIO.encode`.
@@ -90,7 +90,7 @@ class ENotationIO:
         return s.replace("+", "")
 
     @staticmethod
-    def encode(r: Union[float, int], /) -> str:
+    def encode(r: Union[float, int]) -> str:
         """
         Convert a real number `r` to string, using scientific notation.
 
@@ -139,7 +139,7 @@ class ENotationIO:
         return ENotationIO.simplify(s)
 
     @staticmethod
-    def encode_preferential(r: Union[float, int], /) -> str:
+    def encode_preferential(r: Union[float, int]) -> str:
         """
         Convert a real number `r` to string, using sci notation if
         and only if it saves space.
