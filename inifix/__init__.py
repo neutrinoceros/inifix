@@ -1,4 +1,4 @@
 from .io import dump, load
 from .validation import validate_inifile_schema
 
-__version__ = "0.4.6"
+__version__ = "0.4.7"
