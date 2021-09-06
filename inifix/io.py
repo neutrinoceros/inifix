@@ -1,4 +1,5 @@
-from typing import TextIO, Union
+from typing import TextIO
+from typing import Union
 
 from inifix._typing import PathLike
 from inifix.iniconf import InifixConf

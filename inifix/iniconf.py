@@ -1,10 +1,19 @@
 import re
 from collections import defaultdict
-from typing import Callable, List, TextIO, Tuple, Union
+from typing import Callable
+from typing import List
+from typing import TextIO
+from typing import Tuple
+from typing import Union
 
-from more_itertools import always_iterable, mark_ends
+from more_itertools import always_iterable
+from more_itertools import mark_ends
 
-from inifix._typing import InifixParsable, IterableOrSingle, PathLike, Scalar, Section
+from inifix._typing import InifixParsable
+from inifix._typing import IterableOrSingle
+from inifix._typing import PathLike
+from inifix._typing import Scalar
+from inifix._typing import Section
 from inifix.enotation import ENotationIO
 from inifix.validation import validate_inifile_schema
 
