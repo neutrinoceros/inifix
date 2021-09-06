@@ -2,7 +2,8 @@ import argparse
 import os
 import re
 import sys
-from typing import Optional, Sequence
+from typing import Optional
+from typing import Sequence
 
 from inifix.io import load
 
