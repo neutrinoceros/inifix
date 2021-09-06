@@ -1,6 +1,7 @@
 import pytest
 
-from inifix.io import dump, load
+from inifix.io import dump
+from inifix.io import load
 
 
 @pytest.mark.parametrize(

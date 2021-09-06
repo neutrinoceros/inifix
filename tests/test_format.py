@@ -6,7 +6,8 @@ from stat import S_IREAD
 import pytest
 
 from inifix import load
-from inifix.format import iniformat, main
+from inifix.format import iniformat
+from inifix.format import main
 
 
 @pytest.mark.parametrize("flag", ["-i", "--inplace"])
