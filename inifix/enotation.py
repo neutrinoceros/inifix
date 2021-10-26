@@ -1,6 +1,8 @@
 import re
 from typing import Union
 
+from inifix._deprecation import future_positional_only
+
 ENOTATION_REGEXP = re.compile(r"\d+(\.\d*)?e[+-]?\d+?")
 
 
@@ -11,6 +13,7 @@ class ENotationIO:
     """
 
     @staticmethod
+    @future_positional_only({0: "s"})
     def decode(s: str) -> int:
         """
         Cast an 'e' formatted string `s` to integer if such a conversion can
@@ -65,6 +68,7 @@ class ENotationIO:
         return int(float(s))
 
     @staticmethod
+    @future_positional_only({0: "s"})
     def simplify(s: str) -> str:
         """
         Simplify exponents and trailing zeros in decimals.
@@ -90,6 +94,7 @@ class ENotationIO:
         return s.replace("+", "")
 
     @staticmethod
+    @future_positional_only({0: "r"})
     def encode(r: Union[float, int]) -> str:
         """
         Convert a real number `r` to string, using scientific notation.
@@ -139,6 +144,7 @@ class ENotationIO:
         return ENotationIO.simplify(s)
 
     @staticmethod
+    @future_positional_only({0: "r"})
     def encode_preferential(r: Union[float, int]) -> str:
         """
         Convert a real number `r` to string, using sci notation if
