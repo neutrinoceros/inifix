@@ -1,5 +1,7 @@
 from more_itertools import always_iterable
 
+from inifix._deprecation import future_positional_only
+
 
 def validate_elementary_item(key, value) -> None:
     scalar_types = (int, float, bool, str)
@@ -21,6 +23,7 @@ def validate_elementary_item(key, value) -> None:
             )
 
 
+@future_positional_only({0: "d"})
 def validate_inifile_schema(d: dict) -> None:
     """
     Raise `ValueError` if and only if the argument is not a
