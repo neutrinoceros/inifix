@@ -22,7 +22,7 @@ supports section-free definitions.
 - parameter names are strings
 - parameter names and values are separated by white spaces
 - values can be an integers, floats, booleans, or strings
-- a parameter can be associated to a single value or a set of space-separated value
+- to a parameter can be associated a single value or a set of space-separated values
 - optionally, the file can be separated into sections, whose names match this regexp `"$[\.+]"`
 - comments start with `#` and are ignored
 
@@ -82,7 +82,7 @@ as `1e5`, but `10` is left unchanged because `1e1` also uses one more character.
 In case where both reprensations are equally compact (e.g. `100` VS `1e2`),
 e-notation is prefered in encoding.
 
-While decoding, `e` can be lower or upper case, but they are also encoded as
+While decoding, `e` can be lower or upper case, but they are always encoded as
 lower case.
 
 ## Installation
@@ -120,7 +120,7 @@ or from a `str/os.PathLike` object representing a file.
 
 ### Schema Validation
 
-`inifix.validate_inifile_schema` can be used to validate an aribitrary
+`inifix.validate_inifile_schema` can be used to validate an arbitrary
 dictionary as writable to an inifile, following Pluto/Idefix's format. This
 will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
 ```python
@@ -135,7 +135,7 @@ This will print a formatted verison of the input file to `stdout`
 ```shell
 $ inifix-format pluto.ini
 ```
-In can be redirected as
+It can be redirected as
 ```shell
 $ inifix-format pluto.ini > pluto-formatted.ini
 ```
