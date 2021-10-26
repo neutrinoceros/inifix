@@ -22,7 +22,7 @@ supports section-free definitions.
 - parameter names are strings
 - parameter names and values are separated by white spaces
 - values can be an integers, floats, booleans, or strings
-- to a parameter can be associated a single value or a set of space-separated values
+- a parameter can be associated to a single value or a set of space-separated values
 - optionally, the file can be separated into sections, whose names match this regexp `"$[\.+]"`
 - comments start with `#` and are ignored
 
