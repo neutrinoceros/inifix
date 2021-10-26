@@ -1,11 +1,10 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix)](https://pypi.org/project/inifix/)
-![PyPI](https://img.shields.io/pypi/pyversions/inifix?logo=python&logoColor=white&label=Python)
+![PyPI](https://img.shields.io/pypi/pyversions/inifix/0.7.0?logo=python&logoColor=white&label=Python)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
 
 `inifix` in a small Python library with I/O methods to read and write
@@ -147,7 +146,7 @@ This program can also be used as a hook for `pre-commit`. Simply add the followi
 project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.4.4
+    rev: v0.5.1
     hooks:
       - id: inifix-format
 ```

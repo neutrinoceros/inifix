@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 DATA_DIR = Path(__file__).parent / "data"
-INIFILES = list(DATA_DIR.glob("*.ini"))
+INIFILES = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))
 INIFILES_IDS = [inifile.name[:-4] for inifile in INIFILES]
 
 

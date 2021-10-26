@@ -2,7 +2,8 @@ import argparse
 import os
 import re
 import sys
-from typing import Optional, Sequence
+from typing import Optional
+from typing import Sequence
 
 from inifix.io import load
 
@@ -71,7 +72,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         with open(file) as fh:
             data = fh.read()
 
-        if (fmted_data := iniformat(data)) == data:
+        fmted_data = iniformat(data)
+        if fmted_data == data:
             continue
 
         if args.inplace:

@@ -1,7 +1,8 @@
 import pytest
 from more_itertools import unzip
 
-from inifix.io import dump, load
+from inifix.io import dump
+from inifix.io import load
 from inifix.validation import validate_inifile_schema
 
 INVADLID_SCHEMAS, INVALID_SCHEMAS_IDS = unzip(

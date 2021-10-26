@@ -1,10 +1,19 @@
 import re
 from collections import defaultdict
-from typing import Callable, List, TextIO, Tuple, Union
+from typing import Callable
+from typing import List
+from typing import TextIO
+from typing import Tuple
+from typing import Union
 
-from more_itertools import always_iterable, mark_ends
+from more_itertools import always_iterable
+from more_itertools import mark_ends
 
-from inifix._typing import InifixParsable, IterableOrSingle, PathLike, Scalar, Section
+from inifix._typing import InifixParsable
+from inifix._typing import IterableOrSingle
+from inifix._typing import PathLike
+from inifix._typing import Scalar
+from inifix._typing import Section
 from inifix.enotation import ENotationIO
 from inifix.validation import validate_inifile_schema
 
@@ -54,7 +63,8 @@ class InifixConf(dict):
         for line_number, line in enumerate(lines, start=1):
             if not line:
                 continue
-            if (match := re.match(SECTION_REGEXP, line)) is not None:
+            match = re.match(SECTION_REGEXP, line)
+            if match is not None:
                 section: Section = _dict[match.group().strip("[]")]
                 target = section
                 continue
@@ -72,14 +82,9 @@ class InifixConf(dict):
         # normalize text body `data` to parsable text lines
         lines = []
         for line in data.splitlines():
-            if "#" in line:
-                # remove comments
-                line = line[: line.index("#")]
-
-            # normalize whitespace
-            line = line.strip()
-            line = re.sub(r"\s", " ", line)
-            lines.append(line)
+            # remove comments and normalize whitespace
+            line, _, _comment = line.partition("#")
+            lines.append(re.sub(r"\s", " ", line.strip()))
         return lines
 
     @staticmethod
