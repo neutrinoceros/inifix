@@ -9,6 +9,9 @@ line-length = 88
 # only from version 6.0
 minversion = "6.0"
 addopts = "--doctest-modules"
+filterwarnings = [
+    "error",
+]
 
 [tool.coverage.run]
 omit = [

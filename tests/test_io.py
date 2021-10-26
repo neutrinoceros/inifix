@@ -39,9 +39,10 @@ def test_dump_to_file_path(inifile, tmp_path):
     body1 = file1.read_text()
 
     # str
-    file2 = str(tmp_path / "save2.ini")
-    dump(conf, file2)
-    body2 = open(file2).read()
+    file2 = tmp_path / "save2.ini"
+    sfile2 = str(file2)
+    dump(conf, sfile2)
+    body2 = file2.read_text()
 
     assert body1 == body2
     for key, val in conf.items():

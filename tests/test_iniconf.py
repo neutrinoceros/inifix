@@ -34,8 +34,8 @@ def test_idempotent_io(inifile):
         data1 = InifixConf(save1)
         data1.write(save2)
 
-        text1 = open(save1).readlines()
-        text2 = open(save2).readlines()
+        text1 = save1.read_text().split("\n")
+        text2 = save2.read_text().split("\n")
 
         diff = "".join(difflib.context_diff(text1, text2))
         assert not diff
