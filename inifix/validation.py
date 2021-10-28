@@ -1,6 +1,15 @@
+import re
+
 from more_itertools import always_iterable
 
 from inifix._deprecation import future_positional_only
+
+_PARAM_NAME_REGEXP = re.compile(r"[-\w]+")
+
+
+def _uses_invalid_chars(s: str) -> bool:
+    ma = re.fullmatch(_PARAM_NAME_REGEXP, s)
+    return ma is None
 
 
 def validate_elementary_item(key, value) -> None:
@@ -9,6 +18,18 @@ def validate_elementary_item(key, value) -> None:
         raise ValueError(
             f"Invalid schema: received key '{key}' with type '{type(key)}', "
             "expected a str"
+        )
+    if len(key) == 0:
+        raise ValueError("Invalid schema: received an empty str as key")
+    if _uses_invalid_chars(key):
+        raise ValueError(
+            f"Invalid schema: received key {key!r}, "
+            "expected only alphanumeric characters or '-'"
+        )
+    if not key[0].isalpha():
+        raise ValueError(
+            f"Invalid schema: received key {key!r}, "
+            "keys are expected to start with a letter"
         )
     if not isinstance(value, (*scalar_types, list)):
         raise ValueError(

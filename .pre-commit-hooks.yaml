@@ -5,3 +5,9 @@
   description: Format configuration files with inifix-format
   files: '(\.ini)$'
   args: [--inplace]
+- id: inifix-validate
+  name: Validate .ini files (no formatting)
+  language: python
+  entry: inifix-validate
+  description: Validate configuration files with inifix-validate
+  files: '(\.ini)$'

@@ -45,6 +45,7 @@ class InifixConf(dict):
             super().__init__(dict_or_path_or_buffer)
             return
         self._from_file(dict_or_path_or_buffer)
+        validate_inifile_schema(self)
 
     def _from_file(self, filepath_or_buffer: Union[PathLike, TextIO]) -> None:
 
