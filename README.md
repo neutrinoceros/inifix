@@ -127,9 +127,28 @@ will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
 inifix.validate_inifile_schema(data)
 ```
 
-### File formatter
+### CLI
 
-A small command line tool is shipped with the package to format compatible inifiles.
+Command line tool are shipped with the package to validate or format compatible inifiles.
+
+#### Validation
+
+This checks that your inifiles can be loaded with `inifix.load` from the command line
+```shell
+$ inifix-validate pluto.ini
+Validated pluto.ini
+```
+
+This simple validator can be used as a hook for `pre-commit`. Simply add the
+following to your project's `.pre-commit-config.yaml`
+```yaml
+  - repo: https://github.com/neutrinoceros/inifix.git
+    rev: v0.9.0
+    hooks:
+      - id: inifix-validate
+```
+
+#### Formatting
 
 This will print a formatted verison of the input file to `stdout`
 ```shell
@@ -142,18 +161,17 @@ $ inifix-format pluto.ini > pluto-formatted.ini
 Use the `-i/--inplace` flag to write back to the source file.
 Note that comments are preserved in all cases.
 
-This program can also be used as a hook for `pre-commit`. Simply add the following to your
-project's `.pre-commit-config.yaml`
+This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.5.1
+    rev: v0.9.0
     hooks:
       - id: inifix-format
 ```
 ## Contribution guidelines
 
 We use the [pre-commit](https://pre-commit.com) framework to automatically lint for code
-style and common pitfals.
+style and common pitfalls.
 
 Before you commit to your local copy of the repo, please run this from the top level
 ```shell
