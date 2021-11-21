@@ -29,6 +29,13 @@ def bool_caster(s: str) -> bool:
     raise ValueError
 
 
+def str_caster(s: str) -> str:
+    if re.match(r"^'.*'$", s) or re.match(r'^".*"$', s):
+        return s[1:-1]
+    else:
+        return s
+
+
 class InifixConf(dict):
     def __init__(
         self, dict_or_path_or_buffer: Union[InifixParsable, PathLike, TextIO]
@@ -100,7 +107,13 @@ class InifixConf(dict):
         for val in raw_values:
             # remove period and trailing zeros to cast to int when possible
             val = re.sub(r"\.0+$", "", val)
-            casters: List[Callable] = [int, ENotationIO.decode, float, bool_caster, str]
+            casters: List[Callable] = [
+                int,
+                ENotationIO.decode,
+                float,
+                bool_caster,
+                str_caster,
+            ]
             for caster in casters:
                 # cast to types from stricter to most permissive
                 # `str` will always succeed since it is the input type
