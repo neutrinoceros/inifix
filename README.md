@@ -143,7 +143,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.9.0
+    rev: v0.9.1
     hooks:
       - id: inifix-validate
 ```
@@ -164,7 +164,7 @@ Note that comments are preserved in all cases.
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.9.0
+    rev: v0.9.1
     hooks:
       - id: inifix-format
 ```

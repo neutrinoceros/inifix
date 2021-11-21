@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2021-11-21
+
+BUG: fix a bug in str casting
+[PR #80](https://github.com/neutrinoceros/inifix/pull/80)
+
 ## [0.9.0] - 2021-10-28
 
 ENH: improve schema validation and add a file validation pre-commit hook
