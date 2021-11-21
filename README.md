@@ -20,10 +20,15 @@ supports section-free definitions.
 ## File format specifications
 
 - parameter names are strings
-- parameter names and values are separated by white spaces
-- values can be an integers, floats, booleans, or strings
-- a parameter can be associated to a single value or a set of space-separated values
-- optionally, the file can be separated into sections, whose names match this regexp `"$[\.+]"`
+- names and values are separated by non-newline white spaces
+- values are represented in unicode characters
+- all values are considered numbers if possible (e.g., `1e3` is read as `1000`)
+- number values are read as integers if no loss of precision ensues, and floats otherwise
+- `true` and `false` are cast as booleans (case-insensitive)
+- values that can't be read as number or booleans are read as strings.
+- string delimiters `"` and `'` can be used to force string type for values that would otherwise be read as numbers and booleans.
+- a parameter can be associated to a single value or a list of whitespace-separated values
+- sections titles start with `[` and end with `]`
 - comments start with `#` and are ignored
 
 Using the following Python's `typing` notations
@@ -39,8 +44,8 @@ The following content is considered valid
 ```ini
 # My awesome experiment
 [Grid]
-x   1 2 "u" 10    # a comment
-y   4 5 "l" 100
+x   1 2 u 10    # a comment
+y   4 5 l 100
 [Time Integrator]
 CFL  1e-3
 tstop 1E3
@@ -58,7 +63,10 @@ and maps to
     }
 }
 ```
-The following is also considered valid
+The following section-less format doesn't comply to Pluto/Idefix's
+specifications, but it is considered valid for inifix. This is the one
+intentional differences in specifications, which makes inifix format a superset
+of Pluto's inifile format.
 ```ini
 mode   fargo
 
@@ -78,8 +86,8 @@ Note that strings using e-notation (e.g. `1e-3` or `1E3` here) are decoded as
 numbers. They are cast to `int` if no precision loss ensues, and `float`
 otherwise. Reversly, when writing files, numbers are re-encoded using e-notation
 if it leads to a more compact representation. For instance, `100000` is encoded
-as `1e5`, but `10` is left unchanged because `1e1` also uses one more character.
-In case where both reprensations are equally compact (e.g. `100` VS `1e2`),
+as `1e5`, but `10` is left unchanged because `1e1` is longer.
+In cases where both reprensations are equally compact (e.g. `100` VS `1e2`),
 e-notation is prefered in encoding.
 
 While decoding, `e` can be lower or upper case, but they are always encoded as
@@ -93,9 +101,9 @@ $ pip install inifix
 
 ## Usage
 
-The API is similar to that of `toml` and stdlib `json`, though intentionally
-simplified, and consists in two main user-facing functions: `inifix.load` and
-`inifix.dump`.
+The Python API is similar to that of `toml` and stdlib `json`, though
+intentionally simplified, and consists in two main user-facing functions:
+`inifix.load` and `inifix.dump`.
 
 ```python
 import inifix
