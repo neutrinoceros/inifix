@@ -151,7 +151,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.9.1
+    rev: v0.10.0
     hooks:
       - id: inifix-validate
 ```
@@ -176,7 +176,7 @@ Names longer this value will not be aligned, but whitespace separating them from
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.9.1
+    rev: v0.10.0
     hooks:
       - id: inifix-format
 ```
