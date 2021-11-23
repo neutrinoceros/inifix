@@ -46,6 +46,9 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
             parameters.append(parameter)
             values.append(value)
 
+    if not parameters:
+        return "\n".join(lines)
+
     max_name_size = max(len(parameter) for parameter in parameters)
 
     if name_column_size is None:
@@ -101,35 +104,42 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     args = parser.parse_args(argv)
 
+    retv = 0
+
     for file in args.files:
         if not os.path.isfile(file):
             print(f"Error: could not find {file}", file=sys.stderr)
-            return 1
+            retv += 1
+            continue
         try:
             load(file)
         except ValueError as exc:
             print(f"Error: {exc}", file=sys.stderr)
-            return 1
+            retv += 1
 
         with open(file) as fh:
             data = fh.read()
 
         fmted_data = iniformat(data, name_column_size=args.name_column_size)
+
         if fmted_data == data:
-            continue
+            print(f"{file} is already formatted", file=sys.stderr)
+        else:
+            print(f"Fixing {file}", file=sys.stderr)
+            retv += 1
 
         if args.inplace:
-            print(f"Fixing {file}", file=sys.stderr)
             try:
                 with open(file, "w") as fh:
                     fh.write(fmted_data)
             except OSError:
                 print(f"Error: could not write to {file}", file=sys.stderr)
-                return 1
+                retv += 1
+                continue
         else:
-            print(f"{file} >>>", file=sys.stderr)
             print(fmted_data)
-    return 0
+
+    return retv
 
 
 if __name__ == "__main__":  # pragma: no cover
