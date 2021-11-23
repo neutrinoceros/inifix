@@ -40,6 +40,22 @@ def test_exact_format(flag, capsys, tmp_path):
     assert res == expected
 
 
+@pytest.mark.parametrize("size", ["10", "20", "50"])
+@pytest.mark.filterwarnings(r"ignore:^The following parameters\n")
+def test_exact_format_with_column_size_flag(size, capsys, tmp_path):
+    DATA_DIR = Path(__file__).parent / "data"
+    target = tmp_path / "out.ini"
+    shutil.copyfile(DATA_DIR / "format-column-size-in.ini", target)
+    ret = main([str(target), "-i", "--name-column-size", size])
+    assert ret == 0
+    out, err = capsys.readouterr()
+    assert out == ""
+
+    expected = (DATA_DIR / f"format-column-size-out-{size}.ini").read_text()
+    res = target.read_text()
+    assert res == expected
+
+
 def test_missing_file(capsys, tmp_path):
     target = tmp_path / "not_a_file"
     ret = main([str(target)])

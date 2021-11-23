@@ -166,9 +166,13 @@ It can be redirected as
 ```shell
 $ inifix-format pluto.ini > pluto-formatted.ini
 ```
-Use the `-i/--inplace` flag to write back to the source file.
-Note that comments are preserved in all cases.
 
+#### Options
+
+* Use the `-i/--inplace` flag to write back to the source file.
+Note that comments are preserved in all cases.
+* Use `--name-column-size <n>` to specify the length of the first column (including right padding).
+Names longer this value will not be aligned, but whitespace separating them from values will be minimised.
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
