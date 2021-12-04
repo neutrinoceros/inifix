@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - ENH: expose name column length parameter to users in inifix-format
 [PR #73](https://github.com/neutrinoceros/inifix/pull/73)
-- BUG: fix formatter behabiour
+- BUG: fix formatter behaviour
 [PR #83](https://github.com/neutrinoceros/inifix/pull/83)
 
 ## [0.9.1] - 2021-11-21
