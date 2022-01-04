@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import warnings
+from difflib import unified_diff
 from typing import Optional
 from typing import Sequence
 
@@ -97,7 +98,11 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs="+")
-    parser.add_argument("-i", "--inplace", action="store_true")
+    parser.add_argument(
+        "--diff",
+        action="store_true",
+        help="Print the unified diff to stdout instead of editing files inplace",
+    )
     parser.add_argument(
         "--name-column-size", type=int, help="Fixed length of the parameter column"
     )
@@ -116,6 +121,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         except ValueError as exc:
             print(f"Error: {exc}", file=sys.stderr)
             retv += 1
+            continue
 
         with open(file) as fh:
             data = fh.read()
@@ -124,11 +130,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
         if fmted_data == data:
             print(f"{file} is already formatted", file=sys.stderr)
+            continue
         else:
-            print(f"Fixing {file}", file=sys.stderr)
             retv += 1
 
-        if args.inplace:
+        if args.diff:
+            for line in unified_diff(
+                data.splitlines(), fmted_data.splitlines(), fromfile=file
+            ):
+                if sys.version_info >= (3, 9):
+                    line = line.removesuffix("\n")
+                elif line.endswith("\n"):
+                    line = line[:-1]
+                print(line)
+            print("\n")
+        else:
+            print(f"Fixing {file}", file=sys.stderr)
             try:
                 with open(file, "w") as fh:
                     fh.write(fmted_data)
@@ -136,8 +153,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 print(f"Error: could not write to {file}", file=sys.stderr)
                 retv += 1
                 continue
-        else:
-            print(fmted_data)
 
     return retv
 
