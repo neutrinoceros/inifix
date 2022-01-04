@@ -158,21 +158,22 @@ following to your project's `.pre-commit-config.yaml`
 
 #### Formatting
 
-This will print a formatted verison of the input file to `stdout`
+To format a file in place, use
 ```shell
 $ inifix-format pluto.ini
 ```
-It can be redirected as
-```shell
-$ inifix-format pluto.ini > pluto-formatted.ini
-```
+
 
 #### Options
 
-* Use the `-i/--inplace` flag to write back to the source file.
 Note that comments are preserved in all cases.
+* To print a diff patch to stdout instead, pass the `--diff` flag
+```shell
+$ inifix-format pluto.ini --diff
+```
 * Use `--name-column-size <n>` to specify the length of the first column (including right padding).
 Names longer this value will not be aligned, but whitespace separating them from values will be minimised.
+
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
