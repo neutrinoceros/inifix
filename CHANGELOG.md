@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.11.1] - 2022-01-04
+
+BUG: pretty print warnings from iniformat so they don't look as bad from the CLI
+[PR #89](https://github.com/neutrinoceros/inifix/pull/89)
+
 ## [0.11.0] - 2022-01-04
 
 ENH: replace `--inplace` option in `inifix-format` with a `--diff` option

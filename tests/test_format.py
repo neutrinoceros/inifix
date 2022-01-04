@@ -91,7 +91,6 @@ def test_exact_format_inplace(capsys, tmp_path):
 
 
 @pytest.mark.parametrize("size", ["10", "20", "50"])
-@pytest.mark.filterwarnings(r"ignore:^The following parameters\n")
 def test_exact_format_with_column_size_flag(size, capsys, tmp_path):
     DATA_DIR = Path(__file__).parent / "data"
     target = tmp_path / "out.ini"
@@ -100,7 +99,7 @@ def test_exact_format_with_column_size_flag(size, capsys, tmp_path):
     ret = main([str(target), "--name-column-size", size])
     out, err = capsys.readouterr()
 
-    assert err == f"Fixing {target}\n"
+    assert f"Fixing {target}\n" in err
     assert ret != 0
 
     expected = (DATA_DIR / f"format-column-size-out-{size}.ini").read_text()

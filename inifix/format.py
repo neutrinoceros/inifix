@@ -2,7 +2,6 @@ import argparse
 import os
 import re
 import sys
-import warnings
 from difflib import unified_diff
 from typing import Optional
 from typing import Sequence
@@ -61,11 +60,14 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
 
         if max_name_size >= name_column_size:
             long_parameters = [p for p in parameters if len(p) >= name_column_size]
-            warnings.warn(
-                "The following parameters\n"
-                + "\n".join(long_parameters)
-                + f"\nare longer than user specified column length ({name_column_size}). "
-                + "Column length will be adjusted regardless.",
+            print(
+                "WARNING: The following names are longer than the "
+                f"specified name column size ({name_column_size}).\n"
+                + " - "
+                + "\n - ".join(long_parameters)
+                + "\n"
+                + "Additional whitespace will be used.",
+                file=sys.stderr,
             )
 
     new_lines = []
