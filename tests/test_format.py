@@ -79,11 +79,8 @@ def test_exact_format_inplace(capsys, tmp_path):
     ret = main([str(target)])
     out, err = capsys.readouterr()
 
-    if err == f"{target} is already formatted\n":
-        assert ret == 0
-    else:
-        assert err == f"Fixing {target}\n"
-        assert ret != 0
+    assert err == f"Fixing {target}\n"
+    assert ret != 0
 
     expected = (DATA_DIR / "format-out.ini").read_text()
     res = target.read_text()
@@ -105,6 +102,30 @@ def test_exact_format_with_column_size_flag(size, capsys, tmp_path):
     expected = (DATA_DIR / f"format-column-size-out-{size}.ini").read_text()
     res = target.read_text()
     assert res == expected
+
+
+def test_no_parameters(capsys, tmp_path):
+    target = tmp_path / "no_params.ini"
+    target.write_text(
+        "    # comment 1\n"
+        "[Section A]\n"
+        "  # comment 2\n"
+        " # comment 3\n"
+        "[Section B]"
+    )
+    ret = main([str(target)])
+    assert ret != 0
+
+    expected = (
+        "# comment 1\n"
+        "\n\n"
+        "[Section A]\n\n"
+        "# comment 2\n"
+        "# comment 3\n"
+        "\n\n"
+        "[Section B]\n"
+    )
+    assert target.read_text() == expected
 
 
 def test_missing_file(capsys, tmp_path):
