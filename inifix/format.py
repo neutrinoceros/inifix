@@ -47,9 +47,9 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
             values.append(value)
 
     if not parameters:
-        return "\n".join(lines)
-
-    max_name_size = max(len(parameter) for parameter in parameters)
+        max_name_size = 0
+    else:
+        max_name_size = max(len(parameter) for parameter in parameters)
 
     if name_column_size is None:
         padded_name_col_size = (
