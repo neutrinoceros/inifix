@@ -1,7 +1,7 @@
 import pytest
 
 import inifix
-from inifix.iniconf import bool_caster
+from inifix.io import bool_caster
 
 BASE_BOOLS = [
     ("True", True),

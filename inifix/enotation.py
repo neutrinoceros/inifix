@@ -1,7 +1,6 @@
 import re
 from typing import Union
 
-from inifix._deprecation import future_positional_only
 
 ENOTATION_REGEXP = re.compile(r"\d+(\.\d*)?e[+-]?\d+?")
 
@@ -13,8 +12,7 @@ class ENotationIO:
     """
 
     @staticmethod
-    @future_positional_only({0: "s"})
-    def decode(s: str) -> int:
+    def decode(s: str, /) -> int:
         """
         Cast an 'e' formatted string `s` to integer if such a conversion can
         be perfomed without loss of data. Raise ValueError otherwise.
@@ -52,8 +50,8 @@ class ENotationIO:
         if not re.match(ENOTATION_REGEXP, s):
             raise ValueError
 
-        digits, _, exponent = s.partition("e")
-        exponent = int(exponent)
+        digits, _, sexponent = s.partition("e")
+        exponent = int(sexponent)
         if "." in digits:
             digits, decimals = digits.split(".")
             decimals = decimals.rstrip("0")
@@ -68,8 +66,7 @@ class ENotationIO:
         return int(float(s))
 
     @staticmethod
-    @future_positional_only({0: "s"})
-    def simplify(s: str) -> str:
+    def simplify(s: str, /) -> str:
         """
         Simplify exponents and trailing zeros in decimals.
         This is a helper function to `ENotationIO.encode`.
@@ -94,8 +91,7 @@ class ENotationIO:
         return s.replace("+", "")
 
     @staticmethod
-    @future_positional_only({0: "r"})
-    def encode(r: Union[float, int]) -> str:
+    def encode(r: Union[float, int], /) -> str:
         """
         Convert a real number `r` to string, using scientific notation.
 
@@ -144,8 +140,7 @@ class ENotationIO:
         return ENotationIO.simplify(s)
 
     @staticmethod
-    @future_positional_only({0: "r"})
-    def encode_preferential(r: Union[float, int]) -> str:
+    def encode_preferential(r: Union[float, int], /) -> str:
         """
         Convert a real number `r` to string, using sci notation if
         and only if it saves space.

@@ -1,8 +1,8 @@
-from inifix.iniconf import InifixConf
+from inifix.io import load
 
 
 def test_pluto_disk_planet(datadir):
-    conf = InifixConf(datadir / "pluto-DiskPlanet.ini")
+    conf = load(datadir / "pluto-DiskPlanet.ini")
     expected = [
         "Grid",
         "Chombo Refinement",
