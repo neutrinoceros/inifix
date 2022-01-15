@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [1.0.0] - 2022-01-15
+
+The API is now declared stable and any future intentionally breaking change
+will follow a deprecation cycle.
+
+- DEPR: drop support for Python 3.6 and 3.7, inifix now requires Python 3.8 or newer
+- DEPR: end deprecation cycle for function arguments marked as "future-potisional-only"
+- ENH: simplify internal logic (remove a non-user facing class, InifixConf)
+- TYP: add mypy conf, add missing type annotations
+
+
+https://github.com/neutrinoceros/inifix/pull/91
+
 ## [0.11.2] - 2022-01-05
 
 BUG: fix formatting for files with only sections and comments (no parameters)

@@ -1,7 +1,7 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
-[![PyPI](https://img.shields.io/pypi/pyversions/inifix/0.7.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
+[![PyPI](https://img.shields.io/pypi/pyversions/inifix/1.0.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -18,7 +18,7 @@ supports section-free definitions.
 
 
 ## File format specifications
-
+<details><summary>Unroll !</summary>
 - parameter names are strings
 - names and values are separated by non-newline white spaces
 - values are represented in unicode characters
@@ -92,39 +92,44 @@ e-notation is prefered in encoding.
 
 While decoding, `e` can be lower or upper case, but they are always encoded as
 lower case.
+</details>
 
 ## Installation
 
 ```shell
-$ pip install inifix
+pip install inifix
 ```
 
 ## Usage
 
-The Python API is similar to that of `toml` and stdlib `json`, though
-intentionally simplified, and consists in two main user-facing functions:
-`inifix.load` and `inifix.dump`.
+The public API mimicks that of Python's standard library `json`,
+and consists in two main functions: `inifix.load` and `inifix.dump`.
+
+
+### Reading data
+`inifix.load` reads from a file and returns a `dict`
 
 ```python
 import inifix
 
-# read
-conf = inifix.load("pluto.ini")
-
-# patch
-conf["Time"]["CFL"] = 0.1
-
-# write back
-inifix.dump(conf, "pluto-mod.ini")
-```
-
-`inifix.load` supports loading from an open file
-```python
 with open("pluto.ini") as fh:
     conf = inifix.load(fh)
-```
-or from a `str/os.PathLike` object representing a file.
 
+# or equivalently
+conf = inifix.load("pluto.ini")
+```
+
+### ... and writing back to disk
+
+`inifix.dumps` allows to write back to a file.
+
+This allows to change a value on the fly and create new
+configuration files programmatically, for instance.
+```python
+conf["Time"]["CFL"] = 0.1
+inifix.dump(conf, "pluto-mod.ini")
+```
+Data will be validated against inifix's format specification at write time.
 
 ### Schema Validation
 

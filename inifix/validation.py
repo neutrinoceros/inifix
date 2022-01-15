@@ -1,10 +1,11 @@
 import re
+from typing import Any
+from typing import Mapping
 
 from more_itertools import always_iterable
 
-from inifix._deprecation import future_positional_only
-
 _PARAM_NAME_REGEXP = re.compile(r"[-\w]+")
+SCALAR_TYPES = (int, float, bool, str)
 
 
 def _uses_invalid_chars(s: str) -> bool:
@@ -12,8 +13,7 @@ def _uses_invalid_chars(s: str) -> bool:
     return ma is None
 
 
-def validate_elementary_item(key, value) -> None:
-    scalar_types = (int, float, bool, str)
+def validate_elementary_item(key: Any, value: Any) -> None:
     if not isinstance(key, str):
         raise ValueError(
             f"Invalid schema: received key '{key}' with type '{type(key)}', "
@@ -31,24 +31,23 @@ def validate_elementary_item(key, value) -> None:
             f"Invalid schema: received key {key!r}, "
             "keys are expected to start with a letter"
         )
-    if not isinstance(value, (*scalar_types, list)):
+    if not isinstance(value, (*SCALAR_TYPES, list)):
         raise ValueError(
             f"Invalid schema: received value with type '{type(value)}', "
             "exepected an int, float, bool, str, or list"
         )
     for ev in always_iterable(value):
-        if not isinstance(ev, scalar_types):
+        if not isinstance(ev, SCALAR_TYPES):
             raise ValueError(
                 f"Invalid schema: reveived value '{value}' with type '{type(value)}', "
                 "exepected a int, float, bool or str"
             )
 
 
-@future_positional_only({0: "d"})
-def validate_inifile_schema(d: dict) -> None:
+def validate_inifile_schema(d: Mapping, /) -> None:
     """
     Raise `ValueError` if and only if the argument is not a
-    valid configuration according to `inifix.InifixConf` specifications.
+    valid configuration.
     """
 
     for k, v in d.items():

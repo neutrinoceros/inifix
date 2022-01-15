@@ -17,7 +17,7 @@ INVALID_CONTENTS, INVALID_CONTENTS_IDS = unzip(
 
 @pytest.fixture(params=INVALID_CONTENTS, ids=INVALID_CONTENTS_IDS)
 def invalid_file(tmp_path, request):
-    file = tmp_path.joinpath("myfile.ini")
+    file = tmp_path / "myfile.ini"
     file.write_text(request.param)
     return file
 
@@ -30,7 +30,7 @@ def test_empty_file(capsys, tmp_path):
     out, err = capsys.readouterr()
     assert out == ""
     assert f"Failed to validate {target}:" in err
-    assert "appears to be emtpy.\n" in err
+    assert "appears to be empty.\n" in err
 
 
 def test_missing_file(capsys, tmp_path):

@@ -1,7 +1,115 @@
+import difflib
+import re
+import tempfile
+from pathlib import Path
+
 import pytest
 
+from inifix.io import _tokenize_line
 from inifix.io import dump
 from inifix.io import load
+from inifix.io import Section
+
+
+@pytest.mark.parametrize(
+    "invalid_data", ["", "SingleToken", "[InvalidSectionName", "InvalidSection]"]
+)
+def test_tokenizer(invalid_data):
+    with pytest.raises(ValueError):
+        _tokenize_line(invalid_data, file="fake_filename", line_number=-1)
+
+
+def test_unit_read(inifile):
+    load(inifile)
+
+
+def test_idempotent_io(inifile):
+    data0 = load(inifile)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        save1 = Path(tmpdir) / "save1"
+        save2 = Path(tmpdir) / "save2"
+        dump(data0, save1)
+        data1 = load(save1)
+        dump(data1, save2)
+
+        text1 = save1.read_text().split("\n")
+        text2 = save2.read_text().split("\n")
+
+        diff = "".join(difflib.context_diff(text1, text2))
+        assert not diff
+
+
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        ("""val content\n""", {"val": "content"}),
+        ("""val 'content'\n""", {"val": "content"}),
+        ("""val content"\n""", {"val": 'content"'}),
+        ("""val "content\n""", {"val": '"content'}),
+        ("""val content'\n""", {"val": "content'"}),
+        ("""val 'content\n""", {"val": "'content"}),
+        ("""val "content"\n""", {"val": "content"}),
+        ("""val "content'"\n""", {"val": "content'"}),
+        ("""val '"content"'\n""", {"val": '"content"'}),
+        ("""val "'content'"\n""", {"val": "'content'"}),
+        ("""val true\n""", {"val": True}),
+        ("""val "true"\n""", {"val": "true"}),
+        ("""val 'true'\n""", {"val": "true"}),
+        ("""val false\n""", {"val": False}),
+        ("""val "false"\n""", {"val": "false"}),
+        ("""val 'false'\n""", {"val": "false"}),
+        ("""val 1\n""", {"val": 1}),
+        ("""val "1"\n""", {"val": "1"}),
+        ("""val '1'\n""", {"val": "1"}),
+        ("""val 1e2\n""", {"val": 100}),
+        ("""val "1e2"\n""", {"val": "1e2"}),
+        ("""val '1e2'\n""", {"val": "1e2"}),
+    ],
+)
+def test_string_casting(data, expected, tmp_path):
+    file = tmp_path / "test_file.ini"
+    file.write_text(data)
+    mapping = load(file)
+    assert mapping == expected
+
+
+def test_section_init():
+    data = {
+        "dummy": [0.0001, True],
+        "thisparameternameshouldprobablybeshorter": [45, 68],
+        "thisoneisshorter": [15, 68, 774, 6, 7, 5],
+        "faultyTowers": 42,
+    }
+    s1 = Section(data)
+    assert s1.name is None
+
+    s2 = Section(data, name="test")
+    assert s2.name == "test"
+
+
+def test_invalid_section_value():
+    val = frozenset((1, 2, 3))
+    data = {
+        "yes": val,
+    }
+    with pytest.raises(
+        TypeError,
+        match=re.escape(
+            "Expected all values to be scalars or lists of scalars. "
+            f"Received invalid values {val}"
+        ),
+    ):
+        Section(data)
+
+
+def test_invalid_section_key():
+    data = {
+        1: True,
+    }
+    with pytest.raises(
+        TypeError, match=re.escape("Expected str keys. Received invalid key: 1")
+    ):
+        Section(data)
 
 
 @pytest.mark.parametrize(
@@ -55,3 +163,8 @@ def test_load_empty_file(capsys, tmp_path):
     target.touch()
     with pytest.raises(ValueError):
         load(target)
+
+
+def test_load_from_descriptor(inifile):
+    with open(inifile) as fh:
+        load(fh)
