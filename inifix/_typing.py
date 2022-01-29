@@ -11,7 +11,7 @@ T = TypeVar("T")
 Scalar = Union[int, float, bool, str]
 IterableOrSingle = Union[Iterable[T], T]
 
-if sys.version_info > (3, 9):
+if sys.version_info >= (3, 9):
     PathLike = Union[AnyStr, os.PathLike[AnyStr]]
 else:
     PathLike = Union[AnyStr, os.PathLike]
