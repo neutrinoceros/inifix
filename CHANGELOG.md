@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.0.1] - 2022-01-30
+
+TYP: improve type-correctness [PR #93](https://github.com/neutrinoceros/inifix/pull/93)
+
 ## [1.0.0] - 2022-01-15
 
 The API is now declared stable and any future intentionally breaking change
@@ -16,7 +20,7 @@ will follow a deprecation cycle.
 - TYP: add mypy conf, add missing type annotations
 
 
-https://github.com/neutrinoceros/inifix/pull/91
+[PR #91](https://github.com/neutrinoceros/inifix/pull/91)
 
 ## [0.11.2] - 2022-01-05
 
