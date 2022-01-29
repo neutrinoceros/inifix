@@ -132,7 +132,9 @@ def _tokenize_line(
 
 def _from_file_descriptor(file: TextIO) -> InifixConfT:
     data = file.read()
-    container: InifixConfT = {}
+
+    # see https://github.com/python/mypy/issues/6463
+    container: InifixConfT = {}  # type: ignore[assignment]
     lines = _normalize_data(data)
     if not "".join(lines):
         raise ValueError(f"{file.name!r} appears to be empty.")
