@@ -28,7 +28,7 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Build yt + type check deps
+    - name: Build
       run: |
         python3 -m pip install --upgrade pip
         python3 -m pip install .[typecheck]
