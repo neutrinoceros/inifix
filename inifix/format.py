@@ -116,13 +116,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     for file in args.files:
         if not os.path.isfile(file):
             print(f"Error: could not find {file}", file=sys.stderr)
-            retv += 1
+            retv = 1
             continue
         try:
             load(file)
         except ValueError as exc:
             print(f"Error: {exc}", file=sys.stderr)
-            retv += 1
+            retv = 1
             continue
 
         with open(file) as fh:
@@ -134,7 +134,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"{file} is already formatted", file=sys.stderr)
             continue
         else:
-            retv += 1
+            retv = 1
 
         if args.diff:
             for line in unified_diff(
@@ -153,7 +153,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                     fh.write(fmted_data)
             except OSError:
                 print(f"Error: could not write to {file}", file=sys.stderr)
-                retv += 1
+                retv = 1
                 continue
 
     return retv
