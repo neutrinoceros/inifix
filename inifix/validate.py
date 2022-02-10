@@ -16,13 +16,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     for file in args.files:
         if not os.path.isfile(file):
             print(f"Error: could not find {file}", file=sys.stderr)
-            retv += 1
+            retv = 1
             continue
         try:
             load(file)
         except ValueError as exc:
             print(f"Failed to validate {file}:\n  {exc}", file=sys.stderr)
-            retv += 1
+            retv = 1
         else:
             print(f"Validated {file}")
 
