@@ -88,9 +88,10 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
         new_line += comm.rjust(offset + len(comm)) if comment else ""
         new_lines.append(new_line)
     res = "\n".join(new_lines)
+    # compress any duplicate new lines
     res = re.sub("\n+", "\n", res)
-    res = re.sub(r"(.?)\n\[", r"\1\n\n\n[", res)
-    res = re.sub(r"\]\n+", r"]\n\n", res)
+    # add one empty line before a new section
+    res = re.sub(r"(.?)\n\[", r"\1\n\n[", res)
     # ensure there's exactly one newline at the EOF
     res = res.rstrip("\n")
     res += "\n"
