@@ -118,11 +118,11 @@ def test_no_parameters(capsys, tmp_path):
 
     expected = (
         "# comment 1\n"
-        "\n\n"
-        "[Section A]\n\n"
+        "\n"
+        "[Section A]\n"
         "# comment 2\n"
         "# comment 3\n"
-        "\n\n"
+        "\n"
         "[Section B]\n"
     )
     assert target.read_text() == expected

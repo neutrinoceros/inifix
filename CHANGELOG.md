@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.0] - 2022-02-23
+
+ENH: inifix-format now produces more compact files, with fewer empty lines.
+[PR #98](https://github.com/neutrinoceros/inifix/pull/98)
+
+
 ## [1.0.3] - 2022-02-10
 
 BUG: don't try to be clever with cumulative retcodes to avoid retcode overflow
