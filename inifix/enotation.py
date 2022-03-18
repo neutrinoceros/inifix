@@ -1,5 +1,4 @@
 import re
-from typing import Union
 
 
 ENOTATION_REGEXP = re.compile(r"\d+(\.\d*)?e[+-]?\d+?")
@@ -43,7 +42,10 @@ class ENotationIO:
         Traceback (most recent call last):
         ...
         ValueError
-
+        >>> ENotationIO.decode("notanumber")
+        Traceback (most recent call last):
+        ...
+        ValueError
         """
         s = s.lower()
 
@@ -91,7 +93,7 @@ class ENotationIO:
         return s.replace("+", "")
 
     @staticmethod
-    def encode(r: Union[float, int], /) -> str:
+    def encode(r: float, /) -> str:
         """
         Convert a real number `r` to string, using scientific notation.
 
@@ -106,7 +108,7 @@ class ENotationIO:
         Returns
         -------
         ret: str
-            A string representing a number in sci notation.
+            A string representing a number in sci notation
 
         Examples
         --------
@@ -125,24 +127,24 @@ class ENotationIO:
         >>> ENotationIO.encode(1e-15)
         '1e-15'
         >>> ENotationIO.encode(0.0)
-        '0'
+        '0e0'
         >>> ENotationIO.encode(0)
-        '0'
+        '0e0'
         """
         base = str(r)
         if "e" in base:
             return ENotationIO.simplify(base)
         if not base.strip(".0"):
-            return "0"
+            return "0e0"
         max_ndigit = len(base.replace(".", "")) - 1
         fmt = f".{max_ndigit}e"
         s = "{:^{}}".format(r, fmt)
         return ENotationIO.simplify(s)
 
     @staticmethod
-    def encode_preferential(r: Union[float, int], /) -> str:
+    def encode_preferential(r: float, /) -> str:
         """
-        Convert a real number `r` to string, using sci notation if
+        Convert a float `r` to string, using sci notation if
         and only if it saves space.
 
         Examples
@@ -150,14 +152,14 @@ class ENotationIO:
         >>> ENotationIO.encode_preferential(189_000_000)
         '1.89e8'
         >>> ENotationIO.encode_preferential(189)
-        '189'
+        '189.0'
         >>> ENotationIO.encode_preferential(900)
-        '900'
+        '9e2'
         >>> ENotationIO.encode_preferential(1)
-        '1'
+        '1.0'
         >>> ENotationIO.encode_preferential(0.7)
         '0.7'
         >>> ENotationIO.encode_preferential(0.00007)
         '7e-5'
         """
-        return min(str(r), ENotationIO.encode(r), key=lambda x: len(x))
+        return min(str(float(r)), ENotationIO.encode(r), key=lambda x: len(x))

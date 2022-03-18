@@ -7,7 +7,9 @@ import pytest
 
 from inifix.io import _tokenize_line
 from inifix.io import dump
+from inifix.io import dumps
 from inifix.io import load
+from inifix.io import loads
 from inifix.io import Section
 
 
@@ -158,13 +160,34 @@ def test_dump_to_file_path(inifile, tmp_path):
             assert f"[{key}]\n" in body2
 
 
-def test_load_empty_file(capsys, tmp_path):
+def test_load_empty_file(tmp_path):
     target = tmp_path / "empty_file"
     target.touch()
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match=re.escape(f"{str(target)!r} appears to be empty.")
+    ):
         load(target)
 
 
 def test_load_from_descriptor(inifile):
     with open(inifile) as fh:
         load(fh)
+
+
+def test_loads_empty_str():
+    ret = loads("")
+    assert ret == {}
+
+
+def test_loads_invalid_str():
+    with pytest.raises(ValueError, match="Failed to parse line 1: 'invalid'"):
+        loads("invalid")
+
+
+def test_loads_dumps_roundtrip(inifile):
+    with open(inifile) as fh:
+        data = fh.read()
+    d1 = loads(data)
+    s1 = dumps(d1)
+    d2 = loads(s1)
+    assert d1 == d2
