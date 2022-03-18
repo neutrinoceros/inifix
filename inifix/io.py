@@ -46,7 +46,6 @@ def str_caster(s: str) -> str:
 
 CASTERS: List[Callable] = [
     int,
-    ENotationIO.decode,
     float,
     bool_caster,
     str_caster,
@@ -107,11 +106,14 @@ def _normalize_data(data: str) -> List[str]:
 
 
 def _tokenize_line(
-    line: str, file: TextIO, line_number: int
+    line: str, line_number: int, file: Optional[TextIO]
 ) -> Tuple[str, List[Scalar]]:
     key, *raw_values = line.split()
     if not raw_values:
-        raise ValueError(f"Failed to parse {file}:{line_number}:\n{line}")
+        if file is None:
+            raise ValueError(f"Failed to parse line {line_number}: {line!r}")
+        else:
+            raise ValueError(f"Failed to parse {file}:{line_number}:\n{line}")
 
     values = []
     for val in raw_values:
@@ -130,15 +132,10 @@ def _tokenize_line(
     return key, values
 
 
-def _from_file_descriptor(file: TextIO) -> InifixConfT:
-    data = file.read()
-
+def _from_string(data: str, file: Optional[TextIO] = None) -> InifixConfT:
     # see https://github.com/python/mypy/issues/6463
     container: InifixConfT = {}  # type: ignore[assignment]
     lines = _normalize_data(data)
-    if not "".join(lines):
-        raise ValueError(f"{file.name!r} appears to be empty.")
-
     section = Section()  # the default target is a nameless section
     for line_number, line in enumerate(lines, start=1):
         if not line:
@@ -159,6 +156,14 @@ def _from_file_descriptor(file: TextIO) -> InifixConfT:
     return container
 
 
+def _from_file_descriptor(file: TextIO) -> InifixConfT:
+    data = file.read()
+    lines = _normalize_data(data)
+    if not "".join(lines):
+        raise ValueError(f"{file.name!r} appears to be empty.")
+    return _from_string(data, file=file)
+
+
 def _from_path(file: PathLike) -> InifixConfT:
     file = os.fspath(file)
     with open(file) as fh:
@@ -169,7 +174,7 @@ def _from_path(file: PathLike) -> InifixConfT:
 
 
 def _encode(v: Scalar) -> str:
-    if isinstance(v, (float, int)):
+    if isinstance(v, float):
         return ENotationIO.encode_preferential(v)
     return str(v)
 
@@ -219,6 +224,10 @@ def load(source: Union[InifixConfT, PathLike, TextIO], /) -> InifixConfT:
     return source
 
 
+def loads(source: str, /) -> InifixConfT:
+    return _from_string(source)
+
+
 def dump(data: InifixConfT, /, file: Union[PathLike, TextIOBase]) -> None:
     """
     Write data to a file.
@@ -238,3 +247,11 @@ def dump(data: InifixConfT, /, file: Union[PathLike, TextIOBase]) -> None:
         _write_to_buffer(data, file)  # type: ignore
     except AttributeError:
         _write_to_file(data, file)
+
+
+def dumps(data: InifixConfT, /) -> str:
+    from io import StringIO
+
+    s = StringIO()
+    dump(data, file=s)
+    return s.getvalue()

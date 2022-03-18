@@ -59,7 +59,7 @@ and maps to
     },
     "Time Integrator": {
         "CFL": 0.001,
-        "tstop": 1000
+        "tstop": 1000.0
     }
 }
 ```
@@ -79,16 +79,15 @@ and maps to
 {
     "mode": "fargo",
     "CFL": 0.001,
-    "tstop": 1000
+    "tstop": 1000.0
 }
 ```
 Note that strings using e-notation (e.g. `1e-3` or `1E3` here) are decoded as
-numbers. They are cast to `int` if no precision loss ensues, and `float`
-otherwise. Reversly, when writing files, numbers are re-encoded using e-notation
-if it leads to a more compact representation. For instance, `100000` is encoded
-as `1e5`, but `10` is left unchanged because `1e1` is longer.
-In cases where both reprensations are equally compact (e.g. `100` VS `1e2`),
-e-notation is prefered in encoding.
+floats. Reversely, when writing files, floats are re-encoded using e-notation
+if it leads to a more compact representation. For instance, `100000.0` is encoded
+as `1e5`, but `189.0` is left unchanged because `1.89e2` takes one more character.
+In cases where both reprensations are equally compact (e.g. `1.0` VS `1e0`),
+decimal is prefered in encoding.
 
 While decoding, `e` can be lower or upper case, but they are always encoded as
 lower case.
@@ -103,8 +102,10 @@ pip install inifix
 ## Usage
 
 The public API mimicks that of Python's standard library `json`,
-and consists in two main functions: `inifix.load` and `inifix.dump`.
-
+and consists in four main functions:
+- `inifix.load` and `inifix.dump` read from and write to files respectively
+- `inifix.loads` reads from a `str` and returns a `dict`, while `inifix.dumps`
+  does the reverse operation.
 
 ### Reading data
 `inifix.load` reads from a file and returns a `dict`
