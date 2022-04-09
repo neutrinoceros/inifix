@@ -122,7 +122,7 @@ conf = inifix.load("pluto.ini")
 
 ### ... and writing back to disk
 
-`inifix.dumps` allows to write back to a file.
+`inifix.dump` allows to write back to a file.
 
 This allows to change a value on the fly and create new
 configuration files programmatically, for instance.
@@ -143,7 +143,8 @@ inifix.validate_inifile_schema(data)
 
 ### CLI
 
-Command line tool are shipped with the package to validate or format compatible inifiles.
+Command line tools are shipped with the package to validate or format compatible
+inifiles.
 
 #### Validation
 
@@ -157,7 +158,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.10.0
+    rev: v1.2.0
     hooks:
       - id: inifix-validate
 ```
@@ -168,17 +169,19 @@ To format a file in place, use
 ```shell
 $ inifix-format pluto.ini
 ```
-
+Note that comments are preserved.
 
 #### Options
 
-Note that comments are preserved in all cases.
-* To print a diff patch to stdout instead, pass the `--diff` flag
+
+* To print a diff patch to stdout instead of editing the file, use the `--diff`
+  flag
 ```shell
 $ inifix-format pluto.ini --diff
 ```
-* Use `--name-column-size <n>` to specify the length of the first column (including right padding).
-Names longer this value will not be aligned, but whitespace separating them from values will be minimised.
+* Use `--name-column-size <n>` to specify the length of the name column (padding
+included). Values attached to names longer than this value will not be aligned,
+though padding will be minimised.
 
 This program also doubles as `pre-commit` hook
 ```yaml
@@ -189,10 +192,11 @@ This program also doubles as `pre-commit` hook
 ```
 ## Contribution guidelines
 
-We use the [pre-commit](https://pre-commit.com) framework to automatically lint for code
-style and common pitfalls.
+We use the [pre-commit](https://pre-commit.com) framework to automatically lint
+for code style and common pitfalls.
 
-Before you commit to your local copy of the repo, please run this from the top level
+Before you commit to your local copy of the repo, please run this from the top
+level
 ```shell
 $ python3 -m pip install -u -e .[dev]
 $ pre-commit install
@@ -200,8 +204,9 @@ $ pre-commit install
 
 ## Testing
 
-We use the [pytest](https://docs.pytest.org/en/latest/) framework to test `inifix`.
-The test suite can be run from the top level with a simple `pytest` invocation.
+We use the [pytest](https://docs.pytest.org/en/latest/) framework to test
+`inifix`. The test suite can be run from the top level with a simple `pytest`
+invocation.
 ```shell
 $ pytest
 ```
