@@ -10,7 +10,12 @@ INVALID_CONTENTS, INVALID_CONTENTS_IDS = unzip(
         (r"/!\\\n", "invalid param name (special chars)"),
         ("100 100\n", "invalid param name (num-1)"),
         ("1e2 100\n", "invalid param name (num-2)"),
-        (("[Unclosed Section\n" "a 1 2 3\n"), "unclosed section"),
+        ("[Unclosed Section\na 1 2 3\n", "unclosed section"),
+        ("[[extra left bracket]\na 1 2 3\n", "mismatched left bracket"),
+        ("[extra right bracket]]\na 1 2 3\n", "mismatched right bracket"),
+        ("[extra] stuff that's not a comment", "missing comment char"),
+        ("[()]", "invalid section chars (parens)"),
+        ("[{}]", "invalid section chars (brackets)"),
     )
 )
 

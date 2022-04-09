@@ -25,7 +25,7 @@ from inifix.validation import validate_inifile_schema
 
 __all__ = ["load", "dump"]
 
-SECTION_REGEXP = re.compile(r"\[.+\]\s*")
+SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 
 def bool_caster(s: str) -> bool:
@@ -140,11 +140,11 @@ def _from_string(data: str, file: Optional[TextIO] = None) -> InifixConfT:
     for line_number, line in enumerate(lines, start=1):
         if not line:
             continue
-        match = re.match(SECTION_REGEXP, line)
+        match = re.fullmatch(SECTION_REGEXP, line)
         if match is not None:
             if section:
                 section._dump_to(container)
-            section = Section(name=match.group().strip("[]"))
+            section = Section(name=match["title"])
             continue
 
         values: Union[Scalar, List[Scalar]]
