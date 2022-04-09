@@ -1,6 +1,5 @@
 import os
 import shutil
-import sys
 from pathlib import Path
 from stat import S_IREAD
 from subprocess import run
@@ -35,9 +34,6 @@ def test_format_keep_data(inifile, capsys, tmp_path):
     assert data_new == ref_data
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 7), reason="need capture_output argument in subprocess.run"
-)
 @pytest.mark.parametrize("infile", ("format-in.ini", "format-out.ini"))
 def test_exact_format_diff(infile, capsys, tmp_path):
     DATA_DIR = Path(__file__).parent / "data"
@@ -83,23 +79,6 @@ def test_exact_format_inplace(capsys, tmp_path):
     assert ret != 0
 
     expected = (DATA_DIR / "format-out.ini").read_text()
-    res = target.read_text()
-    assert res == expected
-
-
-@pytest.mark.parametrize("size", ["10", "20", "50"])
-def test_exact_format_with_column_size_flag(size, capsys, tmp_path):
-    DATA_DIR = Path(__file__).parent / "data"
-    target = tmp_path / "out.ini"
-    shutil.copyfile(DATA_DIR / "format-column-size-in.ini", target)
-
-    ret = main([str(target), "--name-column-size", size])
-    out, err = capsys.readouterr()
-
-    assert f"Fixing {target}\n" in err
-    assert ret != 0
-
-    expected = (DATA_DIR / f"format-column-size-out-{size}.ini").read_text()
     res = target.read_text()
     assert res == expected
 

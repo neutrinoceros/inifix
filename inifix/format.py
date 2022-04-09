@@ -3,34 +3,24 @@ import os
 import re
 import sys
 from difflib import unified_diff
+from io import StringIO
+from typing import Generator
+from typing import List
 from typing import Optional
 from typing import Sequence
+from typing import TextIO
+from typing import Union
 
 from inifix.io import load
 
-NAME_COL_MINSIZE = 10
-COMMENT_COL = 80
-PADDING_SIZE = 4
-
-
-def _ljust(s: str, width: int) -> str:
-    """
-    A more flexible str.ljust
-    Guarantees the return value has at least one trailing whitespace char,
-    even at the cost of going over the specified width.
-    """
-    justified_name = s.ljust(width)
-    if len(s) < width:
-        return justified_name
-    else:
-        return justified_name + " "
+PADDING_SIZE = 2
 
 
 def _normalize_whitespace(s: str) -> str:
     return re.sub(r"\s", " ", s).strip()
 
 
-def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
+def _format_section(data: str) -> str:
     lines = data.splitlines()
     contents = []
     comments = []
@@ -39,36 +29,34 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
     for line in lines:
         content, _, comment = line.partition("#")
         content = _normalize_whitespace(content)
+        if not content and not comment:
+            continue
         contents.append(content)
         comments.append(_normalize_whitespace(comment))
-        if not content.startswith("[") and content != "":
-            parameter, *value = content.split()
-            parameters.append(parameter)
-            values.append(value)
+        if content.startswith("[") or not content:
+            continue
+        parameter, *value = content.split()
+        parameters.append(parameter)
+        values.append(value)
 
+    column_sizes: List[int] = []
     if not parameters:
         max_name_size = 0
     else:
         max_name_size = max(len(parameter) for parameter in parameters)
+        num_value_cols = max(len(_) for _ in values)
 
-    if name_column_size is None:
-        padded_name_col_size = (
-            max(max_name_size + PADDING_SIZE, NAME_COL_MINSIZE) + PADDING_SIZE
-        )
-    else:
-        padded_name_col_size = name_column_size
+        while len(column_sizes) < num_value_cols:
+            new_column_idx = len(column_sizes)
+            size = 0
+            for v in values:
+                if len(v) < new_column_idx + 1:
+                    continue
+                size = max(size, len(v[new_column_idx]))
+            column_sizes.append(size + PADDING_SIZE)
 
-        if max_name_size >= name_column_size:
-            long_parameters = [p for p in parameters if len(p) >= name_column_size]
-            print(
-                "WARNING: The following names are longer than the "
-                f"specified name column size ({name_column_size}).\n"
-                + " - "
-                + "\n - ".join(long_parameters)
-                + "\n"
-                + "Additional whitespace will be used.",
-                file=sys.stderr,
-            )
+    padded_name_col_size = max_name_size + 2 * PADDING_SIZE
+    content_size = padded_name_col_size + sum(column_sizes) + PADDING_SIZE
 
     new_lines = []
     parameter_idx = 0
@@ -79,15 +67,22 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
             if content.startswith("["):
                 new_line += f"{content}\n"
             else:
-                new_line += _ljust(parameters[parameter_idx], padded_name_col_size)
-                new_line += "  ".join(values[parameter_idx])
-
-                offset = COMMENT_COL - len(new_line)
+                new_line += parameters[parameter_idx].ljust(padded_name_col_size)
+                for val, size in zip(values[parameter_idx], column_sizes):
+                    new_line += val.ljust(size)
                 parameter_idx += 1
-        comm = f"# {comment}"
-        new_line += comm.rjust(offset + len(comm)) if comment else ""
+                new_line = new_line.strip()
+                offset = content_size - len(new_line)
+        if comment:
+            comm = f"# {comment}"
+            new_line += comm.rjust(offset + len(comm))
         new_lines.append(new_line)
     res = "\n".join(new_lines)
+
+    return res
+
+
+def _finalize(res: str) -> str:
     # compress any duplicate new lines
     res = re.sub("\n+", "\n", res)
     # add one empty line before a new section
@@ -98,6 +93,24 @@ def iniformat(data: str, *, name_column_size: Optional[int] = None) -> str:
     return res
 
 
+def _iter_sections(fh: Union[StringIO, TextIO]) -> Generator[str, None, None]:
+    line = fh.readline()
+    while line != "":
+        content = [line]
+        while (line := fh.readline()) != "" and not line.startswith("["):
+            content.append(line)
+        yield "".join(content)
+
+
+def iniformat(fh: Union[StringIO, TextIO, str], /) -> str:
+    if isinstance(fh, str):
+        fh = StringIO(fh)
+    content = []
+    for s in _iter_sections(fh):
+        content.append(_format_section(s))
+    return _finalize("\n".join(content))
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs="+")
@@ -105,9 +118,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--diff",
         action="store_true",
         help="Print the unified diff to stdout instead of editing files inplace",
-    )
-    parser.add_argument(
-        "--name-column-size", type=int, help="Fixed length of the parameter column"
     )
 
     args = parser.parse_args(argv)
@@ -129,7 +139,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         with open(file) as fh:
             data = fh.read()
 
-        fmted_data = iniformat(data, name_column_size=args.name_column_size)
+        fmted_data = iniformat(data)
 
         if fmted_data == data:
             print(f"{file} is already formatted", file=sys.stderr)

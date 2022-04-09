@@ -158,7 +158,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v1.2.1
+    rev: v2.0.0
     hooks:
       - id: inifix-validate
 ```
