@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2022-04-17
+
+The format enforced by inifix-format was changed to improve compacity and
+readability. The new format is designed to be closer to manual formatting that
+is actually perfomed by Idefix users and contributors.
+
+This is considered a major version change because the `--name-column-size` CLI
+flag and its corresponding keyword argument from `inifix.format.iniformat` were
+removed.
+
+The API is otherwize identical to version 1.2.1
 
 ## [1.2.1] - 2022-04-09
 
