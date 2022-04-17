@@ -1,7 +1,7 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
-[![PyPI](https://img.shields.io/pypi/pyversions/inifix/1.1.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
+[![PyPI](https://img.shields.io/pypi/pyversions/inifix/2.0.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -31,13 +31,8 @@ supports section-free definitions.
 - sections titles start with `[` and end with `]`
 - comments start with `#` and are ignored
 
-Using the following Python's `typing` notations
-```python
-from typing import Union, Mapping
-Scalar = Union[str, float, bool, int]
-InifixConf = Mapping[str, Union[Scalar, Mapping[str, Scalar]]
-```
-A configuration file is considered valid if it can be parsed as an `InifixConf` object.
+A file is considered valid if calling `inifix.load(<filename>)` doesn't raise an
+error.
 
 ### Examples
 The following content is considered valid
