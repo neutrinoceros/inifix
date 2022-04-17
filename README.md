@@ -174,9 +174,6 @@ Note that comments are preserved.
 ```shell
 $ inifix-format pluto.ini --diff
 ```
-* Use `--name-column-size <n>` to specify the length of the name column (padding
-included). Values attached to names longer than this value will not be aligned,
-though padding will be minimised.
 
 This program also doubles as `pre-commit` hook
 ```yaml
