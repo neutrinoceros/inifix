@@ -178,7 +178,7 @@ $ inifix-format pluto.ini --diff
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v0.10.0
+    rev: v2.0.0
     hooks:
       - id: inifix-format
 ```
