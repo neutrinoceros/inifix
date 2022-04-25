@@ -119,6 +119,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         action="store_true",
         help="Print the unified diff to stdout instead of editing files inplace",
     )
+    parser.add_argument(
+        "--report-noop",
+        action="store_true",
+        help="Explicitly log noops for files that are already formatted",
+    )
 
     args = parser.parse_args(argv)
 
@@ -142,7 +147,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         fmted_data = iniformat(data)
 
         if fmted_data == data:
-            print(f"{file} is already formatted", file=sys.stderr)
+            if args.report_noop:
+                # printing to stderr so that we can pipe into cdiff in --diff mode
+                print(f"{file} is already formatted", file=sys.stderr)
             continue
         else:
             retv = 1

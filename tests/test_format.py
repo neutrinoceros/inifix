@@ -10,6 +10,8 @@ from inifix import load
 from inifix.format import iniformat
 from inifix.format import main
 
+DATA_DIR = Path(__file__).parent / "data"
+
 
 def test_format_keep_data(inifile, capsys, tmp_path):
     target = tmp_path / inifile.name
@@ -22,22 +24,13 @@ def test_format_keep_data(inifile, capsys, tmp_path):
 
     out, err = capsys.readouterr()
 
-    # nothing to output to stdout with --inplace
     assert out == ""
-    if err == f"{target} is already formatted\n":
-        assert ret == 0
-    else:
-        assert err == f"Fixing {target}\n"
-        assert ret != 0
-
     data_new = load(target)
     assert data_new == ref_data
 
 
 @pytest.mark.parametrize("infile", ("format-in.ini", "format-out.ini"))
 def test_exact_format_diff(infile, capsys, tmp_path):
-    DATA_DIR = Path(__file__).parent / "data"
-
     expected = "\n".join(
         run(
             [
@@ -57,14 +50,7 @@ def test_exact_format_diff(infile, capsys, tmp_path):
 
     ret = main([str(target), "--diff"])
     out, err = capsys.readouterr()
-
-    if err == f"{target} is already formatted\n":
-        assert ret == 0
-        assert out == ""
-    else:
-        assert err == ""
-        assert ret != 0
-        assert expected in out
+    assert (ret == 0 and out == "") or (ret != 0 and err == "" and expected in out)
 
 
 def test_exact_format_inplace(capsys, tmp_path):
@@ -152,10 +138,19 @@ def test_diff_stdout(inifile, capsys, tmp_path):
     assert isinstance(ret, int)
     out, err = capsys.readouterr()
 
-    if err == f"{target} is already formatted\n":
-        assert ret == 0
-        assert out == ""
-    else:
-        assert err == ""
-        assert ret != 0
-        assert out != ""
+    assert (ret == 0 and out == "") or (ret != 0 and err == "" and out != "")
+
+
+def test_report_noop(capsys, tmp_path):
+    inifile = DATA_DIR / "format-out.ini"
+    target = tmp_path / inifile.name
+
+    shutil.copyfile(inifile, target)
+
+    ret = main([str(target), "--report-noop"])
+    assert ret == 0
+
+    out, err = capsys.readouterr()
+
+    assert out == ""
+    assert err == f"{target} is already formatted\n"
