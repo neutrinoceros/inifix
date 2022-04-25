@@ -1,7 +1,7 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
-[![PyPI](https://img.shields.io/pypi/pyversions/inifix/2.0.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
+[![PyPI](https://img.shields.io/pypi/pyversions/inifix/2.1.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -153,7 +153,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v2.0.0
+    rev: v2.1.0
     hooks:
       - id: inifix-validate
 ```
@@ -178,7 +178,7 @@ $ inifix-format pluto.ini --diff
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v2.0.0
+    rev: v2.1.0
     hooks:
       - id: inifix-format
 ```
