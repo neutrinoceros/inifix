@@ -66,12 +66,15 @@ def test_idempotent_io(inifile):
         ("""val 1e2\n""", {"val": 100}),
         ("""val "1e2"\n""", {"val": "1e2"}),
         ("""val '1e2'\n""", {"val": "1e2"}),
+        ('''[Spam]\nEggs "Bacon Saussage"''', {"Spam": {"Eggs": "Bacon Saussage"}}),
+        (
+            "name true 'true'     'steven bacon'  ",
+            {"name": [True, "true", "steven bacon"]},
+        ),
     ],
 )
-def test_string_casting(data, expected, tmp_path):
-    file = tmp_path / "test_file.ini"
-    file.write_text(data)
-    mapping = load(file)
+def test_string_casting(data, expected):
+    mapping = loads(data)
     assert mapping == expected
 
 

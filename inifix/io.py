@@ -6,6 +6,7 @@ from typing import Any
 from typing import Callable
 from typing import cast
 from typing import List
+from typing import Literal
 from typing import Mapping
 from typing import Optional
 from typing import TextIO
@@ -105,10 +106,41 @@ def _normalize_data(data: str) -> List[str]:
     return lines
 
 
+def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> Tuple[str, int]:
+    pos: int = start
+    while pos < len(data) and not re.match(pattern, data[pos]):
+        pos += 1
+    if start == 1:
+        end = pos + 1
+    else:
+        end = pos
+    token = data[:end]
+    return token, pos
+
+
+def _split_tokens(data: str) -> List[str]:
+    tokens = []
+    pattern = r"\s"
+    start: Literal[0, 1] = 0
+    data = data.strip()
+    while True:
+        token, pos = _next_token(data, pattern, start)
+        tokens.append(token)
+        data = data[pos + 1 :].strip()
+        if not data:
+            break
+        if data[0] in ('"', "'"):
+            pattern = data[0]
+            start = 1
+        else:
+            start = 0
+    return tokens
+
+
 def _tokenize_line(
     line: str, line_number: int, file: Optional[TextIO]
 ) -> Tuple[str, List[Scalar]]:
-    key, *raw_values = line.split()
+    key, *raw_values = _split_tokens(line)
     if not raw_values:
         if file is None:
             raise ValueError(f"Failed to parse line {line_number}: {line!r}")
