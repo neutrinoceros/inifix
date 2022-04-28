@@ -11,13 +11,10 @@ from typing import Sequence
 from typing import TextIO
 from typing import Union
 
+from inifix.io import _split_tokens
 from inifix.io import load
 
 PADDING_SIZE = 2
-
-
-def _normalize_whitespace(s: str) -> str:
-    return re.sub(r"\s", " ", s).strip()
 
 
 def _format_section(data: str) -> str:
@@ -28,14 +25,14 @@ def _format_section(data: str) -> str:
     values = []
     for line in lines:
         content, _, comment = line.partition("#")
-        content = _normalize_whitespace(content)
+        content = content.strip()
         if not content and not comment:
             continue
         contents.append(content)
-        comments.append(_normalize_whitespace(comment))
+        comments.append(comment.strip())
         if content.startswith("[") or not content:
             continue
-        parameter, *value = content.split()
+        parameter, *value = _split_tokens(content)
         parameters.append(parameter)
         values.append(value)
 
