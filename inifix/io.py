@@ -24,7 +24,7 @@ from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES
 from inifix.validation import validate_inifile_schema
 
-__all__ = ["load", "dump"]
+__all__ = ["load", "loads", "dump", "dumps"]
 
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
