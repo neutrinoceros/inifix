@@ -69,7 +69,7 @@ def test_exact_format_inplace(capsys, tmp_path):
     assert res == expected
 
 
-def test_no_parameters(capsys, tmp_path):
+def test_no_parameters(tmp_path):
     target = tmp_path / "no_params.ini"
     target.write_text(
         "    # comment 1\n"
@@ -154,3 +154,15 @@ def test_report_noop(capsys, tmp_path):
 
     assert out == ""
     assert err == f"{target} is already formatted\n"
+
+
+def test_format_quoted_strings_with_whitespaces(tmp_path):
+    target = tmp_path / "spaces.ini"
+
+    inserted = '''Eggs 'Bacon Saussage'     "spam"'''
+    expected = """Eggs    'Bacon Saussage'  "spam"\n"""
+    target.write_text(inserted)
+    ret = main([str(target)])
+    assert ret != 0
+
+    assert target.read_text() == expected

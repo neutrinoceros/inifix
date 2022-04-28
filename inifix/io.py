@@ -24,7 +24,7 @@ from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES
 from inifix.validation import validate_inifile_schema
 
-__all__ = ["load", "dump"]
+__all__ = ["load", "loads", "dump", "dumps"]
 
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
@@ -208,7 +208,12 @@ def _from_path(file: PathLike) -> InifixConfT:
 def _encode(v: Scalar) -> str:
     if isinstance(v, float):
         return ENotationIO.encode_preferential(v)
-    return str(v)
+    elif isinstance(v, str) and (
+        re.search(r"\s", v) is not None or v in ("true", "t", "false", "f")
+    ):
+        return repr(v)
+    else:
+        return str(v)
 
 
 def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: TextIO) -> None:

@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2022-04-28
+
+- BUG: fix a bug where formatting would affect spacing within quoted str values
+- BUG: fix a bug where strings containing spacing would be dumped without correct quotes,
+  making them appear as multiple separate values
+- BUG: fix a bug where special strings 'true', 't', 'false' and 'f' would decay to boolean after two parsing cycles
+- BUG: fix import * for inifix.io (add loads and dumps)
+
 ## [2.1.1] - 2022-04-27
 
 BUG: fix a bug where string values containing whitespaces would incorrectly be splitted
