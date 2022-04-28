@@ -208,7 +208,9 @@ def _from_path(file: PathLike) -> InifixConfT:
 def _encode(v: Scalar) -> str:
     if isinstance(v, float):
         return ENotationIO.encode_preferential(v)
-    elif isinstance(v, str) and re.search(r"\s", v) is not None:
+    elif isinstance(v, str) and (
+        re.search(r"\s", v) is not None or v in ("true", "t", "false", "f")
+    ):
         return repr(v)
     else:
         return str(v)

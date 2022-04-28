@@ -66,7 +66,6 @@ def test_idempotent_io(inifile):
         ("""val 1e2\n""", {"val": 100}),
         ("""val "1e2"\n""", {"val": "1e2"}),
         ("""val '1e2'\n""", {"val": "1e2"}),
-        ('''[Spam]\nEggs "Bacon Saussage"''', {"Spam": {"Eggs": "Bacon Saussage"}}),
         (
             "name true 'true'     'steven bacon'  1",
             {"name": [True, "true", "steven bacon", 1]},
@@ -78,9 +77,19 @@ def test_string_casting(data, expected):
     assert mapping == expected
 
 
-def test_idempotent_string_parsing():
-    initial_str = '''[Spam]\nEggs "Bacon Saussage"'''
-    initial_mapping = loads(initial_str)
+@pytest.mark.parametrize(
+    "data, expected",
+    [
+        ('''[Spam]\nEggs "Bacon Saussage"''', {"Spam": {"Eggs": "Bacon Saussage"}}),
+        (
+            "name true 'true'     'steven   bacon'  1",
+            {"name": [True, "true", "steven   bacon", 1]},
+        ),
+    ],
+)
+def test_idempotent_string_parsing(data, expected):
+    initial_mapping = loads(data)
+    assert initial_mapping == expected
     round_str = dumps(initial_mapping)
     round_mapping = loads(round_str)
     assert round_mapping == initial_mapping
