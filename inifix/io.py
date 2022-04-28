@@ -208,7 +208,10 @@ def _from_path(file: PathLike) -> InifixConfT:
 def _encode(v: Scalar) -> str:
     if isinstance(v, float):
         return ENotationIO.encode_preferential(v)
-    return str(v)
+    elif isinstance(v, str) and re.search(r"\s", v) is not None:
+        return repr(v)
+    else:
+        return str(v)
 
 
 def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: TextIO) -> None:

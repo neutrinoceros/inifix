@@ -68,14 +68,22 @@ def test_idempotent_io(inifile):
         ("""val '1e2'\n""", {"val": "1e2"}),
         ('''[Spam]\nEggs "Bacon Saussage"''', {"Spam": {"Eggs": "Bacon Saussage"}}),
         (
-            "name true 'true'     'steven bacon'  ",
-            {"name": [True, "true", "steven bacon"]},
+            "name true 'true'     'steven bacon'  1",
+            {"name": [True, "true", "steven bacon", 1]},
         ),
     ],
 )
 def test_string_casting(data, expected):
     mapping = loads(data)
     assert mapping == expected
+
+
+def test_idempotent_string_parsing():
+    initial_str = '''[Spam]\nEggs "Bacon Saussage"'''
+    initial_mapping = loads(initial_str)
+    round_str = dumps(initial_mapping)
+    round_mapping = loads(round_str)
+    assert round_mapping == initial_mapping
 
 
 def test_section_init():
