@@ -45,6 +45,15 @@ def str_caster(s: str) -> str:
         return s
 
 
+def _is_numeric(s: str) -> bool:
+    try:
+        float(s)
+    except ValueError:
+        return False
+    else:
+        return True
+
+
 CASTERS: List[Callable] = [
     int,
     float,
@@ -133,6 +142,7 @@ def _split_tokens(data: str) -> List[str]:
             pattern = data[0]
             start = 1
         else:
+            pattern = r"\s"
             start = 0
     return tokens
 
@@ -209,7 +219,9 @@ def _encode(v: Scalar) -> str:
     if isinstance(v, float):
         return ENotationIO.encode_preferential(v)
     elif isinstance(v, str) and (
-        re.search(r"\s", v) is not None or v in ("true", "t", "false", "f")
+        re.search(r"\s", v) is not None
+        or v in ("true", "t", "false", "f")
+        or _is_numeric(v)
     ):
         return repr(v)
     else:

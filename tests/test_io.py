@@ -85,6 +85,14 @@ def test_string_casting(data, expected):
             "name true 'true'     'steven   bacon'  1",
             {"name": [True, "true", "steven   bacon", 1]},
         ),
+        (
+            '''vals 'bacon' 2.2 "saussage"''',
+            {"vals": ["bacon", 2.2, "saussage"]},
+        ),
+        (
+            '''numbers 1 '1' 2.2 '2.2' 3.3.3 "3.3.3"''',
+            {"numbers": [1, "1", 2.2, "2.2", "3.3.3", "3.3.3"]},
+        ),
     ],
 )
 def test_idempotent_string_parsing(data, expected):

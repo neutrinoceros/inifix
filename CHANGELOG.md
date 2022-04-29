@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- BUG: fix a critical bug in parsing lines with interleaved quoted strings and other types
+- BUG: fix casting for numeric str
+
+
 ## [2.1.2] - 2022-04-28
 
 - BUG: fix a bug where formatting would affect spacing within quoted str values
