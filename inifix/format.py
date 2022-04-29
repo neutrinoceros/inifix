@@ -4,6 +4,7 @@ import re
 import sys
 from difflib import unified_diff
 from io import StringIO
+from tempfile import TemporaryDirectory
 from typing import Generator
 from typing import List
 from typing import Optional
@@ -163,9 +164,21 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print("\n")
         else:
             print(f"Fixing {file}", file=sys.stderr)
+            if not os.access(file, os.W_OK):
+                print(
+                    f"Error: could not write to {file} (permission denied)",
+                    file=sys.stderr,
+                )
+                retv = 1
+                continue
+
             try:
-                with open(file, "w") as fh:
-                    fh.write(fmted_data)
+                with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
+                    tmpfile = os.path.join(tmpdir, "ini")
+                    with open(tmpfile, "wb") as bfh:
+                        bfh.write(fmted_data.encode("utf-8"))
+                    os.replace(tmpfile, file)
+
             except OSError:
                 print(f"Error: could not write to {file}", file=sys.stderr)
                 retv = 1

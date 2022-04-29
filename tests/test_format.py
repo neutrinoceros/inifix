@@ -126,7 +126,7 @@ def test_error_read_only_file(inifile, capsys, tmp_path):
     assert ret != 0
     out, err = capsys.readouterr()
     assert out == ""
-    assert f"Error: could not write to {target}\n" in err
+    assert f"Error: could not write to {target} (permission denied)\n" in err
 
 
 def test_diff_stdout(inifile, capsys, tmp_path):
