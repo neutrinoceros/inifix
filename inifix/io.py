@@ -133,6 +133,7 @@ def _split_tokens(data: str) -> List[str]:
             pattern = data[0]
             start = 1
         else:
+            pattern = r"\s"
             start = 0
     return tokens
 
