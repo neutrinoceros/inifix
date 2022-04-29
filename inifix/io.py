@@ -2,6 +2,7 @@ import os
 import re
 from copy import deepcopy
 from io import TextIOBase
+from tempfile import TemporaryDirectory
 from typing import Any
 from typing import Callable
 from typing import cast
@@ -246,8 +247,11 @@ def _write_to_buffer(data: InifixConfT, buffer: TextIO) -> None:
 
 
 def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
-    with open(file, mode="wt") as fh:
-        _write_to_buffer(data, fh)
+    with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
+        tmpfile = os.path.join(tmpdir, "ini")
+        with open(tmpfile, "w") as fh:
+            _write_to_buffer(data, fh)
+        os.replace(tmpfile, file)
 
 
 def load(source: Union[InifixConfT, PathLike, TextIO], /) -> InifixConfT:
