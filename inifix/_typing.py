@@ -6,6 +6,9 @@ from typing import Iterable
 from typing import TypeVar
 from typing import Union
 
+# not quite typing.AnyStr : this is not a constrained type variable
+StrLike = Union[str, bytes]
+
 if sys.version_info >= (3, 9):
     PathLike = Union[AnyStr, os.PathLike[AnyStr]]
 else:

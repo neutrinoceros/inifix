@@ -166,3 +166,13 @@ def test_format_quoted_strings_with_whitespaces(tmp_path):
     assert ret != 0
 
     assert target.read_text() == expected
+
+
+def test_data_preservation(inifile, tmp_path):
+    # check that perilous string manipulations do not destroy data
+    initial_mapping = load(inifile)
+    target = tmp_path / inifile.name
+    shutil.copyfile(inifile, target)
+    main([str(target)])
+    round_mapping = load(target)
+    assert round_mapping == initial_mapping

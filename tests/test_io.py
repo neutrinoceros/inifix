@@ -2,6 +2,7 @@ import difflib
 import os
 import re
 import tempfile
+from io import BytesIO
 from pathlib import Path
 from stat import S_IREAD
 
@@ -20,7 +21,7 @@ from inifix.io import Section
 )
 def test_tokenizer(invalid_data):
     with pytest.raises(ValueError):
-        _tokenize_line(invalid_data, file="fake_filename", line_number=-1)
+        _tokenize_line(invalid_data, filename="fake_filename", line_number=-1)
 
 
 def test_unit_read(inifile):
@@ -146,7 +147,7 @@ def test_invalid_section_key():
 
 @pytest.mark.parametrize(
     "mode,expected_err",
-    [("rt", FileNotFoundError), ("rb", FileNotFoundError), ("wb", TypeError)],
+    [("rt", FileNotFoundError), ("rb", FileNotFoundError)],
 )
 def test_dump_wrong_mode(mode, expected_err, inifile, tmp_path):
     conf = load(inifile)
@@ -156,11 +157,12 @@ def test_dump_wrong_mode(mode, expected_err, inifile, tmp_path):
             dump(conf, fh)
 
 
-def test_dump_to_file_descriptor(inifile, tmp_path):
+@pytest.mark.parametrize("mode", ("w", "wb"))
+def test_dump_to_file_descriptor(mode, inifile, tmp_path):
     conf = load(inifile)
 
     file = tmp_path / "save.ini"
-    with open(file, mode="w") as fh:
+    with open(file, mode=mode) as fh:
         dump(conf, fh)
 
     # a little weak but better than just testing that the file isn't empty
@@ -199,8 +201,9 @@ def test_load_empty_file(tmp_path):
         load(target)
 
 
-def test_load_from_descriptor(inifile):
-    with open(inifile) as fh:
+@pytest.mark.parametrize("mode", ("r", "rb"))
+def test_load_from_descriptor(inifile, mode):
+    with open(inifile, mode=mode) as fh:
         load(fh)
 
 
@@ -235,3 +238,9 @@ def test_error_read_only_file(tmp_path):
         match=re.escape(f"Cannot write to {target} (permission denied)"),
     ):
         dump(data, target)
+
+
+def test_read_from_binary_io():
+    b = BytesIO(b"var 1 2 a b 'hello world'")
+    data = load(b)
+    assert data == {"var": [1, 2, "a", "b", "hello world"]}

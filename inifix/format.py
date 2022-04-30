@@ -139,8 +139,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             retv = 1
             continue
 
-        with open(file) as fh:
-            data = fh.read()
+        with open(file, mode="rb") as fh:
+            data = fh.read().decode("utf-8")
+            # make sure newlines are always decoded as \n, even on windows
+            data = data.replace("\r\n", "\n")
 
         fmted_data = iniformat(data)
 

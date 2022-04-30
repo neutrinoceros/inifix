@@ -1,7 +1,7 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
-[![PyPI](https://img.shields.io/pypi/pyversions/inifix/2.2.1?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
+[![PyPI](https://img.shields.io/pypi/pyversions/inifix/2.3.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -108,12 +108,13 @@ and consists in four main functions:
 ```python
 import inifix
 
-with open("pluto.ini") as fh:
+with open("pluto.ini, "rb") as fh:
     conf = inifix.load(fh)
 
 # or equivalently
 conf = inifix.load("pluto.ini")
 ```
+Files are assumed to be encoded as UTF-8.
 
 ### ... and writing back to disk
 
@@ -123,9 +124,15 @@ This allows to change a value on the fly and create new
 configuration files programmatically, for instance.
 ```python
 conf["Time"]["CFL"] = 0.1
+
+with open("pluto-mod.ini", "wb") as fh:
+    inifix.dump(conf, fh)
+
+# or equivalently
 inifix.dump(conf, "pluto-mod.ini")
 ```
 Data will be validated against inifix's format specification at write time.
+Files are always encoded as UTF-8.
 
 ### Schema Validation
 
@@ -153,7 +160,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v2.2.1
+    rev: v2.3.0
     hooks:
       - id: inifix-validate
 ```
@@ -164,7 +171,10 @@ To format a file in place, use
 ```shell
 $ inifix-format pluto.ini
 ```
-Note that comments are preserved.
+inifix-format is guaranteed to preserve comments and to *only* edit (add or remove)
+whitespace characters.
+
+Files are always encoded as UTF-8.
 
 #### Options
 
@@ -178,7 +188,7 @@ $ inifix-format pluto.ini --diff
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v2.2.1
+    rev: v2.3.0
     hooks:
       - id: inifix-format
 ```
