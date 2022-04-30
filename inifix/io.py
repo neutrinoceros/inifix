@@ -1,7 +1,8 @@
 import os
 import re
 from copy import deepcopy
-from io import TextIOBase
+from io import BufferedIOBase
+from io import IOBase
 from tempfile import TemporaryDirectory
 from typing import Any
 from typing import Callable
@@ -10,7 +11,6 @@ from typing import List
 from typing import Literal
 from typing import Mapping
 from typing import Optional
-from typing import TextIO
 from typing import Tuple
 from typing import Union
 
@@ -21,6 +21,7 @@ from inifix._typing import InifixConfT
 from inifix._typing import IterableOrSingle
 from inifix._typing import PathLike
 from inifix._typing import Scalar
+from inifix._typing import StrLike
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES
 from inifix.validation import validate_inifile_schema
@@ -106,14 +107,19 @@ class Section(dict):
 # load helper functions
 
 
-def _normalize_data(data: str) -> List[str]:
+def _normalize_data(data: StrLike) -> List[str]:
     # normalize text body `data` to parsable text lines
-    lines = []
-    for line in data.splitlines():
+    out_lines: List[str] = []
+    if isinstance(data, bytes):
+        raw_lines = [_.decode("utf-8") for _ in data.splitlines()]
+    else:
+        raw_lines = data.splitlines()
+
+    for line in raw_lines:
         # remove comments and normalize whitespace
         line, _, _comment = line.partition("#")
-        lines.append(re.sub(r"\s", " ", line.strip()))
-    return lines
+        out_lines.append(re.sub(r"\s", " ", line.strip()))
+    return out_lines
 
 
 def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> Tuple[str, int]:
@@ -149,14 +155,14 @@ def _split_tokens(data: str) -> List[str]:
 
 
 def _tokenize_line(
-    line: str, line_number: int, file: Optional[TextIO]
+    line: str, line_number: int, filename: Optional[str]
 ) -> Tuple[str, List[Scalar]]:
     key, *raw_values = _split_tokens(line)
     if not raw_values:
-        if file is None:
+        if filename is None:
             raise ValueError(f"Failed to parse line {line_number}: {line!r}")
         else:
-            raise ValueError(f"Failed to parse {file}:{line_number}:\n{line}")
+            raise ValueError(f"Failed to parse {filename}:{line_number}:\n{line}")
 
     values = []
     for val in raw_values:
@@ -175,7 +181,7 @@ def _tokenize_line(
     return key, values
 
 
-def _from_string(data: str, file: Optional[TextIO] = None) -> InifixConfT:
+def _from_string(data: StrLike, filename: Optional[str] = None) -> InifixConfT:
     # see https://github.com/python/mypy/issues/6463
     container: InifixConfT = {}  # type: ignore[assignment]
     lines = _normalize_data(data)
@@ -191,7 +197,7 @@ def _from_string(data: str, file: Optional[TextIO] = None) -> InifixConfT:
             continue
 
         values: Union[Scalar, List[Scalar]]
-        key, values = _tokenize_line(line, file=file, line_number=line_number)
+        key, values = _tokenize_line(line, filename=filename, line_number=line_number)
         if len(values) == 1:
             values = values[0]
         section[key] = values
@@ -199,17 +205,18 @@ def _from_string(data: str, file: Optional[TextIO] = None) -> InifixConfT:
     return container
 
 
-def _from_file_descriptor(file: TextIO) -> InifixConfT:
+def _from_file_descriptor(file: IOBase) -> InifixConfT:
+    filename = str(getattr(file, "name", repr(file)))
     data = file.read()
     lines = _normalize_data(data)
     if not "".join(lines):
-        raise ValueError(f"{file.name!r} appears to be empty.")
-    return _from_string(data, file=file)
+        raise ValueError(f"{filename!r} appears to be empty.")
+    return _from_string(data, filename=filename)
 
 
 def _from_path(file: PathLike) -> InifixConfT:
     file = os.fspath(file)
-    with open(file) as fh:
+    with open(file, "rb") as fh:
         return _from_file_descriptor(fh)
 
 
@@ -229,21 +236,28 @@ def _encode(v: Scalar) -> str:
         return str(v)
 
 
-def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: TextIO) -> None:
+def _write(content: str, buffer: IOBase) -> None:
+    if isinstance(buffer, BufferedIOBase):
+        buffer.write(content.encode("utf-8"))
+    else:
+        buffer.write(content)
+
+
+def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: IOBase) -> None:
     val_repr = [_encode(v) for v in always_iterable(values)]
-    buffer.write(f"{key} {'  '.join([v for v in val_repr])}\n")
+    _write(f"{key} {'  '.join([v for v in val_repr])}\n", buffer)
 
 
-def _write_to_buffer(data: InifixConfT, buffer: TextIO) -> None:
+def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
     for _is_first, is_last, (key, val) in mark_ends(data.items()):
         if not isinstance(val, dict):
             _write_line(key, val, buffer)
             continue
-        buffer.write(f"[{key}]\n")
+        _write(f"[{key}]\n", buffer)
         for k, v in val.items():
             _write_line(k, v, buffer)
         if not is_last:
-            buffer.write("\n")
+            _write("\n", buffer)
 
 
 def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
@@ -251,12 +265,12 @@ def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
         raise PermissionError(f"Cannot write to {file} (permission denied)")
     with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
         tmpfile = os.path.join(tmpdir, "ini")
-        with open(tmpfile, "w") as fh:
+        with open(tmpfile, "wb") as fh:
             _write_to_buffer(data, fh)
         os.replace(tmpfile, file)
 
 
-def load(source: Union[InifixConfT, PathLike, TextIO], /) -> InifixConfT:
+def load(source: Union[InifixConfT, PathLike, IOBase], /) -> InifixConfT:
     """
     Parse data from a file, or a dict.
 
@@ -265,10 +279,12 @@ def load(source: Union[InifixConfT, PathLike, TextIO], /) -> InifixConfT:
     source: any of the following
         - a dict (has to be inifix format-compliant)
         - the name of a file to read from, (str, bytes or os.PathLike)
-        - a readable file handle (assuming text mode)
+        - a readable handle. Both text and binary file modes are supported,
+          though binary is prefered.
+          In binary mode, we assume UTF-8 encoding.
     """
-    if isinstance(source, TextIOBase):
-        source = _from_file_descriptor(source)  # type: ignore [arg-type]
+    if isinstance(source, IOBase):
+        source = _from_file_descriptor(source)
     elif isinstance(source, (str, bytes, os.PathLike)):
         source = _from_path(source)
 
@@ -283,7 +299,7 @@ def loads(source: str, /) -> InifixConfT:
     return _from_string(source)
 
 
-def dump(data: InifixConfT, /, file: Union[PathLike, TextIOBase]) -> None:
+def dump(data: InifixConfT, /, file: Union[PathLike, IOBase]) -> None:
     """
     Write data to a file.
 
@@ -294,19 +310,21 @@ def dump(data: InifixConfT, /, file: Union[PathLike, TextIOBase]) -> None:
 
     file: any of the following
         - the name of a file to write to (str, bytes or os.PathLike)
-        - a writable file handle (assuming text mode)
+        - a writable handle. Both text and binary file modes are supported,
+          though binary is prefered.
+          In binary mode, data is encoded as UTF-8.
     """
     validate_inifile_schema(data)
 
-    try:
-        _write_to_buffer(data, file)  # type: ignore
-    except AttributeError:
+    if isinstance(file, IOBase):
+        _write_to_buffer(data, file)
+    else:
         _write_to_file(data, file)
 
 
 def dumps(data: InifixConfT, /) -> str:
-    from io import StringIO
+    from io import BytesIO
 
-    s = StringIO()
+    s = BytesIO()
     dump(data, file=s)
-    return s.getvalue()
+    return s.getvalue().decode("utf-8")

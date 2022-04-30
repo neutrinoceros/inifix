@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2022-05-01
+
+ENH: add support for binary IO
+
+All internal IO operations are now performed in binary mode whenever possible, assuming
+UTF-8 encoding.
+
 ## [2.2.1] - 2022-04-30
 
 BUG: fix a regression (inifix 2.2.0) where inifix.dump was able to write to a file even if
