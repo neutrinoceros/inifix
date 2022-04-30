@@ -1,7 +1,9 @@
 import difflib
+import os
 import re
 import tempfile
 from pathlib import Path
+from stat import S_IREAD
 
 import pytest
 
@@ -219,3 +221,17 @@ def test_loads_dumps_roundtrip(inifile):
     s1 = dumps(d1)
     d2 = loads(s1)
     assert d1 == d2
+
+
+def test_error_read_only_file(tmp_path):
+    target = tmp_path / "ini"
+    target.touch()
+    os.chmod(target, S_IREAD)
+
+    data = {"names": ["bob", "alice"]}
+
+    with pytest.raises(
+        PermissionError,
+        match=re.escape(f"Cannot write to {target} (permission denied)"),
+    ):
+        dump(data, target)

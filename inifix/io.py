@@ -247,6 +247,8 @@ def _write_to_buffer(data: InifixConfT, buffer: TextIO) -> None:
 
 
 def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
+    if os.path.exists(file) and not os.access(file, os.W_OK):
+        raise PermissionError(f"Cannot write to {file} (permission denied)")
     with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
         tmpfile = os.path.join(tmpdir, "ini")
         with open(tmpfile, "w") as fh:
