@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2022-05-24
+
+This release contains a small, yet breaking change: in previous versions of
+inifix, `t` and `f` were read as booleans. This feature was never documented
+and was never supported in Idefix. Meanwhile, Idefix (dev) now supports reading
+`yes` and `no` as booleans, so inifix will now also automatically parse these
+special strings to booleans.
+
+
 ## [2.3.0] - 2022-05-01
 
 ENH: add support for binary IO

@@ -6,12 +6,12 @@ from inifix.io import bool_caster
 BASE_BOOLS = [
     ("True", True),
     ("true", True),
-    ("T", True),
-    ("t", True),
+    ("Yes", True),
+    ("yes", True),
     ("False", False),
     ("false", False),
-    ("F", False),
-    ("f", False),
+    ("No", False),
+    ("no", False),
 ]
 
 

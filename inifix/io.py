@@ -33,9 +33,9 @@ SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 def bool_caster(s: str) -> bool:
     s = s.lower()
-    if s in ("true", "t"):
+    if s in ("true", "yes"):
         return True
-    elif s in ("false", "f"):
+    elif s in ("false", "no"):
         return False
     raise ValueError
 
