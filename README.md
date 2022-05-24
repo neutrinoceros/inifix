@@ -1,7 +1,7 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
-[![PyPI](https://img.shields.io/pypi/pyversions/inifix/2.3.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
+[![PyPI](https://img.shields.io/pypi/pyversions/inifix/3.0.0?logo=python&logoColor=white&label=Python)](https://pypi.org/project/inifix/)
 [![codecov](https://codecov.io/gh/neutrinoceros/inifix/branch/main/graph/badge.svg)](https://codecov.io/gh/neutrinoceros/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -24,9 +24,10 @@ supports section-free definitions.
 - values are represented in unicode characters
 - all values are considered numbers if possible (e.g., `1e3` is read as `1000`)
 - number values are read as integers if no loss of precision ensues, and floats otherwise
-- `true` and `false` are cast as booleans (case-insensitive)
+- `true` and `false` (resp. `yes` and `no`) are cast to booleans (case-insensitive)
 - values that can't be read as number or booleans are read as strings.
-- string delimiters `"` and `'` can be used to force string type for values that would otherwise be read as numbers and booleans.
+- string delimiters `"` and `'` can be used for strings containing whitespace, or to
+  force string type for values that would otherwise be read as numbers and booleans.
 - a parameter can be associated to a single value or a list of whitespace-separated values
 - sections titles start with `[` and end with `]`
 - comments start with `#` and are ignored
