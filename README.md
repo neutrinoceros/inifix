@@ -109,7 +109,7 @@ and consists in four main functions:
 ```python
 import inifix
 
-with open("pluto.ini, "rb") as fh:
+with open("pluto.ini", "rb") as fh:
     conf = inifix.load(fh)
 
 # or equivalently
