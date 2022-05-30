@@ -5,11 +5,10 @@ import sys
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
+from typing import IO
 from typing import Iterable
 from typing import List
 from typing import Optional
-from typing import Sequence
-from typing import TextIO
 from typing import Union
 
 from inifix.io import _split_tokens
@@ -91,7 +90,7 @@ def _finalize(res: str) -> str:
     return res
 
 
-def _iter_sections(fh: Union[StringIO, TextIO]) -> Iterable[str]:
+def _iter_sections(fh: IO[str]) -> Iterable[str]:
     line = fh.readline()
     while line != "":
         content = [line]
@@ -100,7 +99,7 @@ def _iter_sections(fh: Union[StringIO, TextIO]) -> Iterable[str]:
         yield "".join(content)
 
 
-def iniformat(fh: Union[StringIO, TextIO, str], /) -> str:
+def iniformat(fh: Union[IO[str], str], /) -> str:
     if isinstance(fh, str):
         fh = StringIO(fh)
     content = []
@@ -109,7 +108,7 @@ def iniformat(fh: Union[StringIO, TextIO, str], /) -> str:
     return _finalize("\n".join(content))
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs="+")
     parser.add_argument(
