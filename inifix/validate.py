@@ -1,13 +1,13 @@
+from __future__ import annotations
+
 import argparse
 import os
 import sys
-from typing import List
-from typing import Optional
 
 from inifix.io import load
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs="+")
 

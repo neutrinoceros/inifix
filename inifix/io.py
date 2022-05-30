@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 from copy import deepcopy
@@ -7,12 +9,8 @@ from tempfile import TemporaryDirectory
 from typing import Any
 from typing import Callable
 from typing import cast
-from typing import List
 from typing import Literal
 from typing import Mapping
-from typing import Optional
-from typing import Tuple
-from typing import Union
 
 from more_itertools import always_iterable
 from more_itertools import mark_ends
@@ -56,7 +54,7 @@ def _is_numeric(s: str) -> bool:
         return True
 
 
-CASTERS: List[Callable] = [
+CASTERS: list[Callable] = [
     int,
     float,
     bool_caster,
@@ -67,10 +65,10 @@ CASTERS: List[Callable] = [
 class Section(dict):
     def __init__(
         self,
-        data: Optional[Mapping[str, IterableOrSingle[Scalar]]] = None,
+        data: Mapping[str, IterableOrSingle[Scalar]] | None = None,
         /,
         *,
-        name: Optional[str] = None,
+        name: str | None = None,
     ) -> None:
         super().__init__()
         if data is not None:
@@ -107,9 +105,9 @@ class Section(dict):
 # load helper functions
 
 
-def _normalize_data(data: StrLike) -> List[str]:
+def _normalize_data(data: StrLike) -> list[str]:
     # normalize text body `data` to parsable text lines
-    out_lines: List[str] = []
+    out_lines: list[str] = []
     if isinstance(data, bytes):
         raw_lines = [_.decode("utf-8") for _ in data.splitlines()]
     else:
@@ -122,7 +120,7 @@ def _normalize_data(data: StrLike) -> List[str]:
     return out_lines
 
 
-def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> Tuple[str, int]:
+def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> tuple[str, int]:
     pos: int = start
     while pos < len(data) and not re.match(pattern, data[pos]):
         pos += 1
@@ -134,7 +132,7 @@ def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> Tuple[str, int
     return token, pos
 
 
-def _split_tokens(data: str) -> List[str]:
+def _split_tokens(data: str) -> list[str]:
     tokens = []
     pattern = r"\s"
     start: Literal[0, 1] = 0
@@ -155,8 +153,8 @@ def _split_tokens(data: str) -> List[str]:
 
 
 def _tokenize_line(
-    line: str, line_number: int, filename: Optional[str]
-) -> Tuple[str, List[Scalar]]:
+    line: str, line_number: int, filename: str | None
+) -> tuple[str, list[Scalar]]:
     key, *raw_values = _split_tokens(line)
     if not raw_values:
         if filename is None:
@@ -181,7 +179,7 @@ def _tokenize_line(
     return key, values
 
 
-def _from_string(data: StrLike, filename: Optional[str] = None) -> InifixConfT:
+def _from_string(data: StrLike, filename: str | None = None) -> InifixConfT:
     # see https://github.com/python/mypy/issues/6463
     container: InifixConfT = {}  # type: ignore[assignment]
     lines = _normalize_data(data)
@@ -196,7 +194,7 @@ def _from_string(data: StrLike, filename: Optional[str] = None) -> InifixConfT:
             section = Section(name=match["title"])
             continue
 
-        values: Union[Scalar, List[Scalar]]
+        values: Scalar | list[Scalar]
         key, values = _tokenize_line(line, filename=filename, line_number=line_number)
         if len(values) == 1:
             values = values[0]
@@ -270,7 +268,7 @@ def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
         os.replace(tmpfile, file)
 
 
-def load(source: Union[InifixConfT, PathLike, IOBase], /) -> InifixConfT:
+def load(source: InifixConfT | PathLike | IOBase, /) -> InifixConfT:
     """
     Parse data from a file, or a dict.
 
@@ -299,7 +297,7 @@ def loads(source: str, /) -> InifixConfT:
     return _from_string(source)
 
 
-def dump(data: InifixConfT, /, file: Union[PathLike, IOBase]) -> None:
+def dump(data: InifixConfT, /, file: PathLike | IOBase) -> None:
     """
     Write data to a file.
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import os
 import re
@@ -7,9 +9,6 @@ from io import StringIO
 from tempfile import TemporaryDirectory
 from typing import IO
 from typing import Iterable
-from typing import List
-from typing import Optional
-from typing import Union
 
 from inifix.io import _split_tokens
 from inifix.io import load
@@ -36,7 +35,7 @@ def _format_section(data: str) -> str:
         parameters.append(parameter)
         values.append(value)
 
-    column_sizes: List[int] = []
+    column_sizes: list[int] = []
     if not parameters:
         max_name_size = 0
     else:
@@ -99,7 +98,7 @@ def _iter_sections(fh: IO[str]) -> Iterable[str]:
         yield "".join(content)
 
 
-def iniformat(fh: Union[IO[str], str], /) -> str:
+def iniformat(fh: IO[str] | str, /) -> str:
     if isinstance(fh, str):
         fh = StringIO(fh)
     content = []
@@ -108,7 +107,7 @@ def iniformat(fh: Union[IO[str], str], /) -> str:
     return _finalize("\n".join(content))
 
 
-def main(argv: Optional[List[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs="+")
     parser.add_argument(
