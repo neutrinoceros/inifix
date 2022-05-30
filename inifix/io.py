@@ -54,7 +54,7 @@ def _is_numeric(s: str) -> bool:
         return True
 
 
-CASTERS: list[Callable] = [
+CASTERS: list[Callable[[str], Any]] = [
     int,
     float,
     bool_caster,
