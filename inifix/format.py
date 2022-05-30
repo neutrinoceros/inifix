@@ -5,7 +5,7 @@ import sys
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import Generator
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Sequence
@@ -91,7 +91,7 @@ def _finalize(res: str) -> str:
     return res
 
 
-def _iter_sections(fh: Union[StringIO, TextIO]) -> Generator[str, None, None]:
+def _iter_sections(fh: Union[StringIO, TextIO]) -> Iterable[str]:
     line = fh.readline()
     while line != "":
         content = [line]
