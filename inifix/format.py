@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import os
 import re
@@ -5,12 +7,8 @@ import sys
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import Generator
-from typing import List
-from typing import Optional
-from typing import Sequence
-from typing import TextIO
-from typing import Union
+from typing import IO
+from typing import Iterable
 
 from inifix.io import _split_tokens
 from inifix.io import load
@@ -37,7 +35,7 @@ def _format_section(data: str) -> str:
         parameters.append(parameter)
         values.append(value)
 
-    column_sizes: List[int] = []
+    column_sizes: list[int] = []
     if not parameters:
         max_name_size = 0
     else:
@@ -91,7 +89,7 @@ def _finalize(res: str) -> str:
     return res
 
 
-def _iter_sections(fh: Union[StringIO, TextIO]) -> Generator[str, None, None]:
+def _iter_sections(fh: IO[str]) -> Iterable[str]:
     line = fh.readline()
     while line != "":
         content = [line]
@@ -100,7 +98,7 @@ def _iter_sections(fh: Union[StringIO, TextIO]) -> Generator[str, None, None]:
         yield "".join(content)
 
 
-def iniformat(fh: Union[StringIO, TextIO, str], /) -> str:
+def iniformat(fh: IO[str] | str, /) -> str:
     if isinstance(fh, str):
         fh = StringIO(fh)
     content = []
@@ -109,7 +107,7 @@ def iniformat(fh: Union[StringIO, TextIO, str], /) -> str:
     return _finalize("\n".join(content))
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs="+")
     parser.add_argument(
