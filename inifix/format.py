@@ -172,17 +172,15 @@ def main(argv: list[str] | None = None) -> int:
                 retv = 1
                 continue
 
-            try:
-                with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
-                    tmpfile = os.path.join(tmpdir, "ini")
-                    with open(tmpfile, "wb") as bfh:
-                        bfh.write(fmted_data.encode("utf-8"))
-                    os.replace(tmpfile, file)
-
-            except OSError:
-                print(f"Error: could not write to {file}", file=sys.stderr)
-                retv = 1
-                continue
+            with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
+                tmpfile = os.path.join(tmpdir, "ini")
+                with open(tmpfile, "wb") as bfh:
+                    bfh.write(fmted_data.encode("utf-8"))
+                # this may still raise an error in the unlikely case of a race condition
+                # (if permissions are changed between the look and the leap), but we
+                # won't try to catch it unless it happens in production, because it is
+                # difficult to test systematically.
+                os.replace(tmpfile, file)
 
     return retv
 
