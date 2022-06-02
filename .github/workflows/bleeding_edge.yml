@@ -7,6 +7,9 @@ on:
   schedule:
     # run this every day at 3 am UTC
     - cron: '0 3 * * *'
+  pull_request:
+    paths:
+      - .github/workflows/bleeding_edge.yml
   workflow_dispatch:
 
 jobs:
