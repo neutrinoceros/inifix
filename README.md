@@ -7,17 +7,26 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
-`inifix` in a small Python library with I/O methods to read and write
-Pluto/Idefix inifiles as Python dictionaries.
+`inifix` is a small Python library of I/O functions to read and write "ini"
+configuration files in the style of [Pluto](http://plutocode.ph.unito.it) and
+[Idefix](https://gricad-gitlab.univ-grenoble-alpes.fr/lesurg/idefix-public).
 
-Its primary goal is to support Idefix's model (which is intended as identical to
-Pluto's), though the following file format specification is intended as a
-superset of the one used in Pluto and Idefix. Namely, while Pluto and Idefix
-require that each and every (key, value) pair be part of a section, `inifix`
-supports section-free definitions.
+While its primary goal is to follow Idefix's 'ini' format specification, it
+supports a small superset of it.
 
+The key differences are:
+- `inifix` supports section-free definitions. This means confifuration files
+  from [FARGO 3D](https://fargo3d.bitbucket.io) are also supported.
+- in `inifix`, strings can be escaped using `'` or `"`. This allows to have
+  whitespaces in string values and to force string type decoding where numeric
+  and boolean types would work.
 
-## File format specifications
+In rare cases where Idefix's 'ini' format doesn't match Pluto's, `inifix` will
+follow the former. Know differences are:
+- Idefix allows booleans to be written as `yes` and `no`.
+- Idefix allows integers to be written using scientific notation (e.g. `1e3`)
+
+## File format specifications details
 <details><summary>Unroll !</summary>
 - parameter names are strings
 - names and values are separated by non-newline white spaces
