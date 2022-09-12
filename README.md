@@ -7,7 +7,7 @@
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 
-`inifix` is a small Python library of I/O functions to read and write "ini"
+`inifix` is a small Python library of I/O functions to read and write 'ini'
 configuration files in the style of [Pluto](http://plutocode.ph.unito.it) and
 [Idefix](https://gricad-gitlab.univ-grenoble-alpes.fr/lesurg/idefix-public).
 
@@ -22,7 +22,7 @@ The key differences are:
   and boolean types would work.
 
 In rare cases where Idefix's 'ini' format doesn't match Pluto's, `inifix` will
-follow the former. Know differences are:
+follow the former. Known differences are:
 - Idefix allows booleans to be written as `yes` and `no`.
 - Idefix allows integers to be written using scientific notation (e.g. `1e3`)
 
