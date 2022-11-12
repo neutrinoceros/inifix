@@ -1,5 +1,49 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = [
+    "setuptools>=61.2",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inifix"
+version = "3.0.0"
+description = "I/O facility for Idefix/Pluto configuration files"
+authors = [
+    { name = "C.M.T. Robert" },
+]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Typing :: Typed",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "more-itertools>=8.4",
+]
+
+[project.license]
+text = "GPL-3.0"
+
+[project.optional-dependencies]
+test = [
+    "coverage[toml]>=6.5",
+    "pytest>=6.1",
+]
+typecheck = [
+    "mypy==0.950",
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.scripts]
+inifix-format = "inifix.format:main"
+inifix-validate = "inifix.validate:main"
+
+[project.urls]
+Homepage = "https://github.com/neutrinoceros/inifix"
 
 [tool.black]
 target_version = [
@@ -8,21 +52,6 @@ target_version = [
   'py310',
 ]
 line-length = 88
-
-[tool.pytest.ini_options]
-# pytest looks for configuration from pyproject.toml
-# only from version 6.0
-minversion = "6.0"
-addopts = "--doctest-modules"
-filterwarnings = [
-    "error",
-]
-
-[tool.coverage.run]
-omit = [
-  "setup.py",
-]
-parallel = true
 
 [tool.coverage.report]
 show_missing = true
@@ -41,6 +70,12 @@ exclude_lines = [
     "-> ['\"]?NoReturn['\"]?:",
 ]
 
+[tool.coverage.run]
+omit = [
+  "setup.py",
+]
+parallel = true
+
 [tool.mypy]
 python_version = "3.8"
 show_error_codes = true
@@ -53,3 +88,28 @@ disallow_untyped_defs = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 ignore_errors = true
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--doctest-modules"
+filterwarnings = [
+    "error",
+]
+
+[tool.setuptools]
+license-files = [
+    "LICENSE",
+]
+include-package-data = false
+
+[tool.setuptools.package-data]
+inifix = [
+    "py.typed",
+]
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests*",
+    "testing*",
+]
+namespaces = false
