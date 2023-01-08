@@ -178,7 +178,9 @@ def _tokenize_line(
     return key, values
 
 
-def _from_string(data: StrLike, filename: str | None = None) -> InifixConfT:
+def _from_string(
+    data: StrLike, *, parse_scalars_as_lists: bool, filename: str | None = None
+) -> InifixConfT:
     # see https://github.com/python/mypy/issues/6463
     container: InifixConfT = {}  # type: ignore[assignment]
     lines = _normalize_data(data)
@@ -195,26 +197,28 @@ def _from_string(data: StrLike, filename: str | None = None) -> InifixConfT:
 
         values: Scalar | list[Scalar]
         key, values = _tokenize_line(line, filename=filename, line_number=line_number)
-        if len(values) == 1:
+        if (not parse_scalars_as_lists) and len(values) == 1:
             values = values[0]
         section[key] = values
     section._dump_to(container)
     return container
 
 
-def _from_file_descriptor(file: IOBase) -> InifixConfT:
+def _from_file_descriptor(file: IOBase, *, parse_scalars_as_lists: bool) -> InifixConfT:
     filename = str(getattr(file, "name", repr(file)))
     data = file.read()
     lines = _normalize_data(data)
     if not "".join(lines):
         raise ValueError(f"{filename!r} appears to be empty.")
-    return _from_string(data, filename=filename)
+    return _from_string(
+        data, filename=filename, parse_scalars_as_lists=parse_scalars_as_lists
+    )
 
 
-def _from_path(file: PathLike) -> InifixConfT:
+def _from_path(file: PathLike, *, parse_scalars_as_lists: bool) -> InifixConfT:
     file = os.fspath(file)
     with open(file, "rb") as fh:
-        return _from_file_descriptor(fh)
+        return _from_file_descriptor(fh, parse_scalars_as_lists=parse_scalars_as_lists)
 
 
 # dump helper functions
@@ -270,7 +274,9 @@ def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
         os.replace(tmpfile, file)
 
 
-def load(source: InifixConfT | PathLike | IOBase, /) -> InifixConfT:
+def load(
+    source: InifixConfT | PathLike | IOBase, /, *, parse_scalars_as_lists: bool = False
+) -> InifixConfT:
     """
     Parse data from a file, or a dict.
 
@@ -282,11 +288,17 @@ def load(source: InifixConfT | PathLike | IOBase, /) -> InifixConfT:
         - a readable handle. Both text and binary file modes are supported,
           though binary is prefered.
           In binary mode, we assume UTF-8 encoding.
+
+    parse_scalars_as_lists: bool
+        if set to True, all values will be parses as lists of scalars,
+        even for parameters comprised of a single scalar.
     """
     if isinstance(source, IOBase):
-        source = _from_file_descriptor(source)
+        source = _from_file_descriptor(
+            source, parse_scalars_as_lists=parse_scalars_as_lists
+        )
     elif isinstance(source, (str, bytes, os.PathLike)):
-        source = _from_path(source)
+        source = _from_path(source, parse_scalars_as_lists=parse_scalars_as_lists)
 
     source = cast(Mapping, source)
 
@@ -295,8 +307,8 @@ def load(source: InifixConfT | PathLike | IOBase, /) -> InifixConfT:
     return source
 
 
-def loads(source: str, /) -> InifixConfT:
-    return _from_string(source)
+def loads(source: str, /, *, parse_scalars_as_lists: bool = False) -> InifixConfT:
+    return _from_string(source, parse_scalars_as_lists=parse_scalars_as_lists)
 
 
 def dump(data: InifixConfT, /, file: PathLike | IOBase) -> None:

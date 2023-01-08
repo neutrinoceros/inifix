@@ -244,3 +244,19 @@ def test_read_from_binary_io():
     b = BytesIO(b"var 1 2 a b 'hello world'")
     data = load(b)
     assert data == {"var": [1, 2, "a", "b", "hello world"]}
+
+
+def test_parse_scalars_as_lists(inifile):
+    def _validate(conf):
+        for value in conf.values():
+            if isinstance(value, dict):
+                _validate(value)
+            else:
+                assert type(value) is list
+
+    conf1 = load(inifile, parse_scalars_as_lists=True)
+    with open(inifile) as fh:
+        conf2 = load(fh, parse_scalars_as_lists=True)
+
+    _validate(conf1)
+    _validate(conf2)
