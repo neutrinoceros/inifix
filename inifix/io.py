@@ -5,7 +5,6 @@ import re
 from copy import deepcopy
 from io import BufferedIOBase
 from io import IOBase
-from tempfile import TemporaryDirectory
 from typing import Any
 from typing import Callable
 from typing import cast
@@ -261,6 +260,9 @@ def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
 def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
     if os.path.exists(file) and not os.access(file, os.W_OK):
         raise PermissionError(f"Cannot write to {file} (permission denied)")
+
+    from tempfile import TemporaryDirectory
+
     with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
         tmpfile = os.path.join(tmpdir, "ini")
         with open(tmpfile, "wb") as fh:
