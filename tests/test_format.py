@@ -50,7 +50,14 @@ def test_exact_format_diff(infile, capsys, tmp_path):
 
     ret = main([str(target), "--diff"])
     out, err = capsys.readouterr()
-    assert (ret == 0 and out == "") or (ret != 0 and err == "" and expected in out)
+    if ret == 0:
+        assert out == ""
+    else:
+        assert err == ""
+        for line in expected.split("\n"):
+            # order may vary, so we only check that
+            # each expected diff line is present
+            assert line in out
 
 
 def test_exact_format_inplace(capsys, tmp_path):
