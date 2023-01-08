@@ -125,6 +125,22 @@ conf = inifix.load("pluto.ini")
 ```
 Files are assumed to be encoded as UTF-8.
 
+`inifix.load` and `inifix.loads` accept a optional boolean flag
+`parse_scalars_as_list` (new in `inifix` v3.1.0), that is useful to simplify
+handling unknown data: all values can be safely treated as arrays, and iterated
+over, even in the presence of scalar strings. For illustration
+
+```python
+>>> import inifix
+>>> from pprint import pprint
+>>> pprint(inifix.load("example.ini"))
+{'Grid': {'x': [1, 2, 'u', 10], 'y': [4, 5, 'l', 100]},
+ 'Time Integrator': {'CFL': 0.001, 'tstop': 1000.0}}
+>>> pprint(inifix.load("ex.ini", parse_scalars_as_lists=True))
+{'Grid': {'x': [1, 2, 'u', 10], 'y': [4, 5, 'l', 100]},
+ 'Time Integrator': {'CFL': [0.001], 'tstop': [1000.0]}}
+```
+
 ### ... and writing back to disk
 
 `inifix.dump` allows to write back to a file.
