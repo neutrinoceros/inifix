@@ -217,17 +217,6 @@ This program also doubles as `pre-commit` hook
     hooks:
       - id: inifix-format
 ```
-## Contribution guidelines
-
-We use the [pre-commit](https://pre-commit.com) framework to automatically lint
-for code style and common pitfalls.
-
-Before you commit to your local copy of the repo, please run this from the top
-level
-```shell
-$ python3 -m pip install -u -e .[dev]
-$ pre-commit install
-```
 
 ## Testing
 
