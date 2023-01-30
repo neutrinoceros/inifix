@@ -126,7 +126,7 @@ conf = inifix.load("pluto.ini")
 Files are assumed to be encoded as UTF-8.
 
 `inifix.load` and `inifix.loads` accept a optional boolean flag
-`parse_scalars_as_list` (new in `inifix` v3.1.0), that is useful to simplify
+`parse_scalars_as_list` (new in `inifix` v4.0.0), that is useful to simplify
 handling unknown data: all values can be safely treated as arrays, and iterated
 over, even in the presence of scalar strings. For illustration
 
@@ -216,17 +216,6 @@ This program also doubles as `pre-commit` hook
     rev: v2.3.0
     hooks:
       - id: inifix-format
-```
-## Contribution guidelines
-
-We use the [pre-commit](https://pre-commit.com) framework to automatically lint
-for code style and common pitfalls.
-
-Before you commit to your local copy of the repo, please run this from the top
-level
-```shell
-$ python3 -m pip install -u -e .[dev]
-$ pre-commit install
 ```
 
 ## Testing

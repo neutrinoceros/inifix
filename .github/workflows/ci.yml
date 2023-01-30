@@ -38,7 +38,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Build
-      run: python -m pip install ".[test]"
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install -r tests/requirements.txt
+        python -m pip install .
 
     - run: python -m coverage run -m pytest --color=yes
 
@@ -61,7 +64,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
-          # Use latest Python, so it understands all syntax.
+        # Use latest Python, so it understands all syntax.
         python-version: '3.11'
 
     - run: python -m pip install --upgrade coverage[toml]
@@ -105,8 +108,9 @@ jobs:
 
     - name: Build
       run: |
-        python3 -m pip install --upgrade pip
-        python3 -m pip install .[typecheck]
+        python -m pip install --upgrade pip
+        python -m pip install -r typecheck_requirements.txt
+        python -m pip install .
 
     - name: Run mypy
       run: mypy inifix
