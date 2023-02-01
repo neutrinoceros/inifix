@@ -3,25 +3,14 @@ from __future__ import annotations
 import os
 import re
 from copy import deepcopy
-from io import BufferedIOBase
-from io import IOBase
-from typing import Any
-from typing import Callable
-from typing import cast
-from typing import Literal
-from typing import Mapping
+from io import BufferedIOBase, IOBase
+from typing import Any, Callable, Literal, Mapping, cast
 
-from more_itertools import always_iterable
-from more_itertools import mark_ends
+from more_itertools import always_iterable, mark_ends
 
-from inifix._typing import InifixConfT
-from inifix._typing import IterableOrSingle
-from inifix._typing import PathLike
-from inifix._typing import Scalar
-from inifix._typing import StrLike
+from inifix._typing import InifixConfT, IterableOrSingle, PathLike, Scalar, StrLike
 from inifix.enotation import ENotationIO
-from inifix.validation import SCALAR_TYPES
-from inifix.validation import validate_inifile_schema
+from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 
 __all__ = ["load", "loads", "dump", "dumps"]
 

@@ -36,6 +36,24 @@ inifix-validate = "inifix.validate:main"
 [project.urls]
 Homepage = "https://github.com/neutrinoceros/inifix"
 
+[tool.setuptools]
+license-files = [
+    "LICENSE",
+]
+include-package-data = false
+
+[tool.setuptools.package-data]
+inifix = [
+    "py.typed",
+]
+
+[tool.setuptools.packages.find]
+exclude = [
+    "tests*",
+    "testing*",
+]
+namespaces = false
+
 [tool.black]
 target_version = [
   'py38',
@@ -43,6 +61,19 @@ target_version = [
   'py310',
 ]
 line-length = 88
+
+[tool.ruff]
+target-version = "py38" # https://github.com/charliermarsh/ruff/issues/2039
+exclude = ["*__init__.py"]
+ignore = ["E501"]
+select = [
+    "E",
+    "F",
+    "W",
+    "B",
+    "I",
+    "UP",
+]
 
 [tool.coverage.report]
 show_missing = true
@@ -86,21 +117,3 @@ addopts = "--doctest-modules"
 filterwarnings = [
     "error",
 ]
-
-[tool.setuptools]
-license-files = [
-    "LICENSE",
-]
-include-package-data = false
-
-[tool.setuptools.package-data]
-inifix = [
-    "py.typed",
-]
-
-[tool.setuptools.packages.find]
-exclude = [
-    "tests*",
-    "testing*",
-]
-namespaces = false

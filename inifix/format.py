@@ -7,11 +7,9 @@ import sys
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import IO
-from typing import Iterable
+from typing import IO, Iterable
 
-from inifix.io import _split_tokens
-from inifix.io import load
+from inifix.io import _split_tokens, load
 
 PADDING_SIZE = 2
 

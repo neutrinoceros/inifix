@@ -1,10 +1,6 @@
 import os
 import sys
-from typing import AnyStr
-from typing import Dict
-from typing import Iterable
-from typing import TypeVar
-from typing import Union
+from typing import AnyStr, Dict, Iterable, TypeVar, Union
 
 # not quite typing.AnyStr : this is not a constrained type variable
 StrLike = Union[str, bytes]
