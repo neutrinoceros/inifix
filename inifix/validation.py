@@ -1,6 +1,5 @@
 import re
-from typing import Any
-from typing import Mapping
+from typing import Any, Mapping
 
 from more_itertools import always_iterable
 

@@ -1,6 +1,5 @@
 import re
 
-
 ENOTATION_REGEXP = re.compile(r"\d+(\.\d*)?e[+-]?\d+?")
 
 

@@ -7,8 +7,7 @@ from subprocess import run
 import pytest
 
 from inifix import load
-from inifix.format import iniformat
-from inifix.format import main
+from inifix.format import iniformat, main
 
 DATA_DIR = Path(__file__).parent / "data"
 

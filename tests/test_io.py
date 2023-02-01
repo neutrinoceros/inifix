@@ -8,12 +8,7 @@ from stat import S_IREAD
 
 import pytest
 
-from inifix.io import _tokenize_line
-from inifix.io import dump
-from inifix.io import dumps
-from inifix.io import load
-from inifix.io import loads
-from inifix.io import Section
+from inifix.io import Section, _tokenize_line, dump, dumps, load, loads
 
 
 @pytest.mark.parametrize(
