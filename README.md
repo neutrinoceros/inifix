@@ -101,7 +101,7 @@ lower case.
 ## Installation
 
 ```shell
-pip install inifix
+python -m pip install inifix
 ```
 
 ## Usage
@@ -186,7 +186,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v2.3.0
+    rev: v4.0.0
     hooks:
       - id: inifix-validate
 ```
@@ -214,7 +214,7 @@ $ inifix-format pluto.ini --diff
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v2.3.0
+    rev: v4.0.0
     hooks:
       - id: inifix-format
 ```
@@ -225,5 +225,6 @@ We use the [pytest](https://docs.pytest.org/en/latest/) framework to test
 `inifix`. The test suite can be run from the top level with a simple `pytest`
 invocation.
 ```shell
+$ python -m pip install --requirement requirements/tests.txt
 $ pytest
 ```
