@@ -1,8 +1,13 @@
 import re
-from typing import Any, Mapping
+import sys
+from typing import Any
 
 from more_itertools import always_iterable
 
+if sys.version_info >= (3, 9):
+    from collections.abc import Mapping
+else:
+    from typing import Mapping
 _PARAM_NAME_REGEXP = re.compile(r"[-\w]+")
 SCALAR_TYPES = (int, float, bool, str)
 

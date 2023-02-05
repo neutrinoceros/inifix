@@ -7,7 +7,12 @@ import sys
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import IO, Iterable
+from typing import IO
+
+if sys.version_info >= (3, 9):
+    from collections.abc import Iterable
+else:
+    from typing import Iterable
 
 from inifix.io import _split_tokens, load
 

@@ -1,6 +1,11 @@
 import os
 import sys
-from typing import AnyStr, Dict, Iterable, TypeVar, Union
+from typing import AnyStr, Dict, TypeVar, Union
+
+if sys.version_info >= (3, 9):
+    from collections.abc import Iterable
+else:
+    from typing import Iterable
 
 # not quite typing.AnyStr : this is not a constrained type variable
 StrLike = Union[str, bytes]

@@ -2,15 +2,21 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 from copy import deepcopy
 from io import BufferedIOBase, IOBase
-from typing import Any, Callable, Literal, Mapping, cast
+from typing import Any, Callable, Literal, cast
 
 from more_itertools import always_iterable, mark_ends
 
 from inifix._typing import InifixConfT, IterableOrSingle, PathLike, Scalar, StrLike
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
+
+if sys.version_info >= (3, 9):
+    from collections.abc import Mapping
+else:
+    from typing import Mapping
 
 __all__ = ["load", "loads", "dump", "dumps"]
 
