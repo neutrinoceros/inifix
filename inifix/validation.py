@@ -3,7 +3,7 @@ from typing import Any, Mapping
 
 from more_itertools import always_iterable
 
-_PARAM_NAME_REGEXP = re.compile(r"[-\w]+")
+_PARAM_NAME_REGEXP = re.compile(r"[-\.\w]+")
 SCALAR_TYPES = (int, float, bool, str)
 
 
@@ -23,7 +23,7 @@ def validate_elementary_item(key: Any, value: Any) -> None:
     if _uses_invalid_chars(key):
         raise ValueError(
             f"Invalid schema: received key {key!r}, "
-            "expected only alphanumeric characters or '-'"
+            "expected only alphanumeric characters or special characters from {'-', '.'}"
         )
     if not key[0].isalpha():
         raise ValueError(
