@@ -264,7 +264,11 @@ def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
 
 
 def load(
-    source: InifixConfT | PathLike | IOBase, /, *, parse_scalars_as_lists: bool = False
+    source: InifixConfT | PathLike | IOBase,
+    /,
+    *,
+    parse_scalars_as_lists: bool = False,
+    skip_validation: bool = False,
 ) -> InifixConfT:
     """
     Parse data from a file, or a dict.
@@ -281,6 +285,14 @@ def load(
     parse_scalars_as_lists: bool
         if set to True, all values will be parses as lists of scalars,
         even for parameters comprised of a single scalar.
+
+    skip_validation: bool
+        if set to True, input is not validated. This can be used to speedup io operations
+        trusted input or to work around bugs with the validation routine. Use with caution.
+
+    See Also
+    --------
+    inifix.loads
     """
     if isinstance(source, IOBase):
         source = _from_file_descriptor(
@@ -291,16 +303,49 @@ def load(
 
     source = cast(Mapping, source)
 
-    validate_inifile_schema(source)
+    if not skip_validation:
+        validate_inifile_schema(source)
     source = cast(InifixConfT, source)
     return source
 
 
-def loads(source: str, /, *, parse_scalars_as_lists: bool = False) -> InifixConfT:
-    return _from_string(source, parse_scalars_as_lists=parse_scalars_as_lists)
+def loads(
+    source: str,
+    /,
+    *,
+    parse_scalars_as_lists: bool = False,
+    skip_validation: bool = False,
+) -> InifixConfT:
+    """
+    Parse data from a string.
+
+    Parameters
+    ----------
+    source: str
+        The content of a parameter file (has to be inifix format-compliant)
+
+    parse_scalars_as_lists: bool
+        if set to True, all values will be parses as lists of scalars,
+        even for parameters comprised of a single scalar.
+
+    skip_validation: bool
+        if set to True, input is not validated. This can be used to speedup io operations
+        trusted input or to work around bugs with the validation routine. Use with caution.
+
+    See Also
+    --------
+    inifix.load
+    """
+    retv = _from_string(source, parse_scalars_as_lists=parse_scalars_as_lists)
+
+    if not skip_validation:
+        validate_inifile_schema(retv)
+    return retv
 
 
-def dump(data: InifixConfT, /, file: PathLike | IOBase) -> None:
+def dump(
+    data: InifixConfT, /, file: PathLike | IOBase, *, skip_validation: bool = False
+) -> None:
     """
     Write data to a file.
 
@@ -314,8 +359,17 @@ def dump(data: InifixConfT, /, file: PathLike | IOBase) -> None:
         - a writable handle. Both text and binary file modes are supported,
           though binary is prefered.
           In binary mode, data is encoded as UTF-8.
+
+    skip_validation: bool
+        if set to True, input is not validated. This can be used to speedup io operations
+        trusted input or to work around bugs with the validation routine. Use with caution.
+
+    See Also
+    --------
+    inifix.dumps
     """
-    validate_inifile_schema(data)
+    if not skip_validation:
+        validate_inifile_schema(data)
 
     if isinstance(file, IOBase):
         _write_to_buffer(data, file)
@@ -323,9 +377,29 @@ def dump(data: InifixConfT, /, file: PathLike | IOBase) -> None:
         _write_to_file(data, file)
 
 
-def dumps(data: InifixConfT, /) -> str:
+def dumps(data: InifixConfT, /, *, skip_validation: bool = False) -> str:
+    """
+    Convert data to a string.
+
+    Parameters
+    ----------
+    data: dict
+        has to be inifix format-compliant
+
+    skip_validation: bool
+        if set to True, input is not validated. This can be used to speedup io operations
+        trusted input or to work around bugs with the validation routine. Use with caution.
+
+    Returns
+    -------
+    string representing the content of a parameter file
+
+    See Also
+    --------
+    inifix.dump
+    """
     from io import BytesIO
 
     s = BytesIO()
-    dump(data, file=s)
+    dump(data, file=s, skip_validation=skip_validation)
     return s.getvalue().decode("utf-8")

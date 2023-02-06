@@ -255,3 +255,31 @@ def test_parse_scalars_as_lists(inifile):
 
     _validate(conf1)
     _validate(conf2)
+
+
+def test_skip_validation(monkeypatch, tmp_path):
+    import inifix
+
+    def _mp_validate_inifile_schema(d, /):
+        raise ValueError("gotcha")
+
+    # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
+    monkeypatch.setattr(
+        inifix.io, "validate_inifile_schema", _mp_validate_inifile_schema
+    )
+    ctx = pytest.raises(ValueError, match="gotcha")
+
+    data = "[Static Grid Output]\n" "dbl.h5    -1.0  -1"
+
+    with ctx:
+        loads(data)
+
+    with open(tmp_path / "data.ini", "w") as fh:
+        fh.write(data)
+
+    with ctx:
+        load(tmp_path / "data.ini")
+
+    conf1 = loads(data, skip_validation=True)
+    conf2 = load(tmp_path / "data.ini", skip_validation=True)
+    assert conf1 == conf2
