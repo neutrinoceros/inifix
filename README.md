@@ -15,7 +15,7 @@ While its primary goal is to follow Idefix's 'ini' format specification, it
 supports a small superset of it.
 
 The key differences are:
-- `inifix` supports section-free definitions. This means confifuration files
+- `inifix` supports section-free definitions. This means configuration files
   from [FARGO 3D](https://fargo3d.bitbucket.io) are also supported.
 - in `inifix`, strings can be escaped using `'` or `"`. This allows to have
   whitespaces in string values and to force string type decoding where numeric
