@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import re
+from functools import partial
 from io import BufferedIOBase, IOBase
 from typing import Any, Callable, Literal, Mapping, cast
 
@@ -88,6 +89,10 @@ class Section(dict):
 # load helper functions
 
 
+# this is more efficient than running str.partition in a loop
+_SPLIT_COMMENTS = partial(str.split, sep="#", maxsplit=1)
+
+
 def _normalize_data(data: StrLike) -> list[str]:
     # normalize text body `data` to parsable text lines
     out_lines: list[str] = []
@@ -96,10 +101,8 @@ def _normalize_data(data: StrLike) -> list[str]:
     else:
         raw_lines = data.splitlines()
 
-    for line in raw_lines:
-        # remove comments and normalize whitespace
-        line, _, _comment = line.partition("#")
-        out_lines.append(re.sub(r"\s", " ", line.strip()))
+    out_lines.extend([line.strip() for (line, *_) in map(_SPLIT_COMMENTS, raw_lines)])
+
     return out_lines
 
 
