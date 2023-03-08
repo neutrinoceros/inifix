@@ -1,7 +1,7 @@
 import pytest
 
 import inifix
-from inifix.io import bool_caster
+from inifix.io import _RE_CASTERS
 
 BASE_BOOLS = [
     ("True", True),
@@ -15,15 +15,20 @@ BASE_BOOLS = [
 ]
 
 
+def autocast(v):
+    for regexp, caster in _RE_CASTERS:
+        if regexp.fullmatch(v):
+            return caster(v)
+
+
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)
 def test_bool_cast(s, expected):
-    assert bool_caster(s) is expected
+    assert autocast(s) is expected
 
 
 @pytest.mark.parametrize("s", ["tdsk", "1213", "Treu", "Flsae", "flkj"])
 def test_bool_cast_invalid(s):
-    with pytest.raises(ValueError):
-        bool_caster(s)
+    assert type(autocast(s)) is not bool
 
 
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import re
-from copy import deepcopy
+from functools import partial
 from io import BufferedIOBase, IOBase
 from typing import Any, Callable, Literal, Mapping, cast
 
@@ -17,22 +17,6 @@ __all__ = ["load", "loads", "dump", "dumps"]
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 
-def bool_caster(s: str) -> bool:
-    s = s.lower()
-    if s in ("true", "yes"):
-        return True
-    elif s in ("false", "no"):
-        return False
-    raise ValueError
-
-
-def str_caster(s: str) -> str:
-    if re.match(r"^'.*'$", s) or re.match(r'^".*"$', s):
-        return s[1:-1]
-    else:
-        return s
-
-
 def _is_numeric(s: str) -> bool:
     try:
         float(s)
@@ -40,14 +24,6 @@ def _is_numeric(s: str) -> bool:
         return False
     else:
         return True
-
-
-CASTERS: list[Callable[[str], Any]] = [
-    int,
-    float,
-    bool_caster,
-    str_caster,
-]
 
 
 class Section(dict):
@@ -68,13 +44,9 @@ class Section(dict):
         if not isinstance(k, str):
             raise TypeError(f"Expected str keys. Received invalid key: {k}")
 
-        _val = deepcopy(v)  # avoid consuming the original iterable
         if not (
             isinstance(v, SCALAR_TYPES)
-            or (
-                isinstance(_val, list)
-                and all(isinstance(_, SCALAR_TYPES) for _ in _val)
-            )
+            or (isinstance(v, list) and all(isinstance(_, SCALAR_TYPES) for _ in v))
         ):
             raise TypeError(
                 "Expected all values to be scalars or lists of scalars. "
@@ -93,6 +65,10 @@ class Section(dict):
 # load helper functions
 
 
+# this is more efficient than running str.partition in a loop
+_SPLIT_COMMENTS = partial(str.split, sep="#", maxsplit=1)
+
+
 def _normalize_data(data: StrLike) -> list[str]:
     # normalize text body `data` to parsable text lines
     out_lines: list[str] = []
@@ -101,17 +77,20 @@ def _normalize_data(data: StrLike) -> list[str]:
     else:
         raw_lines = data.splitlines()
 
-    for line in raw_lines:
-        # remove comments and normalize whitespace
-        line, _, _comment = line.partition("#")
-        out_lines.append(re.sub(r"\s", " ", line.strip()))
+    out_lines.extend([line.strip() for (line, *_) in map(_SPLIT_COMMENTS, raw_lines)])
+
     return out_lines
 
 
-def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> tuple[str, int]:
+def _next_token(
+    data: str, pattern: re.Pattern, start: Literal[0, 1]
+) -> tuple[str, int]:
     pos: int = start
-    while pos < len(data) and not re.match(pattern, data[pos]):
-        pos += 1
+    match = pattern.search(data[start:])
+    if match is not None:
+        pos = start + match.start()
+    else:
+        pos = len(data)
     if start == 1:
         end = pos + 1
     else:
@@ -120,9 +99,14 @@ def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> tuple[str, int
     return token, pos
 
 
+_SPACES = re.compile(r"\s")
+_SINGLE_QUOTE = re.compile("'")
+_DOUBLE_QUOTE = re.compile('"')
+
+
 def _split_tokens(data: str) -> list[str]:
     tokens = []
-    pattern = r"\s"
+    pattern = _SPACES
     start: Literal[0, 1] = 0
     data = data.strip()
     while True:
@@ -131,13 +115,35 @@ def _split_tokens(data: str) -> list[str]:
         data = data[pos + 1 :].strip()
         if not data:
             break
-        if data[0] in ('"', "'"):
-            pattern = data[0]
+        d0 = data[0]
+        if _SINGLE_QUOTE.match(d0):
+            pattern = _SINGLE_QUOTE
+            start = 1
+        elif _DOUBLE_QUOTE.match(d0):
+            pattern = _DOUBLE_QUOTE
             start = 1
         else:
-            pattern = r"\s"
+            pattern = _SPACES
             start = 0
     return tokens
+
+
+_TRAILLING_NUM = re.compile(r"\.0+$")
+
+_RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
+    (re.compile(r"[0-9]+"), int),
+    (
+        re.compile(
+            r"(?:((?:\d\.?\d*[Ee][+\-]?\d+)|(?:\d+\.\d*|\d*\.\d+))|\d+|inf\s|nan\s)"
+        ),
+        float,
+    ),
+    (re.compile(r"(true|yes)", re.I), lambda _: True),
+    (re.compile(r"(false|no)", re.I), lambda _: False),
+    (re.compile(r"^'.*'$"), lambda s: s[1:-1]),
+    (re.compile(r'^".*"$'), lambda s: s[1:-1]),
+    (re.compile(r".*"), lambda s: s),
+]
 
 
 def _tokenize_line(
@@ -153,16 +159,12 @@ def _tokenize_line(
     values = []
     for val in raw_values:
         # remove period and trailing zeros to cast to int when possible
-        val = re.sub(r"\.0+$", "", val)
+        val = _TRAILLING_NUM.sub("", val)
 
-        for caster in CASTERS:
-            # cast to types from stricter to most permissive
-            # `str` will always succeed since it is the input type
-            try:
+        for regexp, caster in _RE_CASTERS:
+            if regexp.fullmatch(val):
                 values.append(caster(val))
                 break
-            except ValueError:
-                continue
 
     return key, values
 
@@ -177,7 +179,7 @@ def _from_string(
     for line_number, line in enumerate(lines, start=1):
         if not line:
             continue
-        match = re.fullmatch(SECTION_REGEXP, line)
+        match = SECTION_REGEXP.fullmatch(line)
         if match is not None:
             if section:
                 section._dump_to(container)
