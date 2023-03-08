@@ -17,22 +17,6 @@ __all__ = ["load", "loads", "dump", "dumps"]
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 
-def bool_caster(s: str) -> bool:
-    s = s.lower()
-    if s in ("true", "yes"):
-        return True
-    elif s in ("false", "no"):
-        return False
-    raise ValueError
-
-
-def str_caster(s: str) -> str:
-    if re.match(r"^'.*'$", s) or re.match(r'^".*"$', s):
-        return s[1:-1]
-    else:
-        return s
-
-
 def _is_numeric(s: str) -> bool:
     try:
         float(s)
@@ -40,14 +24,6 @@ def _is_numeric(s: str) -> bool:
         return False
     else:
         return True
-
-
-CASTERS: list[Callable[[str], Any]] = [
-    int,
-    float,
-    bool_caster,
-    str_caster,
-]
 
 
 class Section(dict):
@@ -154,6 +130,21 @@ def _split_tokens(data: str) -> list[str]:
 
 _TRAILLING_NUM = re.compile(r"\.0+$")
 
+_RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
+    (re.compile(r"[0-9]+"), int),
+    (
+        re.compile(
+            r"(?:((?:\d\.?\d*[Ee][+\-]?\d+)|(?:\d+\.\d*|\d*\.\d+))|\d+|inf\s|nan\s)"
+        ),
+        float,
+    ),
+    (re.compile(r"(true|yes)", re.I), lambda _: True),
+    (re.compile(r"(false|no)", re.I), lambda _: False),
+    (re.compile(r"^'.*'$"), lambda s: s[1:-1]),
+    (re.compile(r'^".*"$'), lambda s: s[1:-1]),
+    (re.compile(r".*"), lambda s: s),
+]
+
 
 def _tokenize_line(
     line: str, line_number: int, filename: str | None
@@ -170,15 +161,9 @@ def _tokenize_line(
         # remove period and trailing zeros to cast to int when possible
         val = _TRAILLING_NUM.sub("", val)
 
-        for caster in CASTERS:
-            # cast to types from stricter to most permissive
-            # `str` will always succeed since it is the input type
-            try:
-                _casted = caster(val)
-            except ValueError:
-                continue
-            else:
-                values.append(_casted)
+        for regexp, caster in _RE_CASTERS:
+            if regexp.fullmatch(val):
+                values.append(caster(val))
                 break
 
     return key, values
