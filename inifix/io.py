@@ -108,8 +108,11 @@ def _normalize_data(data: StrLike) -> list[str]:
 
 def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> tuple[str, int]:
     pos: int = start
-    while pos < len(data) and not re.match(pattern, data[pos]):
-        pos += 1
+    match = re.search(pattern, data[start:])
+    if match is not None:
+        pos = start + match.start()
+    else:
+        pos = len(data)
     if start == 1:
         end = pos + 1
     else:
