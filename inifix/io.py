@@ -138,6 +138,9 @@ def _split_tokens(data: str) -> list[str]:
     return tokens
 
 
+_TRAILLING_NUM = re.compile(r"\.0+$")
+
+
 def _tokenize_line(
     line: str, line_number: int, filename: str | None
 ) -> tuple[str, list[Scalar]]:
@@ -151,16 +154,18 @@ def _tokenize_line(
     values = []
     for val in raw_values:
         # remove period and trailing zeros to cast to int when possible
-        val = re.sub(r"\.0+$", "", val)
+        val = _TRAILLING_NUM.sub("", val)
 
         for caster in CASTERS:
             # cast to types from stricter to most permissive
             # `str` will always succeed since it is the input type
             try:
-                values.append(caster(val))
-                break
+                _casted = caster(val)
             except ValueError:
                 continue
+            else:
+                values.append(_casted)
+                break
 
     return key, values
 
