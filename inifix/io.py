@@ -179,7 +179,7 @@ def _from_string(
     for line_number, line in enumerate(lines, start=1):
         if not line:
             continue
-        match = re.fullmatch(SECTION_REGEXP, line)
+        match = SECTION_REGEXP.fullmatch(line)
         if match is not None:
             if section:
                 section._dump_to(container)
