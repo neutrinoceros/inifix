@@ -106,9 +106,11 @@ def _normalize_data(data: StrLike) -> list[str]:
     return out_lines
 
 
-def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> tuple[str, int]:
+def _next_token(
+    data: str, pattern: re.Pattern, start: Literal[0, 1]
+) -> tuple[str, int]:
     pos: int = start
-    match = re.search(pattern, data[start:])
+    match = pattern.search(data[start:])
     if match is not None:
         pos = start + match.start()
     else:
@@ -121,9 +123,14 @@ def _next_token(data: str, pattern: str, start: Literal[0, 1]) -> tuple[str, int
     return token, pos
 
 
+_SPACES = re.compile(r"\s")
+_SINGLE_QUOTE = re.compile("'")
+_DOUBLE_QUOTE = re.compile('"')
+
+
 def _split_tokens(data: str) -> list[str]:
     tokens = []
-    pattern = r"\s"
+    pattern = _SPACES
     start: Literal[0, 1] = 0
     data = data.strip()
     while True:
@@ -132,11 +139,15 @@ def _split_tokens(data: str) -> list[str]:
         data = data[pos + 1 :].strip()
         if not data:
             break
-        if data[0] in ('"', "'"):
-            pattern = data[0]
+        d0 = data[0]
+        if _SINGLE_QUOTE.match(d0):
+            pattern = _SINGLE_QUOTE
+            start = 1
+        elif _DOUBLE_QUOTE.match(d0):
+            pattern = _DOUBLE_QUOTE
             start = 1
         else:
-            pattern = r"\s"
+            pattern = _SPACES
             start = 0
     return tokens
 
