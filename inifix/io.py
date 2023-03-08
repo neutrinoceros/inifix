@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-from copy import deepcopy
 from io import BufferedIOBase, IOBase
 from typing import Any, Callable, Literal, Mapping, cast
 
@@ -68,13 +67,9 @@ class Section(dict):
         if not isinstance(k, str):
             raise TypeError(f"Expected str keys. Received invalid key: {k}")
 
-        _val = deepcopy(v)  # avoid consuming the original iterable
         if not (
             isinstance(v, SCALAR_TYPES)
-            or (
-                isinstance(_val, list)
-                and all(isinstance(_, SCALAR_TYPES) for _ in _val)
-            )
+            or (isinstance(v, list) and all(isinstance(_, SCALAR_TYPES) for _ in v))
         ):
             raise TypeError(
                 "Expected all values to be scalars or lists of scalars. "
