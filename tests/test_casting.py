@@ -37,3 +37,23 @@ def test_bool_cast_integration(s, expected, tmp_path):
         fh.write(f"dummy {s}")
     d = inifix.load(tmp_path / "dummy.ini")
     assert d == {"dummy": expected}
+
+
+@pytest.mark.parametrize(
+    "s, expected",
+    [
+        ("1.", 1.0),
+        ("1.0", 1.0),
+        ("1e3", 1000.0),
+        ("+1.", 1.0),
+        ("+1.0", 1.0),
+        ("+1e3", 1000.0),
+        ("-1.", -1.0),
+        ("-1.0", -1.0),
+        ("-1e3", -1000.0),
+    ],
+)
+def test_float_cast(s, expected):
+    res = autocast(s)
+    assert type(res) is float
+    assert res == expected

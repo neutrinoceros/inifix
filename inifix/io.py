@@ -134,7 +134,7 @@ _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
     (re.compile(r"[0-9]+"), int),
     (
         re.compile(
-            r"(?:((?:\d\.?\d*[Ee][+\-]?\d+)|(?:\d+\.\d*|\d*\.\d+))|\d+|inf\s|nan\s)"
+            r"[+/-]?(?:((?:\d\.?\d*[Ee][+\-]?\d+)|(?:\d+\.\d*|\d*\.\d+))|\d+|inf\s|nan\s)"
         ),
         float,
     ),
