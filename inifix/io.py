@@ -71,15 +71,12 @@ _SPLIT_COMMENTS = partial(str.split, sep="#", maxsplit=1)
 
 def _normalize_data(data: StrLike) -> list[str]:
     # normalize text body `data` to parsable text lines
-    out_lines: list[str] = []
     if isinstance(data, bytes):
         raw_lines = [_.decode("utf-8") for _ in data.splitlines()]
     else:
         raw_lines = data.splitlines()
 
-    out_lines.extend([line.strip() for (line, *_) in map(_SPLIT_COMMENTS, raw_lines)])
-
-    return out_lines
+    return [line.strip() for (line, *_) in map(_SPLIT_COMMENTS, raw_lines)]
 
 
 def _next_token(
@@ -116,10 +113,10 @@ def _split_tokens(data: str) -> list[str]:
         if not data:
             break
         d0 = data[0]
-        if _SINGLE_QUOTE.match(d0):
+        if d0 == "'":
             pattern = _SINGLE_QUOTE
             start = 1
-        elif _DOUBLE_QUOTE.match(d0):
+        elif d0 == '"':
             pattern = _DOUBLE_QUOTE
             start = 1
         else:
