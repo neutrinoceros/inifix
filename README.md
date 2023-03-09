@@ -186,7 +186,7 @@ This simple validator can be used as a hook for `pre-commit`. Simply add the
 following to your project's `.pre-commit-config.yaml`
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v4.2.1
+    rev: v4.2.2
     hooks:
       - id: inifix-validate
 ```
@@ -214,7 +214,7 @@ $ inifix-format pluto.ini --diff
 This program also doubles as `pre-commit` hook
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v4.2.1
+    rev: v4.2.2
     hooks:
       - id: inifix-format
 ```
