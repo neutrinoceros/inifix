@@ -35,6 +35,7 @@ inifix-validate = "inifix.validate:main"
 
 [project.urls]
 Homepage = "https://github.com/neutrinoceros/inifix"
+Changelog = "https://github.com/neutrinoceros/inifix/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 license-files = [
