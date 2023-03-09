@@ -116,10 +116,10 @@ def _split_tokens(data: str) -> list[str]:
         if not data:
             break
         d0 = data[0]
-        if _SINGLE_QUOTE.match(d0):
+        if d0 == "'":
             pattern = _SINGLE_QUOTE
             start = 1
-        elif _DOUBLE_QUOTE.match(d0):
+        elif d0 == '"':
             pattern = _DOUBLE_QUOTE
             start = 1
         else:
