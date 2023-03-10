@@ -142,9 +142,12 @@ over, even in the presence of scalar strings. For illustration
  'Time Integrator': {'CFL': [0.001], 'tstop': [1000.0]}}
 ```
 
+By default, `inifix.load` and `inifix.loads` validate input data. This step can
+be skipped by specifying `skip_validation=True`.
+
 ### ... and writing back to disk
 
-`inifix.dump` allows to write back to a file.
+`inifix.dump` writes data back to a file.
 
 This allows to change a value on the fly and create new
 configuration files programmatically, for instance.
@@ -159,6 +162,13 @@ inifix.dump(conf, "pluto-mod.ini")
 ```
 Data will be validated against inifix's format specification at write time.
 Files are always encoded as UTF-8.
+
+`inifix.dumps` is the same as `inifix.dump` except that it returns a string
+instead of writing to a file.
+
+By default, `inifix.dump` and `inifix.dumps` validate input data. This step can
+be skipped by specifying `skip_validation=True`.
+
 
 ### Schema Validation
 
@@ -182,14 +192,6 @@ $ inifix-validate pluto.ini
 Validated pluto.ini
 ```
 
-This simple validator can be used as a hook for `pre-commit`. Simply add the
-following to your project's `.pre-commit-config.yaml`
-```yaml
-  - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v4.2.2
-    hooks:
-      - id: inifix-validate
-```
 
 #### Formatting
 
@@ -202,21 +204,50 @@ whitespace characters.
 
 Files are always encoded as UTF-8.
 
-#### Options
-
-
-* To print a diff patch to stdout instead of editing the file, use the `--diff`
-  flag
+To print a diff patch to stdout instead of editing the file, use the `--diff` flag
 ```shell
 $ inifix-format pluto.ini --diff
 ```
 
-This program also doubles as `pre-commit` hook
+By default, `inifix-format` also validates input data. This step can be skipped with the
+`--skip-validation` flag
+
+### pre-commit hooks
+
+`inifix-validate` and `inifix-format` can be used as `pre-commit` hooks with the
+following configuration (add to `.pre-commit-config.yaml`)
+
+```yaml
+  - repo: https://github.com/neutrinoceros/inifix.git
+    rev: v4.2.2
+    hooks:
+      - id: inifix-validate
+```
+or
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
     rev: v4.2.2
     hooks:
       - id: inifix-format
+```
+
+Note that `inifix-format` also validates data by default, so it is redundant to
+utilize both hooks. Validation and formatting may nonetheless be decoupled as
+```patch
+  - repo: https://github.com/neutrinoceros/inifix.git
+    rev: v4.2.2
+    hooks:
+    - id: inifix-validate
+    - id: inifix-format
++     args: [--skip-validation]
+```
+
+By default, both hooks target files matching the regular expression `(\.ini)$`.
+It is possible to override this expression as, e.g.,
+```patch
+   hooks:
+   - id: inifix-format
++    files: (\.ini|\.par)$
 ```
 
 ## Testing
