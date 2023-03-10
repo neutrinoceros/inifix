@@ -118,6 +118,12 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Explicitly log noops for files that are already formatted",
     )
+    parser.add_argument(
+        "--skip-validation",
+        dest="validate",
+        action="store_false",
+        help="Skip validation step (formatting unvalidated data may lead to undefined behaviour)",
+    )
 
     args = parser.parse_args(argv)
 
@@ -128,12 +134,14 @@ def main(argv: list[str] | None = None) -> int:
             print(f"Error: could not find {file}", file=sys.stderr)
             retv = 1
             continue
-        try:
-            load(file)
-        except ValueError as exc:
-            print(f"Error: {exc}", file=sys.stderr)
-            retv = 1
-            continue
+
+        if args.validate:
+            try:
+                load(file)
+            except ValueError as exc:
+                print(f"Error: {exc}", file=sys.stderr)
+                retv = 1
+                continue
 
         with open(file, mode="rb") as fh:
             data = fh.read().decode("utf-8")
