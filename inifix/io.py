@@ -97,7 +97,6 @@ _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
     (re.compile(r"(false|no)", re.I), lambda _: False),
     (re.compile(r"^'.*'$"), lambda s: s[1:-1]),
     (re.compile(r'^".*"$'), lambda s: s[1:-1]),
-    (re.compile(r".*"), lambda s: s),
 ]
 
 
@@ -120,6 +119,8 @@ def _tokenize_line(
             if regexp.fullmatch(val):
                 values.append(caster(val))
                 break
+        else:
+            values.append(val)
 
     return key, values
 
