@@ -72,11 +72,8 @@ _SPLIT_COMMENTS = partial(str.split, sep="#", maxsplit=1)
 def _normalize_data(data: StrLike) -> list[str]:
     # normalize text body `data` to parsable text lines
     if isinstance(data, bytes):
-        raw_lines = [_.decode("utf-8") for _ in data.splitlines()]
-    else:
-        raw_lines = data.splitlines()
-
-    return [line.strip() for (line, *_) in map(_SPLIT_COMMENTS, raw_lines)]
+        data = data.decode("utf-8")
+    return [line.strip() for (line, *_) in map(_SPLIT_COMMENTS, data.splitlines())]
 
 
 def _next_token(
