@@ -4,7 +4,7 @@ import os
 import re
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import Any, Callable, Literal, Mapping, cast
+from typing import Any, Callable, Mapping, cast
 
 from more_itertools import always_iterable, mark_ends
 
@@ -76,50 +76,11 @@ def _normalize_data(data: StrLike) -> list[str]:
     return [line.strip() for (line, *_) in map(_SPLIT_COMMENTS, data.splitlines())]
 
 
-def _next_token(
-    data: str, pattern: re.Pattern, start: Literal[0, 1]
-) -> tuple[str, int]:
-    pos: int = start
-    match = pattern.search(data[start:])
-    if match is not None:
-        pos = start + match.start()
-    else:
-        pos = len(data)
-    if start == 1:
-        end = pos + 1
-    else:
-        end = pos
-    token = data[:end]
-    return token, pos
-
-
-_SPACES = re.compile(r"\s")
-_SINGLE_QUOTE = re.compile("'")
-_DOUBLE_QUOTE = re.compile('"')
+_TOKEN = re.compile(r"""'[^']*'|"[^"]*"|\S+""")
 
 
 def _split_tokens(data: str) -> list[str]:
-    tokens = []
-    pattern = _SPACES
-    start: Literal[0, 1] = 0
-    data = data.strip()
-    while True:
-        token, pos = _next_token(data, pattern, start)
-        tokens.append(token)
-        data = data[pos + 1 :].strip()
-        if not data:
-            break
-        d0 = data[0]
-        if d0 == "'":
-            pattern = _SINGLE_QUOTE
-            start = 1
-        elif d0 == '"':
-            pattern = _DOUBLE_QUOTE
-            start = 1
-        else:
-            pattern = _SPACES
-            start = 0
-    return tokens
+    return _TOKEN.findall(data)
 
 
 _TRAILLING_NUM = re.compile(r"\.0+$")
