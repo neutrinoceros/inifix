@@ -4,4 +4,4 @@ from .io import load
 from .io import loads
 from .validation import validate_inifile_schema
 
-__version__ = "4.2.2"
+__version__ = "4.3.0"
