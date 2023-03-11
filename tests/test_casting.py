@@ -1,7 +1,7 @@
 import pytest
 
 import inifix
-from inifix.io import _RE_CASTERS
+from inifix.io import _auto_cast
 
 BASE_BOOLS = [
     ("True", True),
@@ -15,20 +15,14 @@ BASE_BOOLS = [
 ]
 
 
-def autocast(v):
-    for regexp, caster in _RE_CASTERS:
-        if regexp.fullmatch(v):
-            return caster(v)
-
-
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)
 def test_bool_cast(s, expected):
-    assert autocast(s) is expected
+    assert _auto_cast(s) is expected
 
 
 @pytest.mark.parametrize("s", ["tdsk", "1213", "Treu", "Flsae", "flkj"])
 def test_bool_cast_invalid(s):
-    assert type(autocast(s)) is not bool
+    assert type(_auto_cast(s)) is not bool
 
 
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)
@@ -42,18 +36,18 @@ def test_bool_cast_integration(s, expected, tmp_path):
 @pytest.mark.parametrize(
     "s, expected",
     [
-        ("1.", 1.0),
-        ("1.0", 1.0),
-        ("1e3", 1000.0),
-        ("+1.", 1.0),
-        ("+1.0", 1.0),
-        ("+1e3", 1000.0),
-        ("-1.", -1.0),
-        ("-1.0", -1.0),
-        ("-1e3", -1000.0),
+        ("1.", 1),
+        ("1.0", 1),
+        ("1e3", 1000),
+        ("+1.", 1),
+        ("+1.0", 1),
+        ("+1e3", 1000),
+        ("-1.", -1),
+        ("-1.0", -1),
+        ("-1e3", -1000),
     ],
 )
 def test_float_cast(s, expected):
-    res = autocast(s)
-    assert type(res) is float
+    res = _auto_cast(s)
+    assert type(res) is type(expected)
     assert res == expected

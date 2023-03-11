@@ -68,6 +68,11 @@ def test_idempotent_io(inifile):
             "name true 'true'     'steven bacon'  1",
             {"name": [True, "true", "steven bacon", 1]},
         ),
+        (
+            # see https://github.com/neutrinoceros/inifix/issues/167
+            "dogs Idefix.000000",
+            {"dogs": "Idefix.000000"},
+        ),
     ],
 )
 def test_string_casting(data, expected):
