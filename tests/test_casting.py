@@ -36,18 +36,18 @@ def test_bool_cast_integration(s, expected, tmp_path):
 @pytest.mark.parametrize(
     "s, expected",
     [
-        ("1.", 1.0),
-        ("1.0", 1.0),
-        ("1e3", 1000.0),
-        ("+1.", 1.0),
-        ("+1.0", 1.0),
-        ("+1e3", 1000.0),
-        ("-1.", -1.0),
-        ("-1.0", -1.0),
-        ("-1e3", -1000.0),
+        ("1.", 1),
+        ("1.0", 1),
+        ("1e3", 1000),
+        ("+1.", 1),
+        ("+1.0", 1),
+        ("+1e3", 1000),
+        ("-1.", -1),
+        ("-1.0", -1),
+        ("-1e3", -1000),
     ],
 )
 def test_float_cast(s, expected):
     res = _auto_cast(s)
-    assert type(res) is float
+    assert type(res) is type(expected)
     assert res == expected
