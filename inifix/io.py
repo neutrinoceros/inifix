@@ -83,10 +83,7 @@ def _split_tokens(data: str) -> list[str]:
     return _TOKEN.findall(data)
 
 
-_TRAILLING_NUM = re.compile(r"\.0+$")
-
 _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
-    (re.compile(r"[0-9]+"), int),
     (
         re.compile(
             r"[+/-]?(?:((?:\d\.?\d*[Ee][+\-]?\d+)|(?:\d+\.\d*|\d*\.\d+))|\d+|inf\s|nan\s)"
@@ -100,6 +97,17 @@ _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
 ]
 
 
+def _auto_cast(s: str) -> Any:
+    if s.isnumeric():
+        return int(s)
+
+    for regexp, caster in _RE_CASTERS:
+        if regexp.fullmatch(s):
+            return caster(s)
+
+    return s
+
+
 def _tokenize_line(
     line: str, line_number: int, filename: str | None
 ) -> tuple[str, list[Scalar]]:
@@ -110,19 +118,7 @@ def _tokenize_line(
         else:
             raise ValueError(f"Failed to parse {filename}:{line_number}:\n{line}")
 
-    values = []
-    for val in raw_values:
-        # remove period and trailing zeros to cast to int when possible
-        val = _TRAILLING_NUM.sub("", val)
-
-        for regexp, caster in _RE_CASTERS:
-            if regexp.fullmatch(val):
-                values.append(caster(val))
-                break
-        else:
-            values.append(val)
-
-    return key, values
+    return key, [_auto_cast(v) for v in raw_values]
 
 
 def _from_string(
