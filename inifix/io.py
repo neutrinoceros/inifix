@@ -84,12 +84,6 @@ def _split_tokens(data: str) -> list[str]:
 
 
 _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
-    (
-        re.compile(
-            r"[+/-]?(?:((?:\d\.?\d*[Ee][+\-]?\d+)|(?:\d+\.\d*|\d*\.\d+))|\d+|inf\s|nan\s)"
-        ),
-        float,
-    ),
     (re.compile(r"(true|yes)", re.I), lambda _: True),
     (re.compile(r"(false|no)", re.I), lambda _: False),
     (re.compile(r"^'.*'$"), lambda s: s[1:-1]),
@@ -98,8 +92,15 @@ _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
 
 
 def _auto_cast(s: str) -> Any:
-    if s.isnumeric():
-        return int(s)
+    try:
+        f = float(s)
+    except ValueError:
+        pass
+    else:
+        if f.is_integer():
+            return int(f)
+        else:
+            return f
 
     for regexp, caster in _RE_CASTERS:
         if regexp.fullmatch(s):
