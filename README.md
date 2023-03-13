@@ -9,7 +9,7 @@
 
 `inifix` is a small Python library of I/O functions to read and write 'ini'
 configuration files in the style of [Pluto](http://plutocode.ph.unito.it) and
-[Idefix](https://gricad-gitlab.univ-grenoble-alpes.fr/lesurg/idefix-public).
+[Idefix](https://github.com/idefix-code/idefix).
 
 While its primary goal is to follow Idefix's 'ini' format specification, it
 supports a small superset of it.
