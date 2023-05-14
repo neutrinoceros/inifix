@@ -190,7 +190,7 @@ def _write(content: str, buffer: IOBase) -> None:
 
 def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: IOBase) -> None:
     val_repr = [_encode(v) for v in always_iterable(values)]
-    _write(f"{key} {'  '.join([v for v in val_repr])}\n", buffer)
+    _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
 
 def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
