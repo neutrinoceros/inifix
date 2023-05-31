@@ -49,10 +49,7 @@ inifix = [
 ]
 
 [tool.setuptools.packages.find]
-exclude = [
-    "tests*",
-    "testing*",
-]
+where = ["src"]
 namespaces = false
 
 [tool.ruff]
@@ -68,6 +65,9 @@ select = [
     "I",   # isort
     "UP",  # pyupgrade
 ]
+
+[tool.ruff.isort]
+known-first-party = ["inifix"]
 
 [tool.coverage.report]
 show_missing = true
