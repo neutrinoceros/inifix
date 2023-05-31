@@ -6,7 +6,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inifix"
-version = "4.3.2"
 description = "I/O facility for Idefix/Pluto configuration files"
 authors = [
     { name = "C.M.T. Robert" },
@@ -21,6 +20,10 @@ requires-python = ">=3.8"
 dependencies = [
     "more-itertools>=8.4",
 ]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "inifix.__version__"}
 
 [project.license]
 text = "GPL-3.0"
