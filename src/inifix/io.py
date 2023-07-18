@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import os
 import re
+from collections.abc import Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import Any, Callable, Mapping, cast
+from typing import Any, Callable, cast
 
 from more_itertools import always_iterable, mark_ends
 
