@@ -4,10 +4,11 @@ import argparse
 import os
 import re
 import sys
+from collections.abc import Iterable
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import IO, Iterable
+from typing import IO
 
 from inifix.io import _split_tokens, load
 
@@ -162,10 +163,7 @@ def main(argv: list[str] | None = None) -> int:
             for line in unified_diff(
                 data.splitlines(), fmted_data.splitlines(), fromfile=file
             ):
-                if sys.version_info >= (3, 9):
-                    line = line.removesuffix("\n")
-                elif line.endswith("\n"):
-                    line = line[:-1]
+                line = line.removesuffix("\n")
                 print(line)
             print("\n")
         else:
