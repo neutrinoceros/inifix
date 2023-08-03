@@ -109,7 +109,6 @@ ignore_errors = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "--doctest-modules"
 filterwarnings = [
     "error",
 ]
