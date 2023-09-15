@@ -136,7 +136,7 @@ over, even in the presence of scalar strings. For illustration
 >>> pprint(inifix.load("example.ini"))
 {'Grid': {'x': [1, 2, 'u', 10], 'y': [4, 5, 'l', 100]},
  'Time Integrator': {'CFL': 0.001, 'tstop': 1000.0}}
->>> pprint(inifix.load("ex.ini", parse_scalars_as_lists=True))
+>>> pprint(inifix.load("example.ini", parse_scalars_as_lists=True))
 {'Grid': {'x': [1, 2, 'u', 10], 'y': [4, 5, 'l', 100]},
  'Time Integrator': {'CFL': [0.001], 'tstop': [1000.0]}}
 ```
