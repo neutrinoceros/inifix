@@ -20,7 +20,7 @@ INVALID_CONTENTS, INVALID_CONTENTS_IDS = unzip(
 )
 
 
-@pytest.fixture(params=INVALID_CONTENTS, ids=INVALID_CONTENTS_IDS)
+@pytest.fixture(params=INVALID_CONTENTS, ids=INVALID_CONTENTS_IDS)  # type: ignore[call-overload]
 def invalid_file(tmp_path, request):
     file = tmp_path / "myfile.ini"
     file.write_text(request.param)

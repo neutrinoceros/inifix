@@ -5,7 +5,7 @@ import re
 from collections.abc import Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import Any, Callable, cast
+from typing import Any, Callable, TypeVar, cast, overload
 
 from more_itertools import always_iterable, mark_ends
 
@@ -219,13 +219,43 @@ def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
         os.replace(tmpfile, file)
 
 
+_RT = TypeVar("_RT")
+
+
+@overload
 def load(
     source: InifixConfT | PathLike | IOBase,
     /,
     *,
     parse_scalars_as_lists: bool = False,
     skip_validation: bool = False,
+    return_type: type[_RT],
+) -> _RT:
+    # the user is responsible for defining the return type and verifying that
+    # the result conforms to the definition
+    ...
+
+
+@overload
+def load(
+    source: InifixConfT | PathLike | IOBase,
+    /,
+    *,
+    parse_scalars_as_lists: bool = False,
+    skip_validation: bool = False,
+    return_type: None = None,
 ) -> InifixConfT:
+    ...
+
+
+def load(  #  type: ignore[no-untyped-def]
+    source,
+    /,
+    *,
+    parse_scalars_as_lists=False,
+    skip_validation=False,
+    return_type=None,
+):
     """
     Parse data from a file, or a dict.
 
@@ -246,6 +276,11 @@ def load(
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
 
+    return_type: Python type, or None (default)
+       this argument enables type-checking user code by specifying the expected return
+       type. Note that this has no effect at runtime. The user is responsible for
+       any runtime validation.
+
     See Also
     --------
     inifix.loads
@@ -265,13 +300,40 @@ def load(
     return source
 
 
+@overload
 def loads(
     source: str,
     /,
     *,
     parse_scalars_as_lists: bool = False,
     skip_validation: bool = False,
+    return_type: type[_RT],
+) -> _RT:
+    # the user is responsible for defining the return type and verifying that
+    # the result conforms to the definition
+    ...
+
+
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    parse_scalars_as_lists: bool = False,
+    skip_validation: bool = False,
+    return_type: None = None,
 ) -> InifixConfT:
+    ...
+
+
+def loads(  #  type: ignore[no-untyped-def]
+    source,
+    /,
+    *,
+    parse_scalars_as_lists=False,
+    skip_validation=False,
+    return_type=None,
+):
     """
     Parse data from a string.
 
@@ -288,6 +350,10 @@ def loads(
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
 
+    return_type: Python type, or None (default)
+       this argument enables type-checking user code by specifying the expected return
+       type. Note that this has no effect at runtime. The user is responsible for
+       any runtime validation.
     See Also
     --------
     inifix.load

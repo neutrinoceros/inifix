@@ -18,7 +18,7 @@ INVADLID_SCHEMAS, INVALID_SCHEMAS_IDS = unzip(
 )
 
 
-@pytest.fixture(params=INVADLID_SCHEMAS, ids=INVALID_SCHEMAS_IDS)
+@pytest.fixture(params=INVADLID_SCHEMAS, ids=INVALID_SCHEMAS_IDS)  # type: ignore[call-overload]
 def invalid_conf(request):
     return request.param
 
