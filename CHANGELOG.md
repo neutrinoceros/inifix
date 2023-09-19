@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.4.1] - 2023-09-19
+
+- BLD: drop support for CPython 3.8
+- TST: add support for CPython 3.12
+- DOC: fix a undesired asymmetry in usage example
+- DEP: drop more-itertools as a dependency
+
+## [4.4.0] - 2023-05-31
+
+- DOC: update link to Idefix
+- MNT: migrate to src layout
+
 ## [4.3.2] - 2023-03-11
 
 BUG: fix type casting bugs affecting integers and strings
