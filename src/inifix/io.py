@@ -7,8 +7,7 @@ from functools import partial
 from io import BufferedIOBase, IOBase
 from typing import Any, Callable, cast
 
-from more_itertools import always_iterable, mark_ends
-
+from inifix._more import always_iterable
 from inifix._typing import InifixConfT, IterableOrSingle, PathLike, Scalar, StrLike
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
@@ -195,14 +194,15 @@ def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: IOBase) -> N
 
 
 def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
-    for _is_first, is_last, (key, val) in mark_ends(data.items()):
+    last = len(data) - 1
+    for i, (key, val) in enumerate(data.items()):
         if not isinstance(val, dict):
             _write_line(key, val, buffer)
             continue
         _write(f"[{key}]\n", buffer)
         for k, v in val.items():
             _write_line(k, v, buffer)
-        if not is_last:
+        if i < last:
             _write("\n", buffer)
 
 

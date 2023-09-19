@@ -16,9 +16,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 requires-python = ">=3.9"
-dependencies = [
-    "more-itertools>=8.4",
-]
 dynamic = ["version"]
 
 [tool.setuptools.dynamic]
