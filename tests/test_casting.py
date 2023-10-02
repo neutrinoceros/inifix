@@ -22,7 +22,7 @@ def test_bool_cast(s, expected):
 
 @pytest.mark.parametrize("s", ["tdsk", "1213", "Treu", "Flsae", "flkj"])
 def test_bool_cast_invalid(s):
-    assert type(_auto_cast(s)) is not bool
+    assert type(_auto_cast(s)) is not bool  # noqa: E721
 
 
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)
