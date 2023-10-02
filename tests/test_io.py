@@ -252,7 +252,7 @@ def test_parse_scalars_as_lists(inifile):
             if isinstance(value, dict):
                 _validate(value)
             else:
-                assert type(value) is list
+                assert type(value) is list  # noqa: E721
 
     conf1 = load(inifile, parse_scalars_as_lists=True)
     with open(inifile) as fh:
