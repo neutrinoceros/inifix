@@ -22,12 +22,12 @@ jobs:
         - '3.9'
         - '3.10'
         - '3.11'
-        - 3.12-dev
+        - '3.12'
         include:
         - os: macos-latest
-          python-version: '3.11'
+          python-version: '3.12'
         - os: windows-latest
-          python-version: '3.11'
+          python-version: '3.12'
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -65,7 +65,7 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         # Use latest Python, so it understands all syntax.
-        python-version: 3.12-dev
+        python-version: 3.x
 
     - run: python -m pip install --upgrade coverage[toml]
 
@@ -87,11 +87,18 @@ jobs:
       if: ${{ failure() }}
 
   type-check:
+
+    strategy:
+      matrix:
+        python-version:
+        - '3.9'
+        - '3.12'
+
     runs-on: ubuntu-latest
     name: type check
 
     concurrency:
-      group: ${{ github.ref }}-dev
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ matrix.python-version }}-typecheck
       cancel-in-progress: true
 
     steps:
@@ -102,9 +109,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        # Match minimal supported Python version
-        # to make sure we're not using unparseable syntax
-        python-version: '3.9'
+        python-version: ${{ matrix.python-version }}
 
     - name: Build
       run: |
