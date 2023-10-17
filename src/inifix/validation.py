@@ -34,13 +34,13 @@ def validate_elementary_item(key: Any, value: Any) -> None:
     if not isinstance(value, (*SCALAR_TYPES, list)):
         raise ValueError(
             f"Invalid schema: received value with type '{type(value)}', "
-            "exepected an int, float, bool, str, or list"
+            "expected an int, float, bool, str, or list"
         )
     for ev in always_iterable(value):
         if not isinstance(ev, SCALAR_TYPES):
             raise ValueError(
                 f"Invalid schema: reveived value '{ev}' with type '{type(ev)}', "
-                "exepected a int, float, bool or str"
+                "expected an int, float, bool or str"
             )
 
 
