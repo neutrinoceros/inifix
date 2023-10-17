@@ -39,7 +39,7 @@ def validate_elementary_item(key: Any, value: Any) -> None:
     for ev in always_iterable(value):
         if not isinstance(ev, SCALAR_TYPES):
             raise ValueError(
-                f"Invalid schema: reveived value '{value}' with type '{type(value)}', "
+                f"Invalid schema: reveived value '{ev}' with type '{type(ev)}', "
                 "exepected a int, float, bool or str"
             )
 
