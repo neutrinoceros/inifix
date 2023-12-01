@@ -125,8 +125,7 @@ def _tokenize_line(
 def _from_string(
     data: StrLike, *, parse_scalars_as_lists: bool, filename: str | None = None
 ) -> InifixConfT:
-    # see https://github.com/python/mypy/issues/6463
-    container: InifixConfT = {}  # type: ignore[assignment]
+    container: InifixConfT = {}
     lines = _normalize_data(data)
     section = Section()  # the default target is a nameless section
     for line_number, line in enumerate(lines, start=1):
