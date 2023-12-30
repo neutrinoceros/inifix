@@ -52,7 +52,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@v4
       with:
-        name: inifix_coverage_data
+        name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}
         path: .coverage.*
         if-no-files-found: ignore
 
@@ -72,7 +72,8 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: inifix_coverage_data
+        pattern: inifix_coverage_data-*
+        merge-multiple: true
 
     - name: Check coverage
       run: |
