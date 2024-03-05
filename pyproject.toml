@@ -51,7 +51,7 @@ inifix = [
 where = ["src"]
 namespaces = false
 
-[tool.ruff]
+[tool.ruff.lint]
 exclude = ["*__init__.py"]
 ignore = ["E501"]
 select = [
@@ -65,7 +65,7 @@ select = [
     "UP",  # pyupgrade
 ]
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 known-first-party = ["inifix"]
 
 [tool.coverage.report]
