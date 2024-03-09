@@ -1,8 +1,8 @@
 import os
 import shutil
+from difflib import unified_diff
 from pathlib import Path
 from stat import S_IREAD
-from subprocess import run
 
 import pytest
 
@@ -28,35 +28,40 @@ def test_format_keep_data(inifile, capsys, tmp_path):
     assert data_new == ref_data
 
 
-@pytest.mark.parametrize("infile", ("format-in.ini", "format-out.ini"))
-def test_exact_format_diff(infile, capsys, tmp_path):
-    expected = "\n".join(
-        run(
-            [
-                "diff",
-                "-u",
-                str(DATA_DIR / "format-in.ini"),
-                str(DATA_DIR / "format-out.ini"),
-            ],
-            capture_output=True,
+def diff_file(f1: Path, f2: Path) -> str:
+    return (
+        "\n".join(
+            line.removesuffix("\n")
+            for line in unified_diff(
+                f1.read_text().splitlines(),
+                f2.read_text().splitlines(),
+                fromfile=str(f1),
+                # tofile=str(f2),
+            )
         )
-        .stdout.decode()
-        .splitlines()[2:]
+        + "\n"
     )
 
-    target = tmp_path / "out.ini"
-    shutil.copyfile(DATA_DIR / infile, target)
 
-    ret = main([str(target), "--diff"])
+@pytest.mark.parametrize(
+    "infile, expect_diff", [("format-in.ini", True), ("format-out.ini", False)]
+)
+def test_exact_format_diff(infile, expect_diff, capsys):
+    body = (DATA_DIR / infile).read_text()
+
+    ret = main([str(DATA_DIR / infile), "--diff"])
     out, err = capsys.readouterr()
-    if ret == 0:
-        assert out == ""
-    else:
+    if expect_diff:
+        assert ret != 0
+        expected = diff_file(DATA_DIR / infile, DATA_DIR / "format-out.ini")
+        assert out == expected
         assert err == ""
-        for line in expected.split("\n"):
-            # order may vary, so we only check that
-            # each expected diff line is present
-            assert line in out
+    else:
+        assert ret == 0
+        assert out == ""
+        assert err == ""
+
+    assert (DATA_DIR / infile).read_text() == body
 
 
 def test_exact_format_inplace(capsys, tmp_path):
