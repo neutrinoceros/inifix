@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
       with:
-        python-version: 3.12-dev
+        python-version: 3.13-dev
 
     - name: Install dependencies
       run: |
@@ -27,6 +27,7 @@ jobs:
         python -m pip install git+https://github.com/pytest-dev/pytest.git
     - name: Build
       run: python -m pip install .
+    - run: python -m pip list
     - name: Run tests
       run: pytest --color=yes
     - name: Run doctests
