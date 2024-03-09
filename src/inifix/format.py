@@ -160,12 +160,13 @@ def main(argv: list[str] | None = None) -> int:
             retv = 1
 
         if args.diff:
-            for line in unified_diff(
-                data.splitlines(), fmted_data.splitlines(), fromfile=file
-            ):
-                line = line.removesuffix("\n")
-                print(line)
-            print("\n")
+            diff = "\n".join(
+                line.removesuffix("\n")
+                for line in unified_diff(
+                    data.splitlines(), fmted_data.splitlines(), fromfile=file
+                )
+            )
+            print(diff)
         else:
             print(f"Fixing {file}", file=sys.stderr)
             if not os.access(file, os.W_OK):
