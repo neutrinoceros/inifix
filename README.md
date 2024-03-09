@@ -217,14 +217,14 @@ following configuration (add to `.pre-commit-config.yaml`)
 
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v4.4.2
+    rev: v4.4.3
     hooks:
       - id: inifix-validate
 ```
 or
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v4.4.2
+    rev: v4.4.3
     hooks:
       - id: inifix-format
 ```
