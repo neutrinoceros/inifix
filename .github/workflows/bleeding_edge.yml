@@ -27,6 +27,7 @@ jobs:
         python -m pip install git+https://github.com/pytest-dev/pytest.git
     - name: Build
       run: python -m pip install .
+    - run: python -m pip list
     - name: Run tests
       run: pytest --color=yes
     - name: Run doctests
