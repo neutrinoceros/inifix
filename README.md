@@ -177,6 +177,59 @@ will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
 inifix.validate_inifile_schema(data)
 ```
 
+### Writing type-safe applications of `inifix.load(s)`
+
+`inifix.load` has no built-in expectations on the type of any specific parameter;
+instead, all types are infered at runtime, which allows the function to work
+seamlessly with arbitrary parameter files.
+
+However, this also means that the output is not (and cannot be) type-safe.
+In other words, type checkers (e.g. `mypy`) cannot infer exact types of outputs,
+which is a problem in applications relying on type-checking.
+
+A solution to this problem, which is actually not specific to `inifix.load` and
+works with any arbitrarily formed `dict`, is to create a pipeline around this data
+which implements type-checkable code, where data is *also* validated at runtime.
+
+We'll illustrate this with a real-life example inspired from
+[`nonos`](https://pypi.org/project/nonos).
+Say, for instance, that we only care about a couple parameters from the `[Output]`
+and `[Hydro]` sections of `idefix.ini`. Let's build a type-safe `read_parameter_file`
+function around these.
+
+```python
+class IdefixIni:
+    def __init__(self, *, Hydro, Output, **kwargs):
+        self.hydro = IdefixIniHydro(**Hydro)
+        self.output = IdefixIniOutput(**Output)
+
+class IdefixIniHydro:
+    def __init__(self, **kwargs):
+        if "rotation" in kwargs:
+            self.frame = "COROT"
+            self.rotation = float(kwargs["rotation"])
+        else:
+            self.frame = "UNSET"
+            self.rotation = 0.0
+
+class IdefixIniOutput:
+    def __init__(self, *, vtk, **kwargs):
+        self.vtk = float(vtk)
+
+def read_parameter_file(file) -> IdefixIni:
+    return IdefixIni(**inifix.load(file))
+
+ini = read_parameter_file("idefix.ini")
+```
+
+Type checkers can now safely assume that, `ini.hydro.frame`, `ini.hydro.rotation`
+and `ini.output.vtk` all exist and are of type `str`, `float` and `float`, respectively.
+If this assumption is not verified at runtime, a `TypeError` will be raised.
+
+Note that we've used the catch-all `**kwargs` construct to capture optional
+parameters as well as any other parameters present (possibly none) that we do not
+care about.
+
 ### CLI
 
 Command line tools are shipped with the package to validate or format compatible
