@@ -11,13 +11,30 @@ on:
 
 jobs:
   build:
+    name: 'py${{ matrix.python-version }} (free-threading: ${{ matrix.free-threading }})'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - 3.13-dev
+        free-threading:
+        - false
+        - true
 
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
+      if: ${{ !matrix.free-threading }}
       with:
-        python-version: 3.13-dev
+        python-version: ${{ matrix.python-version }}
+    - uses: deadsnakes/action@v3.1.0
+      if: ${{ matrix.free-threading }}
+      with:
+        python-version: ${{ matrix.python-version }}
+        nogil: true
 
     - name: Install dependencies
       run: |
