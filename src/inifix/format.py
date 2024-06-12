@@ -138,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.validate:
             try:
-                load(file)
+                validate_baseline = load(file)
             except ValueError as exc:
                 print(f"Error: {exc}", file=sys.stderr)
                 retv = 1
@@ -181,6 +181,18 @@ def main(argv: list[str] | None = None) -> int:
                 tmpfile = os.path.join(tmpdir, "ini")
                 with open(tmpfile, "wb") as bfh:
                     bfh.write(fmted_data.encode("utf-8"))
+
+                if (
+                    args.validate and load(tmpfile) != validate_baseline
+                ):  # pragma: no cover
+                    print(
+                        f"Error: failed to format {file}: "
+                        "formatted data compares unequal to unformatted data",
+                        file=sys.stderr,
+                    )
+                    retv = 1
+                    continue
+
                 # this may still raise an error in the unlikely case of a race condition
                 # (if permissions are changed between the look and the leap), but we
                 # won't try to catch it unless it happens in production, because it is
