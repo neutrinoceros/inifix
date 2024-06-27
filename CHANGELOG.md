@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [4.5.0] - 2024-06-27
 
 - DOC: illustate how to write type-safe applications of `inifix.load`
+- ENH: `inifix-format` (and pre-commit hook) now validates that formatted data
+  compares identical to unformatted data (unless `--skip-validation` is passed)
 
 ## [4.4.3] - 2024-03-09
 
