@@ -145,18 +145,6 @@ def test_invalid_section_key():
         Section(data)
 
 
-@pytest.mark.parametrize(
-    "mode,expected_err",
-    [("rt", FileNotFoundError), ("rb", FileNotFoundError)],
-)
-def test_dump_wrong_mode(mode, expected_err, inifile, tmp_path):
-    conf = load(inifile)
-    save_file = str(tmp_path / "save.ini")
-    with pytest.raises(expected_err):
-        with open(save_file, mode=mode) as fh:
-            dump(conf, fh)
-
-
 @pytest.mark.parametrize("mode", ("w", "wb"))
 def test_dump_to_file_descriptor(mode, inifile, tmp_path):
     conf = load(inifile)

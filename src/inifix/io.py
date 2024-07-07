@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import os
 import re
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import Any, Callable, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from inifix._more import always_iterable
-from inifix._typing import InifixConfT, IterableOrSingle, PathLike, Scalar, StrLike
+from inifix._typing import InifixConfT, IterableOrSingle, Scalar, StrLike
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
+
+if TYPE_CHECKING:
+    from _typeshed import GenericPath
 
 __all__ = ["load", "loads", "dump", "dumps"]
 
@@ -158,7 +161,7 @@ def _from_file_descriptor(file: IOBase, *, parse_scalars_as_lists: bool) -> Inif
     )
 
 
-def _from_path(file: PathLike, *, parse_scalars_as_lists: bool) -> InifixConfT:
+def _from_path(file: GenericPath, *, parse_scalars_as_lists: bool) -> InifixConfT:
     file = os.fspath(file)
     with open(file, "rb") as fh:
         return _from_file_descriptor(fh, parse_scalars_as_lists=parse_scalars_as_lists)
@@ -205,7 +208,7 @@ def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
             _write("\n", buffer)
 
 
-def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
+def _write_to_file(data: InifixConfT, file: GenericPath, /) -> None:
     if os.path.exists(file) and not os.access(file, os.W_OK):
         raise PermissionError(f"Cannot write to {file} (permission denied)")
 
@@ -219,7 +222,7 @@ def _write_to_file(data: InifixConfT, file: PathLike, /) -> None:
 
 
 def load(
-    source: InifixConfT | PathLike | IOBase,
+    source: InifixConfT | GenericPath | IOBase,
     /,
     *,
     parse_scalars_as_lists: bool = False,
@@ -253,7 +256,7 @@ def load(
         source = _from_file_descriptor(
             source, parse_scalars_as_lists=parse_scalars_as_lists
         )
-    elif isinstance(source, (str, bytes, os.PathLike)):
+    elif isinstance(source, str | bytes | os.PathLike):
         source = _from_path(source, parse_scalars_as_lists=parse_scalars_as_lists)
 
     source = cast(Mapping, source)
@@ -299,7 +302,7 @@ def loads(
 
 
 def dump(
-    data: InifixConfT, /, file: PathLike | IOBase, *, skip_validation: bool = False
+    data: InifixConfT, /, file: GenericPath | IOBase, *, skip_validation: bool = False
 ) -> None:
     """
     Write data to a file.
