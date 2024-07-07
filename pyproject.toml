@@ -15,7 +15,7 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Typing :: Typed",
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dynamic = ["version"]
 
 [tool.setuptools.dynamic]
@@ -92,7 +92,7 @@ omit = [
 parallel = true
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.10"
 show_error_codes = true
 warn_unused_configs = true
 warn_unused_ignores = true

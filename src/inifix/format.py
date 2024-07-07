@@ -55,7 +55,7 @@ def _format_section(data: str) -> str:
 
     new_lines = []
     parameter_idx = 0
-    for content, comment in zip(contents, comments):
+    for content, comment in zip(contents, comments, strict=True):
         new_line = ""
         offset = 0
         if content:
@@ -63,7 +63,7 @@ def _format_section(data: str) -> str:
                 new_line += f"{content}\n"
             else:
                 new_line += parameters[parameter_idx].ljust(padded_name_col_size)
-                for val, size in zip(values[parameter_idx], column_sizes):
+                for val, size in zip(values[parameter_idx], column_sizes, strict=False):
                     new_line += val.ljust(size)
                 parameter_idx += 1
                 new_line = new_line.strip()
