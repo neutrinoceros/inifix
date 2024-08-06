@@ -42,6 +42,7 @@ jobs:
         python -m pip install --upgrade setuptools wheel
         python -m pip install git+https://github.com/more-itertools/more-itertools.git
         python -m pip install git+https://github.com/pytest-dev/pytest.git
+        python -m pip install pytest-repeat
     - name: Build
       run: python -m pip install .
     - run: python -m pip list
@@ -49,3 +50,5 @@ jobs:
       run: pytest --color=yes
     - name: Run doctests
       run: pytest --color=yes --pyargs inifix --doctest-modules
+    - name: Run concurrency tests
+      run: pytest --color=yes --count 100 tests/test_concurrent.py
