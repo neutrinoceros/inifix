@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from inifix.format import main as inifix_format_cli
+from inifix.validate import main as inifix_validate_cli
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -38,3 +39,15 @@ def test_inifix_format_cli(unformated_files, capsys):
     for file in unformated_files:
         body = file.read_text()
         assert body == expected
+
+
+def test_inifix_validate_cli(unformated_files, capsys):
+    ret = inifix_validate_cli([str(f) for f in unformated_files])
+    assert ret == 0
+
+    out, err = capsys.readouterr()
+    assert err == ""
+
+    # order of lines doesn't matter and is not guaranteed
+    out_lines = out.splitlines()
+    assert set(out_lines) == {f"Validated {file}" for file in unformated_files}
