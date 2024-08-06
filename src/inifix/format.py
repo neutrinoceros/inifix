@@ -8,8 +8,9 @@ from collections.abc import Iterable
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import IO, Literal, NamedTuple
+from typing import IO, Literal
 
+from inifix._cli import Message, TaskResults
 from inifix.io import _split_tokens, load
 
 PADDING_SIZE = 2
@@ -129,37 +130,36 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     global_status = 0
     for file in args.files:
-        report = _format_single_file_cli(
+        results = _format_single_file_cli(
             file,
             args_validate=args.validate,
             args_report_noop=args.report_noop,
             args_diff=args.diff,
         )
-        global_status = max(global_status, report.status)
-        if report.stdout:
-            print(report.stdout)
-        if report.stderr:
-            print(report.stderr, file=sys.stderr)
+        global_status = max(global_status, results.status)
+        for message in results.messages:
+            print(message.content, file=message.dest)
     return global_status
-
-
-class _FormatReport(NamedTuple):
-    status: Literal[0, 1]
-    stdout: str = ""
-    stderr: str = ""
 
 
 def _format_single_file_cli(
     file: str, *, args_validate: bool, args_report_noop: bool, args_diff: bool
-) -> _FormatReport:
+) -> TaskResults:
+    status: Literal[0, 1] = 0
+    messages: list[Message] = []
+
     if not os.path.isfile(file):
-        return _FormatReport(status=1, stderr=f"Error: could not find {file}")
+        status = 1
+        messages.append(Message(f"Error: could not find {file}", sys.stderr))
+        return TaskResults(status, messages)
 
     if args_validate:
         try:
             validate_baseline = load(file)
         except ValueError as exc:
-            return _FormatReport(status=1, stderr=f"Error: {exc}")
+            status = 1
+            messages.append(Message(f"Error: {exc}", sys.stderr))
+            return TaskResults(status, messages)
 
     with open(file, mode="rb") as fh:
         data = fh.read().decode("utf-8")
@@ -171,35 +171,29 @@ def _format_single_file_cli(
     if fmted_data == data:
         if args_report_noop:
             # printing to stderr so that we can pipe into cdiff in --diff mode
-            return _FormatReport(status=0, stderr=f"{file} is already formatted")
-        else:
-            return _FormatReport(status=0)
-
-    status: Literal[0, 1] = 1
-    stdout_lines: list[str] = []
-    stderr_lines: list[str] = []
-
-    def finalize_retv() -> _FormatReport:
-        return _FormatReport(
-            status=status,
-            stdout="\n".join(stdout_lines),
-            stderr="\n".join(stderr_lines),
-        )
+            messages.append(Message(f"{file} is already formatted", sys.stderr))
+        return TaskResults(status, messages)
 
     if args_diff:
-        stdout_lines.append(
-            "\n".join(
-                line.removesuffix("\n")
-                for line in unified_diff(
-                    data.splitlines(), fmted_data.splitlines(), fromfile=file
-                )
+        diff = "\n".join(
+            line.removesuffix("\n")
+            for line in unified_diff(
+                data.splitlines(), fmted_data.splitlines(), fromfile=file
             )
         )
+        if diff:
+            status = 1
+            messages.append(Message(diff, sys.stdout))
     else:
-        stderr_lines.append(f"Fixing {file}")
+        status = 1
+        messages.append(Message(f"Fixing {file}", sys.stderr))
         if not os.access(file, os.W_OK):
-            stderr_lines.append(f"Error: could not write to {file} (permission denied)")
-            return finalize_retv()
+            messages.append(
+                Message(
+                    f"Error: could not write to {file} (permission denied)", sys.stderr
+                )
+            )
+            return TaskResults(status, messages)
 
         with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
             tmpfile = os.path.join(tmpdir, "ini")
@@ -207,11 +201,14 @@ def _format_single_file_cli(
                 bfh.write(fmted_data.encode("utf-8"))
 
             if args_validate and load(tmpfile) != validate_baseline:  # pragma: no cover
-                stderr_lines.append(
-                    f"Error: failed to format {file}: "
-                    "formatted data compares unequal to unformatted data",
+                messages.append(
+                    Message(
+                        f"Error: failed to format {file}: "
+                        "formatted data compares unequal to unformatted data",
+                        sys.stderr,
+                    )
                 )
-                return finalize_retv()
+                return TaskResults(status, messages)
 
             # this may still raise an error in the unlikely case of a race condition
             # (if permissions are changed between the look and the leap), but we
@@ -219,7 +216,7 @@ def _format_single_file_cli(
             # difficult to test systematically.
             os.replace(tmpfile, file)
 
-    return finalize_retv()
+    return TaskResults(status, messages)
 
 
 if __name__ == "__main__":  # pragma: no cover
