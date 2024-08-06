@@ -8,7 +8,7 @@ from collections.abc import Iterable
 from difflib import unified_diff
 from io import StringIO
 from tempfile import TemporaryDirectory
-from typing import IO
+from typing import IO, Literal, NamedTuple
 
 from inifix.io import _split_tokens, load
 
@@ -127,79 +127,99 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     args = parser.parse_args(argv)
-
-    retv = 0
-
+    global_status = 0
     for file in args.files:
-        if not os.path.isfile(file):
-            print(f"Error: could not find {file}", file=sys.stderr)
-            retv = 1
-            continue
+        report = _format_single_file_cli(
+            file,
+            args_validate=args.validate,
+            args_report_noop=args.report_noop,
+            args_diff=args.diff,
+        )
+        global_status = max(global_status, report.status)
+        if report.stdout:
+            print(report.stdout)
+        if report.stderr:
+            print(report.stderr, file=sys.stderr)
+    return global_status
 
-        if args.validate:
-            try:
-                validate_baseline = load(file)
-            except ValueError as exc:
-                print(f"Error: {exc}", file=sys.stderr)
-                retv = 1
-                continue
 
-        with open(file, mode="rb") as fh:
-            data = fh.read().decode("utf-8")
-            # make sure newlines are always decoded as \n, even on windows
-            data = data.replace("\r\n", "\n")
+class _FormatReport(NamedTuple):
+    status: Literal[0, 1]
+    stdout: str = ""
+    stderr: str = ""
 
-        fmted_data = iniformat(data)
 
-        if fmted_data == data:
-            if args.report_noop:
-                # printing to stderr so that we can pipe into cdiff in --diff mode
-                print(f"{file} is already formatted", file=sys.stderr)
-            continue
+def _format_single_file_cli(
+    file: str, *, args_validate: bool, args_report_noop: bool, args_diff: bool
+) -> _FormatReport:
+    if not os.path.isfile(file):
+        return _FormatReport(status=1, stderr=f"Error: could not find {file}")
+
+    if args_validate:
+        try:
+            validate_baseline = load(file)
+        except ValueError as exc:
+            return _FormatReport(status=1, stderr=f"Error: {exc}")
+
+    with open(file, mode="rb") as fh:
+        data = fh.read().decode("utf-8")
+        # make sure newlines are always decoded as \n, even on windows
+        data = data.replace("\r\n", "\n")
+
+    fmted_data = iniformat(data)
+
+    if fmted_data == data:
+        if args_report_noop:
+            # printing to stderr so that we can pipe into cdiff in --diff mode
+            return _FormatReport(status=0, stderr=f"{file} is already formatted")
         else:
-            retv = 1
+            return _FormatReport(status=0)
 
-        if args.diff:
-            diff = "\n".join(
+    status: Literal[0, 1] = 1
+    stdout_lines: list[str] = []
+    stderr_lines: list[str] = []
+
+    def finalize_retv() -> _FormatReport:
+        return _FormatReport(
+            status=status,
+            stdout="\n".join(stdout_lines),
+            stderr="\n".join(stderr_lines),
+        )
+
+    if args_diff:
+        stdout_lines.append(
+            "\n".join(
                 line.removesuffix("\n")
                 for line in unified_diff(
                     data.splitlines(), fmted_data.splitlines(), fromfile=file
                 )
             )
-            print(diff)
-        else:
-            print(f"Fixing {file}", file=sys.stderr)
-            if not os.access(file, os.W_OK):
-                print(
-                    f"Error: could not write to {file} (permission denied)",
-                    file=sys.stderr,
+        )
+    else:
+        stderr_lines.append(f"Fixing {file}")
+        if not os.access(file, os.W_OK):
+            stderr_lines.append(f"Error: could not write to {file} (permission denied)")
+            return finalize_retv()
+
+        with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
+            tmpfile = os.path.join(tmpdir, "ini")
+            with open(tmpfile, "wb") as bfh:
+                bfh.write(fmted_data.encode("utf-8"))
+
+            if args_validate and load(tmpfile) != validate_baseline:  # pragma: no cover
+                stderr_lines.append(
+                    f"Error: failed to format {file}: "
+                    "formatted data compares unequal to unformatted data",
                 )
-                retv = 1
-                continue
+                return finalize_retv()
 
-            with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
-                tmpfile = os.path.join(tmpdir, "ini")
-                with open(tmpfile, "wb") as bfh:
-                    bfh.write(fmted_data.encode("utf-8"))
+            # this may still raise an error in the unlikely case of a race condition
+            # (if permissions are changed between the look and the leap), but we
+            # won't try to catch it unless it happens in production, because it is
+            # difficult to test systematically.
+            os.replace(tmpfile, file)
 
-                if (
-                    args.validate and load(tmpfile) != validate_baseline
-                ):  # pragma: no cover
-                    print(
-                        f"Error: failed to format {file}: "
-                        "formatted data compares unequal to unformatted data",
-                        file=sys.stderr,
-                    )
-                    retv = 1
-                    continue
-
-                # this may still raise an error in the unlikely case of a race condition
-                # (if permissions are changed between the look and the leap), but we
-                # won't try to catch it unless it happens in production, because it is
-                # difficult to test systematically.
-                os.replace(tmpfile, file)
-
-    return retv
+    return finalize_retv()
 
 
 if __name__ == "__main__":  # pragma: no cover
