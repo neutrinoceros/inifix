@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - MNT: drop support for CPython 3.9
 - RFC: refactor `inifix-format` in preparation for multi-threading parallelism
+- TST: setup concurrency testing
 
 ## [4.5.0] - 2024-06-27
 
