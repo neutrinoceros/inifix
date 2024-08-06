@@ -5,7 +5,9 @@ import os
 import re
 import sys
 from collections.abc import Iterable
+from concurrent.futures import ThreadPoolExecutor
 from difflib import unified_diff
+from functools import partial
 from io import StringIO
 from tempfile import TemporaryDirectory
 from typing import IO, Literal
@@ -128,18 +130,21 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     args = parser.parse_args(argv)
-    global_status = 0
-    for file in args.files:
-        results = _format_single_file_cli(
-            file,
-            args_validate=args.validate,
-            args_report_noop=args.report_noop,
-            args_diff=args.diff,
-        )
-        global_status = max(global_status, results.status)
-        for message in results.messages:
+    closure = partial(
+        _format_single_file_cli,
+        args_validate=args.validate,
+        args_report_noop=args.report_noop,
+        args_diff=args.diff,
+    )
+    with ThreadPoolExecutor(max_workers=int((os.cpu_count() or 2) / 2)) as executor:
+        futures = [executor.submit(closure, file) for file in args.files]
+        results = [f.result() for f in futures]
+
+    for res in results:
+        for message in res.messages:
             print(message.content, file=message.dest)
-    return global_status
+
+    return max(res.status for res in results)
 
 
 def _format_single_file_cli(

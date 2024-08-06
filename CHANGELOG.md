@@ -7,8 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 - MNT: drop support for CPython 3.9
-- RFC: refactor `inifix-format` in preparation for multi-threading parallelism
 - TST: setup concurrency testing
+- PERF: `inifix-format` (and the assiociated pre-commit hook) now runs on
+  multiple threads. The performance gain is modest on stable versions of Python
+  (as of 3.12), but expected to get more significant in the future (PEP 703).
 
 ## [4.5.0] - 2024-06-27
 
