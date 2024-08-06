@@ -189,7 +189,7 @@ def test_data_preservation(inifile, tmp_path):
     assert round_mapping == initial_mapping
 
 
-N_FILES = 200
+N_FILES = 257
 
 
 @pytest.fixture
