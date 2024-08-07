@@ -152,8 +152,12 @@ over, even in the presence of scalar strings. For illustration
 ```
 
 `inifix.load` and `inifix.loads` also accept an `integer_casting` argument (new
-in `inifix` v5.0.0), which can be set to `'stable'` (default) or `'agressive'`,
-which will match the behavior of `inifix` v4.5.0.
+in `inifix` v5.0.0), which can be set to decide how numbers written in decimal
+notation which happen to have integral values (e.g. `1e2` or `30000.`) should be
+parsed.
+This argument accepts two values:
+`'stable'` (default) gives `float`s while `'agressive'` gives `int`s,
+matching the behavior of `inifix` v4.5.0.
 
 The key difference is that the default strategy is roundtrip-stable on types,
 while the agressive mode isn't:
