@@ -313,8 +313,7 @@ def load(
         casting strategy for numbers written in decimal notations, such as '1.',
         '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
         as Python floats). Setting `integer_casting='agressive'` will instead
-        parse these as Python ints, matching the behavior of inifix versions
-        older than 5.0 .
+        parse these as Python ints, matching the behavior of inifix 4.5
 
         New in inifix 5.0
 
@@ -373,8 +372,7 @@ def loads(
         casting strategy for numbers written in decimal notations, such as '1.',
         '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
         as Python floats). Setting `integer_casting='agressive'` will instead
-        parse these as Python ints, matching the behavior of inifix versions
-        older than 5.0 .
+        parse these as Python ints, matching the behavior of inifix 4.5
 
         New in inifix 5.0
 

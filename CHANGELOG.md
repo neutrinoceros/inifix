@@ -11,10 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PERF: `inifix-format` (and the assiociated pre-commit hook) now runs on
   multiple threads. The performance gain is modest on stable versions of Python
   (as of 3.12), but expected to get more significant in the future (PEP 703).
-- API: `inifix.load` and `inifix.loads` used to cast all integer-compatible
-  strings (e.g. `'1.0'`, `'1.'` or `'1e0'`) as Python `int`s. They now read
-  these as Python `float`s by default. The previous behavior is still available
-  as an opt-in, using the new argument `integer_parsing='agressive'`.
+- API: in version 4.5.0, `inifix.load` and `inifix.loads` used to cast any
+  integer-compatible string (e.g. `'1.0'`, `'1.'` or `'1e0'`) as a Python `int`.
+  They now read these as Python `float`s by default. The previous behavior is
+  still available as an opt-in, using the new argument `integer_parsing='agressive'`.
   Strings such as `'123'` (without a `'.'`, an `'e'` or an `'E'`) are still
   parsed as Python `int`s in all cases.
 
