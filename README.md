@@ -19,10 +19,19 @@ The key differences are:
   whitespaces in string values and to force string type decoding where numeric
   and boolean types would work.
 
-In rare cases where Idefix's 'ini' format doesn't match Pluto's, `inifix` will
-follow the former. Known differences are:
-- Idefix allows booleans to be written as `yes` and `no`.
-- Idefix allows integers to be written using scientific notation (e.g. `1e3`)
+In rare cases where Idefix's 'ini' format doesn't match Pluto's, `inifix` takes
+the path of least resistance to support both.
+
+Known differences are:
+- Idefix allows booleans to be written as `yes` and `no`, as so does `inifix`,
+  but these are not valid in Pluto (as of version 4.4).
+- Idefix allows integers to be written using decimal notation (e.g. `1.0` or `1e3`).
+  This creates some ambiguity when deserializing such strings, as the expected type
+  (`int` or `float`) cannot be unambiguously guessed. By default, `inifix` (from
+  version 5.0) will parse these as `float`s, allowing for 1-to-1 roundtrips.
+  Idefix (as of version 2.1) is also resilient against integers written as decimal,
+  so `inifix` will not break any working inifile by a load/patch/dump routine.
+  See [Reading Options](#reading-options) for more.
 
 ## File format specifications details
 <details><summary>Unroll !</summary>
@@ -124,7 +133,9 @@ conf = inifix.load("pluto.ini")
 ```
 Files are assumed to be encoded as UTF-8.
 
-`inifix.load` and `inifix.loads` accept a optional boolean flag
+#### Reading options
+
+`inifix.load` and `inifix.loads` accept an optional boolean flag
 `parse_scalars_as_list` (new in `inifix` v4.0.0), that is useful to simplify
 handling unknown data: all values can be safely treated as arrays, and iterated
 over, even in the presence of scalar strings. For illustration
@@ -138,6 +149,23 @@ over, even in the presence of scalar strings. For illustration
 >>> pprint(inifix.load("example.ini", parse_scalars_as_lists=True))
 {'Grid': {'x': [1, 2, 'u', 10], 'y': [4, 5, 'l', 100]},
  'Time Integrator': {'CFL': [0.001], 'tstop': [1000.0]}}
+```
+
+`inifix.load` and `inifix.loads` also accept an `integer_casting` argument (new
+in `inifix` v5.0.0), which can be set to `'stable'` (default) or `'agressive'`,
+which will match the behavior of `inifix` versions older than 5.0.
+
+The key difference is that the default strategy is roundtrip-stable on types,
+while the agressive mode isn't:
+```python
+>>> import inifix
+>>> data = {'option_a': [0, 1., 2e3, 4.5]}
+>>> data
+{'option_a': [0, 1.0, 2000.0, 4.5]}
+>>> inifix.loads(inifix.dumps(data))
+{'option_a': [0, 1.0, 2000.0, 4.5]}
+>>> inifix.loads(inifix.dumps(data), integer_casting='agressive')
+{'option_a': [0, 1, 2000, 4.5]}
 ```
 
 By default, `inifix.load` and `inifix.loads` validate input data. This step can
