@@ -5,7 +5,7 @@ import re
 from collections.abc import Callable, Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 from inifix._more import always_iterable
 from inifix._typing import InifixConfT, IterableOrSingle, Scalar, StrLike
@@ -94,7 +94,7 @@ _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
 ]
 
 
-def _auto_cast(s: str) -> Any:
+def _auto_cast_agressive(s: str) -> Scalar:
     try:
         f = float(s)
     except ValueError:
@@ -112,8 +112,45 @@ def _auto_cast(s: str) -> Any:
     return s
 
 
+def _auto_cast_stable(s: str) -> Scalar:
+    try:
+        return int(s)
+    except ValueError:
+        pass
+
+    try:
+        return float(s)
+    except ValueError:
+        pass
+
+    for regexp, caster in _RE_CASTERS:
+        if regexp.fullmatch(s):
+            return caster(s)
+
+    return s
+
+
+CasterFunction = Callable[[str], Scalar]
+
+
+def _get_caster(integer_casting: Literal["stable", "agressive"]) -> CasterFunction:
+    match integer_casting:
+        case "stable":
+            return _auto_cast_stable
+        case "agressive":
+            return _auto_cast_agressive
+        case _:
+            raise ValueError(
+                f"Unknown integer_casting value {integer_casting!r}. "
+                "Exepected 'stable' or 'agressive'."
+            )
+
+
 def _tokenize_line(
-    line: str, line_number: int, filename: str | None
+    line: str,
+    line_number: int,
+    filename: str | None,
+    caster: CasterFunction,
 ) -> tuple[str, list[Scalar]]:
     key, *raw_values = _split_tokens(line)
     if not raw_values:
@@ -122,11 +159,15 @@ def _tokenize_line(
         else:
             raise ValueError(f"Failed to parse {filename}:{line_number}:\n{line}")
 
-    return key, [_auto_cast(v) for v in raw_values]
+    return key, [caster(v) for v in raw_values]
 
 
 def _from_string(
-    data: StrLike, *, parse_scalars_as_lists: bool, filename: str | None = None
+    data: StrLike,
+    *,
+    parse_scalars_as_lists: bool,
+    caster: CasterFunction,
+    filename: str | None = None,
 ) -> InifixConfT:
     container: InifixConfT = {}
     lines = _normalize_data(data)
@@ -142,7 +183,9 @@ def _from_string(
             continue
 
         values: Scalar | list[Scalar]
-        key, values = _tokenize_line(line, filename=filename, line_number=line_number)
+        key, values = _tokenize_line(
+            line, filename=filename, line_number=line_number, caster=caster
+        )
         if (not parse_scalars_as_lists) and len(values) == 1:
             values = values[0]
         section[key] = values
@@ -150,21 +193,38 @@ def _from_string(
     return container
 
 
-def _from_file_descriptor(file: IOBase, *, parse_scalars_as_lists: bool) -> InifixConfT:
+def _from_file_descriptor(
+    file: IOBase,
+    *,
+    parse_scalars_as_lists: bool,
+    caster: CasterFunction,
+) -> InifixConfT:
     filename = str(getattr(file, "name", repr(file)))
     data = file.read()
     lines = _normalize_data(data)
     if not "".join(lines):
         raise ValueError(f"{filename!r} appears to be empty.")
     return _from_string(
-        data, filename=filename, parse_scalars_as_lists=parse_scalars_as_lists
+        data,
+        filename=filename,
+        parse_scalars_as_lists=parse_scalars_as_lists,
+        caster=caster,
     )
 
 
-def _from_path(file: GenericPath, *, parse_scalars_as_lists: bool) -> InifixConfT:
+def _from_path(
+    file: GenericPath,
+    *,
+    parse_scalars_as_lists: bool,
+    caster: CasterFunction,
+) -> InifixConfT:
     file = os.fspath(file)
     with open(file, "rb") as fh:
-        return _from_file_descriptor(fh, parse_scalars_as_lists=parse_scalars_as_lists)
+        return _from_file_descriptor(
+            fh,
+            parse_scalars_as_lists=parse_scalars_as_lists,
+            caster=caster,
+        )
 
 
 # dump helper functions
@@ -227,6 +287,7 @@ def load(
     *,
     parse_scalars_as_lists: bool = False,
     skip_validation: bool = False,
+    integer_casting: Literal["stable", "agressive"] = "stable",
 ) -> InifixConfT:
     """
     Parse data from a file, or a dict.
@@ -248,16 +309,33 @@ def load(
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
 
+    integer_casting: "stable" (default) or "agressive"
+        casting strategy for numbers written in decimal notations, such as '1.',
+        '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
+        as Python floats). Setting `integer_casting='agressive'` will instead
+        parse these as Python ints, matching the behavior of inifix versions
+        older than 5.0 .
+
+        New in inifix 5.0
+
     See Also
     --------
     inifix.loads
     """
+    caster = _get_caster(integer_casting)
+
     if isinstance(source, IOBase):
         source = _from_file_descriptor(
-            source, parse_scalars_as_lists=parse_scalars_as_lists
+            source,
+            parse_scalars_as_lists=parse_scalars_as_lists,
+            caster=caster,
         )
     elif isinstance(source, str | bytes | os.PathLike):
-        source = _from_path(source, parse_scalars_as_lists=parse_scalars_as_lists)
+        source = _from_path(
+            source,
+            parse_scalars_as_lists=parse_scalars_as_lists,
+            caster=caster,
+        )
 
     source = cast(Mapping, source)
 
@@ -273,6 +351,7 @@ def loads(
     *,
     parse_scalars_as_lists: bool = False,
     skip_validation: bool = False,
+    integer_casting: Literal["stable", "agressive"] = "stable",
 ) -> InifixConfT:
     """
     Parse data from a string.
@@ -290,11 +369,23 @@ def loads(
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
 
+    integer_casting: "stable" (default) or "agressive"
+        casting strategy for numbers written in decimal notations, such as '1.',
+        '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
+        as Python floats). Setting `integer_casting='agressive'` will instead
+        parse these as Python ints, matching the behavior of inifix versions
+        older than 5.0 .
+
+        New in inifix 5.0
+
     See Also
     --------
     inifix.load
     """
-    retv = _from_string(source, parse_scalars_as_lists=parse_scalars_as_lists)
+    caster = _get_caster(integer_casting)
+    retv = _from_string(
+        source, parse_scalars_as_lists=parse_scalars_as_lists, caster=caster
+    )
 
     if not skip_validation:
         validate_inifile_schema(retv)

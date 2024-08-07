@@ -8,7 +8,15 @@ from stat import S_IREAD
 
 import pytest
 
-from inifix.io import Section, _tokenize_line, dump, dumps, load, loads
+from inifix.io import (
+    Section,
+    _auto_cast_stable,
+    _tokenize_line,
+    dump,
+    dumps,
+    load,
+    loads,
+)
 
 
 @pytest.mark.parametrize(
@@ -16,7 +24,12 @@ from inifix.io import Section, _tokenize_line, dump, dumps, load, loads
 )
 def test_tokenizer(invalid_data):
     with pytest.raises(ValueError):
-        _tokenize_line(invalid_data, filename="fake_filename", line_number=-1)
+        _tokenize_line(
+            invalid_data,
+            filename="fake_filename",
+            line_number=-1,
+            caster=_auto_cast_stable,
+        )
 
 
 def test_unit_read(inifile):
@@ -276,3 +289,60 @@ def test_skip_validation(monkeypatch, tmp_path):
     conf1 = loads(data, skip_validation=True)
     conf2 = load(tmp_path / "data.ini", skip_validation=True)
     assert conf1 == conf2
+
+
+@pytest.mark.parametrize(
+    "input_str, expected_dict, expected_output_str",
+    [
+        pytest.param(
+            "opt 0 1. 2.0 3e0 4.5",
+            {"opt": [0, 1.0, 2.0, 3.0, 4.5]},
+            "opt 0  1.0  2.0  3.0  4.5\n",
+            id="dubious style",
+        ),
+        pytest.param(
+            "opt 0 1.0 2e3 5.6",
+            {"opt": [0, 1.0, 2e3, 5.6]},
+            "opt 0  1.0  2e3  5.6\n",
+            id="stable style",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        pytest.param({}, id="implicitly stable"),
+        pytest.param({"integer_casting": "stable"}, id="explicitly stable"),
+    ],
+)
+def test_roundtrip_stability(input_str, expected_dict, expected_output_str, kwargs):
+    data = loads(input_str, **kwargs)
+    assert list(data.keys()) == ["opt"]
+    for item, expected_item in zip(data["opt"], expected_dict["opt"], strict=True):
+        assert item == expected_item
+        assert type(item) is type(expected_item)
+    output_str_1 = dumps(data)
+    assert output_str_1 == expected_output_str
+
+    output_str_2 = dumps(loads(output_str_1, **kwargs))
+    assert output_str_2 == output_str_1
+
+
+def test_aggressive_integer_casting():
+    input_data = "opt 0 1. 2.0 3e0 4.5"
+    data = loads(input_data, integer_casting="agressive")
+
+    expected = {"opt": [0, 1, 2, 3, 4.5]}
+    assert list(data.keys()) == ["opt"]
+    for item, expected_item in zip(data["opt"], expected["opt"], strict=True):
+        assert item == expected_item
+        assert type(item) is type(expected_item)
+
+
+def test_unknown_integer_casting():
+    input_data = "opt 0 1. 2.0 3e0 4.5"
+    with pytest.raises(
+        ValueError,
+        match="Unknown integer_casting value 'unknown_strategy'.",
+    ):
+        loads(input_data, integer_casting="unknown_strategy")
