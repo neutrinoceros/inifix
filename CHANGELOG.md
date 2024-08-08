@@ -8,13 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - MNT: drop support for CPython 3.9
 - TST: setup concurrency testing
-- PERF: `inifix-format` (and the assiociated pre-commit hook) now runs on
+- PERF: `inifix-format` (and the associated pre-commit hook) now runs on
   multiple threads. The performance gain is modest on stable versions of Python
   (as of 3.12), but expected to get more significant in the future (PEP 703).
 - API: in version 4.5.0, `inifix.load` and `inifix.loads` used to cast any
   integer-compatible string (e.g. `'1.0'`, `'1.'` or `'1e0'`) as a Python `int`.
   They now read these as Python `float`s by default. The previous behavior is
-  still available as an opt-in, using the new argument `integer_parsing='agressive'`.
+  still available as an opt-in, using the new argument `integer_parsing='aggressive'`.
   Strings such as `'123'` (without a `'.'`, an `'e'` or an `'E'`) are still
   parsed as Python `int`s in all cases.
 - BUG: fix a corner case where data would be lost on dump for empty string values
@@ -131,7 +131,7 @@ user doesn't have permission to.
 
 ## [2.1.1] - 2022-04-27
 
-BUG: fix a bug where string values containing whitespaces would incorrectly be splitted
+BUG: fix a bug where string values containing whitespaces would incorrectly be split
 
 
 ## [2.1.0] - 2022-04-25
@@ -145,13 +145,13 @@ This makes the associated pre-commit hook much less verbose.
 
 The format enforced by inifix-format was changed to improve compacity and
 readability. The new format is designed to be closer to manual formatting that
-is actually perfomed by Idefix users and contributors.
+is actually performed by Idefix users and contributors.
 
 This is considered a major version change because the `--name-column-size` CLI
 flag and its corresponding keyword argument from `inifix.format.iniformat` were
 removed.
 
-The API is otherwize identical to version 1.2.1
+The API is otherwise identical to version 1.2.1
 
 ## [1.2.1] - 2022-04-09
 

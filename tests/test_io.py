@@ -373,7 +373,7 @@ def test_roundtrip_stability_generated(kwargs, L):
 
 def test_aggressive_integer_casting():
     input_data = "opt 0 1. 2.0 3e0 4.5"
-    data = loads(input_data, integer_casting="agressive")
+    data = loads(input_data, integer_casting="aggressive")
 
     expected = {"opt": [0, 1, 2, 3, 4.5]}
     assert list(data.keys()) == ["opt"]

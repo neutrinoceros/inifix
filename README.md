@@ -99,7 +99,7 @@ floats. Reversely, when writing files, floats are re-encoded using e-notation
 if it leads to a more compact representation. For instance, `100000.0` is encoded
 as `1e5`, but `189.0` is left unchanged because `1.89e2` takes one more character.
 In cases where both reprensations are equally compact (e.g. `1.0` VS `1e0`),
-decimal is prefered in encoding.
+decimal is preferred in encoding.
 
 While decoding, `e` can be lower or upper case, but they are always encoded as
 lower case.
@@ -113,7 +113,7 @@ python -m pip install inifix
 
 ## Usage
 
-The public API mimicks that of Python's standard library `json`,
+The public API mimics that of Python's standard library `json`,
 and consists in four main functions:
 - `inifix.load` and `inifix.dump` read from and write to files respectively
 - `inifix.loads` reads from a `str` and returns a `dict`, while `inifix.dumps`
@@ -156,11 +156,11 @@ in `inifix` v5.0.0), which can be set to decide how numbers written in decimal
 notation which happen to have integral values (e.g. `1e2` or `30000.`) should be
 parsed.
 This argument accepts two values:
-`'stable'` (default) gives `float`s while `'agressive'` gives `int`s,
+`'stable'` (default) gives `float`s while `'aggressive'` gives `int`s,
 matching the behavior of `inifix` v4.5.0.
 
 The key difference is that the default strategy is roundtrip-stable on types,
-while the agressive mode isn't:
+while the aggressive mode isn't:
 ```python
 >>> import inifix
 >>> data = {'option_a': [0, 1., 2e3, 4.5]}
@@ -168,17 +168,17 @@ while the agressive mode isn't:
 {'option_a': [0, 1.0, 2000.0, 4.5]}
 >>> inifix.loads(inifix.dumps(data))
 {'option_a': [0, 1.0, 2000.0, 4.5]}
->>> inifix.loads(inifix.dumps(data), integer_casting='agressive')
+>>> inifix.loads(inifix.dumps(data), integer_casting='aggressive')
 {'option_a': [0, 1, 2000, 4.5]}
 ```
 
-Agressive casting may also lead to loss of precision beyond a certain range
+Aggressive casting may also lead to loss of precision beyond a certain range
 ```python
 >>> import inifix
 >>> data = {'option_b': 9_007_199_254_740_993}
 >>> inifix.loads(inifix.dumps(data))
 {'option_b': 9007199254740993}
->>> inifix.loads(inifix.dumps(data), integer_casting='agressive')
+>>> inifix.loads(inifix.dumps(data), integer_casting='aggressive')
 {'option_b': 9007199254740992}
 ```
 
@@ -214,7 +214,7 @@ be skipped by specifying `skip_validation=True`.
 
 `inifix.validate_inifile_schema` can be used to validate an arbitrary
 dictionary as writable to an inifile, following Pluto/Idefix's format. This
-will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
+will raise an exception (`ValueError`) if the dictionary `data` is invalid.
 ```python
 inifix.validate_inifile_schema(data)
 ```
@@ -227,7 +227,7 @@ See [Formatting CLI](#formatting-cli) for how to use this at scale.
 ### Writing type-safe applications of `inifix.load(s)`
 
 `inifix.load` has no built-in expectations on the type of any specific parameter;
-instead, all types are infered at runtime, which allows the function to work
+instead, all types are inferred at runtime, which allows the function to work
 seamlessly with arbitrary parameter files.
 
 However, this also means that the output is not (and cannot be) type-safe.

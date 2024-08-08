@@ -3,7 +3,7 @@ from typing import Any
 
 
 def always_iterable(obj: Any, /) -> Iterator[Any]:
-    # adapated from more_iterools 10.1.0 (MIT)
+    # adapted from more_iterools 10.1.0 (MIT)
     if isinstance(obj, str):
         return iter((obj,))
 
