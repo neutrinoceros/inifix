@@ -219,6 +219,11 @@ will raise an exception (`ValueError`) if the dictionnary `data` is invalid.
 inifix.validate_inifile_schema(data)
 ```
 
+### Runtime formatting
+
+`inifix.format_string` formats a string representing the contents of an ini file.
+See [Formatting CLI](#formatting-cli) for how to use this at scale.
+
 ### Writing type-safe applications of `inifix.load(s)`
 
 `inifix.load` has no built-in expectations on the type of any specific parameter;
@@ -277,16 +282,17 @@ care about.
 Command line tools are shipped with the package to validate or format compatible
 inifiles.
 
-#### Validation
+#### Validation CLI
 
 This checks that your inifiles can be loaded with `inifix.load` from the command line
 ```shell
 $ inifix-validate pluto.ini
 Validated pluto.ini
 ```
+This CLI can also be called as `python -m inifix.validate`.
 
 
-#### Formatting
+#### Formatting CLI
 
 To format a file in place, use
 ```shell
@@ -301,6 +307,7 @@ To print a diff patch to stdout instead of editing the file, use the `--diff` fl
 ```shell
 $ inifix-format pluto.ini --diff
 ```
+This CLI can also be called as `python -m inifix.format`.
 
 By default, `inifix-format` also validates input data. This step can be skipped with the
 `--skip-validation` flag

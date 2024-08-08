@@ -4,6 +4,7 @@ import argparse
 import os
 import re
 import sys
+import warnings
 from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor
 from difflib import unified_diff
@@ -14,6 +15,8 @@ from typing import IO, Literal
 
 from inifix._cli import Message, TaskResults
 from inifix.io import _split_tokens, load
+
+__all__ = ["format_string"]
 
 PADDING_SIZE = 2
 
@@ -100,13 +103,42 @@ def _iter_sections(fh: IO[str]) -> Iterable[str]:
         yield "".join(content)
 
 
-def iniformat(fh: IO[str] | str, /) -> str:
-    if isinstance(fh, str):
-        fh = StringIO(fh)
+def format_string(s: str, /) -> str:
+    """Format a string representing the content of an inifile.
+
+    This only operates on whitespace to and aims to maximize readability.
+    Comments are preserved.
+
+    Examples
+    --------
+    >>> import inifix
+    >>> print(inifix.format_string(
+    ...     "[Grid]\n"
+    ...     "X1-grid  1    0.0    1024          u    4.0\n"
+    ...     "X2-grid    1    0.0    256 u   1.0 # is ignored in 1D\n"
+    ...     "X3-grid      1    0.0    1       u    1.0  # is ignored in 1D and 2D"
+    ... ))
+    [Grid]
+    X1-grid    1  0.0  1024  u  4.0
+    X2-grid    1  0.0  256   u  1.0    # is ignored in 1D
+    X3-grid    1  0.0  1     u  1.0    # is ignored in 1D and 2D
+    """
+    fh = StringIO(s)
     content = []
     for s in _iter_sections(fh):
         content.append(_format_section(s))
     return _finalize("\n".join(content))
+
+
+def iniformat(s: str, /) -> str:
+    warnings.warn(
+        "inifix.format.iniformat is deprecated since v5.0.0"
+        "and will be removed in a future version. "
+        "Please use inifix.format_string instead.",
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
+    return format_string(s)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -171,7 +203,7 @@ def _format_single_file_cli(
         # make sure newlines are always decoded as \n, even on windows
         data = data.replace("\r\n", "\n")
 
-    fmted_data = iniformat(data)
+    fmted_data = format_string(data)
 
     if fmted_data == data:
         if args_report_noop:
