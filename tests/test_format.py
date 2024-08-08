@@ -7,7 +7,7 @@ from stat import S_IREAD
 import pytest
 
 from inifix import load
-from inifix.format import iniformat, main
+from inifix.format import format_string, iniformat, main
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -128,7 +128,7 @@ def test_error_read_only_file(inifile, capsys, tmp_path):
     shutil.copy(inifile, target)
 
     data = target.read_text()
-    if iniformat(data) == data:
+    if format_string(data) == data:
         return
 
     os.chmod(target, S_IREAD)
@@ -138,6 +138,17 @@ def test_error_read_only_file(inifile, capsys, tmp_path):
     out, err = capsys.readouterr()
     assert out == ""
     assert f"Error: could not write to {target} (permission denied)\n" in err
+
+
+def test_informat_depr():
+    body = (DATA_DIR / "format-in.ini").read_text()
+    s1 = format_string(body)
+    with pytest.warns(
+        DeprecationWarning,
+        match="inifix.format.iniformat is deprecated",
+    ):
+        s2 = iniformat(body)
+    assert s2 == s1
 
 
 def test_diff_stdout(inifile, capsys, tmp_path):

@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   parsed as Python `int`s in all cases.
 - BUG: fix a corner case where data would be lost on dump for empty string values
 - BUG: fix bugs around decoding supported bool values
+- ENH: add and document `inifix.format_string`, replacing previously
+  undocumented `inifix.iniformat` (still available for backward compatibility)
 
 ## [4.5.0] - 2024-06-27
 
