@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Strings such as `'123'` (without a `'.'`, an `'e'` or an `'E'`) are still
   parsed as Python `int`s in all cases.
 - BUG: fix a corner case where data would be lost on dump for empty string values
+- BUG: fix bugs around decoding supported bool values
 
 ## [4.5.0] - 2024-06-27
 

@@ -86,9 +86,13 @@ def _split_tokens(data: str) -> list[str]:
     return _TOKEN.findall(data)
 
 
+TRUTHY_STRINGS = frozenset({"True", "true", "yes", "Yes"})
+FALSY_STRINGS = frozenset({"False", "false", "no", "No"})
+ALL_BOOL_STRINGS = frozenset({*TRUTHY_STRINGS, *FALSY_STRINGS})
+
 _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
-    (re.compile(r"(true|yes)", re.I), lambda _: True),
-    (re.compile(r"(false|no)", re.I), lambda _: False),
+    (re.compile("(" + "|".join(TRUTHY_STRINGS) + ")"), lambda _: True),
+    (re.compile("(" + "|".join(FALSY_STRINGS) + ")"), lambda _: False),
     (re.compile(r"^'.*'$"), lambda s: s[1:-1]),
     (re.compile(r'^".*"$'), lambda s: s[1:-1]),
 ]
@@ -236,7 +240,7 @@ def _encode(v: Scalar) -> str:
     elif isinstance(v, str) and (
         v == ""
         or re.search(r"\s", v) is not None
-        or v in ("true", "t", "false", "f")
+        or v in ALL_BOOL_STRINGS
         or _is_numeric(v)
     ):
         return repr(v)
