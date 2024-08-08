@@ -136,7 +136,7 @@ Files are assumed to be encoded as UTF-8.
 #### Reading options
 
 `inifix.load` and `inifix.loads` accept an optional boolean flag
-`parse_scalars_as_list` (new in `inifix` v4.0.0), that is useful to simplify
+`parse_scalars_as_lists` (new in `inifix` v4.0.0), that is useful to simplify
 handling unknown data: all values can be safely treated as arrays, and iterated
 over, even in the presence of scalar strings. For illustration
 
