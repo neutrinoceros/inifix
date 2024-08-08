@@ -234,7 +234,8 @@ def _encode(v: Scalar) -> str:
     if isinstance(v, float):
         return ENotationIO.encode_preferential(v)
     elif isinstance(v, str) and (
-        re.search(r"\s", v) is not None
+        v == ""
+        or re.search(r"\s", v) is not None
         or v in ("true", "t", "false", "f")
         or _is_numeric(v)
     ):

@@ -9,7 +9,7 @@ from stat import S_IREAD
 from typing import Any
 
 import pytest
-from hypothesis import given
+from hypothesis import example, given
 from hypothesis import strategies as st
 
 from inifix.io import (
@@ -338,11 +338,12 @@ def assert_dict_equal(d1: dict, d2: dict) -> None:
                     categories=("Nd", "L"),
                     include_characters=[" "],
                 )
-            ).filter(lambda t: len(t) > 0),  # this filter shouldn't be needed (fixme)
+            ),
         )
     ).filter(lambda L: len(L) > 0)
 )
-def test_roundtrip_stability(kwargs, L):
+@example([1, ""])  # regression test for gh-243
+def test_roundtrip_stability_generated(kwargs, L):
     if len(L) == 1:
         kwargs.setdefault("parse_scalars_as_lists", True)
     data1 = {"a": L}
