@@ -172,6 +172,16 @@ while the agressive mode isn't:
 {'option_a': [0, 1, 2000, 4.5]}
 ```
 
+Agressive casting may also lead to loss of precision beyond a certain range
+```python
+>>> import inifix
+>>> data = {'option_b': 9_007_199_254_740_993}
+>>> inifix.loads(inifix.dumps(data))
+{'option_b': 9007199254740993}
+>>> inifix.loads(inifix.dumps(data), integer_casting='agressive')
+{'option_b': 9007199254740992}
+```
+
 By default, `inifix.load` and `inifix.loads` validate input data. This step can
 be skipped by specifying `skip_validation=True`.
 
