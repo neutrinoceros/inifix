@@ -80,7 +80,9 @@ def test_int_like_floats_casting(caster, expected_type, i):
 def test_unambiguous_float_casting(caster, f):
     s = str(f)
     res = caster(s)
-    if not isnan(f):
+    if isnan(f):
+        assert isnan(res)
+    else:
         assert res == float(s)
     assert isinstance(res, int | float)
     if caster is _auto_cast_agressive and f.is_integer():
