@@ -3,10 +3,14 @@ import os
 import re
 import tempfile
 from io import BytesIO
+from math import isnan
 from pathlib import Path
 from stat import S_IREAD
+from typing import Any
 
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from inifix.io import (
     Section,
@@ -291,23 +295,30 @@ def test_skip_validation(monkeypatch, tmp_path):
     assert conf1 == conf2
 
 
-@pytest.mark.parametrize(
-    "input_str, expected_dict, expected_output_str",
-    [
-        pytest.param(
-            "opt 0 1. 2.0 3e0 4.5",
-            {"opt": [0, 1.0, 2.0, 3.0, 4.5]},
-            "opt 0  1.0  2.0  3.0  4.5\n",
-            id="dubious style",
-        ),
-        pytest.param(
-            "opt 0 1.0 2e3 5.6",
-            {"opt": [0, 1.0, 2e3, 5.6]},
-            "opt 0  1.0  2e3  5.6\n",
-            id="stable style",
-        ),
-    ],
-)
+def assert_item_equal(i1: Any, i2: Any) -> None:
+    __tracebackhide__ = True
+    assert type(i1) is type(i2)
+    if type(i2) is float and isnan(i2):
+        assert isnan(i1)
+    else:
+        assert i1 == i2
+
+
+def assert_dict_equal(d1: dict, d2: dict) -> None:
+    __tracebackhide__ = True
+    # note that key insertion order matters in this comparison
+    assert list(d2.keys()) == list(d1.keys())
+    for v1, v2 in zip(d1.values(), d2.values(), strict=True):
+        assert type(v1) is type(v2)
+        if isinstance(v1, dict):
+            assert_dict_equal(v1, v2)
+        elif isinstance(v1, list):
+            for i1, i2 in zip(v1, v2, strict=True):
+                assert_item_equal(i1, i2)
+        else:  # pragma: no cover
+            assert_item_equal(i1, i2)
+
+
 @pytest.mark.parametrize(
     "kwargs",
     [
@@ -315,17 +326,32 @@ def test_skip_validation(monkeypatch, tmp_path):
         pytest.param({"integer_casting": "stable"}, id="explicitly stable"),
     ],
 )
-def test_roundtrip_stability(input_str, expected_dict, expected_output_str, kwargs):
-    data = loads(input_str, **kwargs)
-    assert list(data.keys()) == ["opt"]
-    for item, expected_item in zip(data["opt"], expected_dict["opt"], strict=True):
-        assert item == expected_item
-        assert type(item) is type(expected_item)
-    output_str_1 = dumps(data)
-    assert output_str_1 == expected_output_str
+@given(
+    st.lists(
+        st.one_of(
+            st.integers(),
+            st.floats(),
+            st.booleans(),
+            st.text(
+                alphabet=st.characters(
+                    codec="utf-8",
+                    categories=("Nd", "L"),
+                    include_characters=[" "],
+                )
+            ).filter(lambda t: len(t) > 0),  # this filter shouldn't be needed (fixme)
+        )
+    ).filter(lambda L: len(L) > 0)
+)
+def test_roundtrip_stability(kwargs, L):
+    if len(L) == 1:
+        kwargs.setdefault("parse_scalars_as_lists", True)
+    data1 = {"a": L}
+    data1_rt = loads(dumps(data1), **kwargs)
+    assert_dict_equal(data1_rt, data1)
 
-    output_str_2 = dumps(loads(output_str_1, **kwargs))
-    assert output_str_2 == output_str_1
+    data2 = {"Section 1": data1, "Section 2": data1}
+    data2_rt = loads(dumps(data2), **kwargs)
+    assert_dict_equal(data2_rt, data2)
 
 
 def test_aggressive_integer_casting():
