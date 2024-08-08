@@ -1,6 +1,11 @@
+from math import isnan
+
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 import inifix
+from inifix.enotation import ENotationIO
 from inifix.io import _auto_cast_agressive, _auto_cast_stable
 
 BASE_BOOLS = [
@@ -35,14 +40,20 @@ def test_bool_cast_integration(s, expected, tmp_path):
     assert d == {"dummy": expected}
 
 
-@pytest.mark.parametrize("caster", [_auto_cast_stable, _auto_cast_agressive])
-@pytest.mark.parametrize(
-    "s, expected",
-    [("0", 0), ("123", 123), ("-1", -1)],
-)
-def test_unambiguous_int(caster, s, expected):
-    res = caster(s)
-    assert res == expected
+@given(st.integers())
+def test_unambiguous_int_cast_stable(i):
+    s = str(i)
+    res = _auto_cast_stable(s)
+    assert res == i
+    assert type(res) is int
+
+
+# agressively casting to float first leads to loss of precision beyond a threshold
+@given(st.integers(min_value=-9_007_199_254_740_992, max_value=9_007_199_254_740_992))
+def test_unambiguous_int_cast_agressive(i):
+    s = str(i)
+    res = _auto_cast_agressive(s)
+    assert res == i
     assert type(res) is int
 
 
@@ -53,24 +64,26 @@ def test_unambiguous_int(caster, s, expected):
         (_auto_cast_agressive, int),
     ],
 )
-@pytest.mark.parametrize(
-    "s",
-    ["0.", "1.", "1.0", "1e3", "+1.", "+1.0", "+1e3", "-1.", "-1.0", "-1e3"],
-)
-def test_int_like_casting(caster, expected_type, s):
-    res = caster(s)
-    assert res == float(s)
-    assert type(res) is expected_type
-    if expected_type is float:
-        assert res.is_integer()
+@given(st.integers())
+def test_int_like_floats_casting(caster, expected_type, i):
+    f = float(i)
+    for s in (str(f), ENotationIO.encode(i)):
+        res = caster(s)
+        assert res == f
+        assert type(res) is expected_type
+        if expected_type is float:
+            assert res.is_integer()
 
 
 @pytest.mark.parametrize("caster", [_auto_cast_stable, _auto_cast_agressive])
-@pytest.mark.parametrize(
-    "s",
-    ["0.1", "1.2", "3.56789e2"],
-)
-def test_unambiguous_float_casting(caster, s):
+@given(st.floats())
+def test_unambiguous_float_casting(caster, f):
+    s = str(f)
     res = caster(s)
-    assert res == float(s)
-    assert type(res) is float
+    if not isnan(f):
+        assert res == float(s)
+    assert isinstance(res, int | float)
+    if caster is _auto_cast_agressive and f.is_integer():
+        assert type(res) is int
+    else:
+        assert type(res) is float
