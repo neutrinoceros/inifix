@@ -1,26 +1,25 @@
 import pytest
-from more_itertools import unzip
 
 from inifix.validate import main
 
-INVALID_CONTENTS, INVALID_CONTENTS_IDS = unzip(
-    (
-        ("a\n", "missing value (empty row)"),
-        ("a #\n", "missing value (comm)"),
-        (r"/!\\\n", "invalid param name (special chars)"),
-        ("100 100\n", "invalid param name (num-1)"),
-        ("1e2 100\n", "invalid param name (num-2)"),
-        ("[Unclosed Section\na 1 2 3\n", "unclosed section"),
-        ("[[extra left bracket]\na 1 2 3\n", "mismatched left bracket"),
-        ("[extra right bracket]]\na 1 2 3\n", "mismatched right bracket"),
-        ("[extra] stuff that's not a comment", "missing comment char"),
-        ("[()]", "invalid section chars (parens)"),
-        ("[{}]", "invalid section chars (brackets)"),
-    )
+
+@pytest.fixture(
+    params=[
+        pytest.param("a\n", id="missing value (empty row)"),
+        pytest.param("a #\n", id="missing value (comm)"),
+        pytest.param(r"/!\\\n", id="invalid param name (special chars)"),
+        pytest.param("100 100\n", id="invalid param name (num-1)"),
+        pytest.param("1e2 100\n", id="invalid param name (num-2)"),
+        pytest.param("[Unclosed Section\na 1 2 3\n", id="unclosed section"),
+        pytest.param("[[extra left bracket]\na 1 2 3\n", id="mismatched left bracket"),
+        pytest.param(
+            "[extra right bracket]]\na 1 2 3\n", id="mismatched right bracket"
+        ),
+        pytest.param("[extra] stuff that's not a comment", id="missing comment char"),
+        pytest.param("[()]", id="invalid section chars (parens)"),
+        pytest.param("[{}]", id="invalid section chars (brackets)"),
+    ]
 )
-
-
-@pytest.fixture(params=INVALID_CONTENTS, ids=INVALID_CONTENTS_IDS)
 def invalid_file(tmp_path, request):
     file = tmp_path / "myfile.ini"
     file.write_text(request.param)
