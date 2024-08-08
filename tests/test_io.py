@@ -13,6 +13,9 @@ from hypothesis import example, given
 from hypothesis import strategies as st
 
 from inifix.io import (
+    ALL_BOOL_STRINGS,
+    FALSY_STRINGS,
+    TRUTHY_STRINGS,
     Section,
     _auto_cast_stable,
     _tokenize_line,
@@ -100,18 +103,20 @@ def test_string_casting(data, expected):
 @pytest.mark.parametrize(
     "data, expected",
     [
-        ('''[Spam]\nEggs "Bacon Saussage"''', {"Spam": {"Eggs": "Bacon Saussage"}}),
-        (
-            "name true 'true'     'steven   bacon'  1",
-            {"name": [True, "true", "steven   bacon", 1]},
+        pytest.param(
+            '''[Spam]\nEggs "Bacon  Saussage"''',
+            {"Spam": {"Eggs": "Bacon  Saussage"}},
+            id="simple strings",
         ),
-        (
-            '''vals 'bacon' 2.2 "saussage"''',
-            {"vals": ["bacon", 2.2, "saussage"]},
-        ),
-        (
+        pytest.param(
             '''numbers 1 '1' 2.2 '2.2' 3.3.3 "3.3.3"''',
             {"numbers": [1, "1", 2.2, "2.2", "3.3.3", "3.3.3"]},
+            id="numbers",
+        ),
+        pytest.param(
+            '''vals  1 'bacon' 2.2 "saussage" True no "a b c d"''',
+            {"vals": [1, "bacon", 2.2, "saussage", True, False, "a b c d"]},
+            id="mixed bag",
         ),
     ],
 )
@@ -121,6 +126,17 @@ def test_idempotent_string_parsing(data, expected):
     round_str = dumps(initial_mapping)
     round_mapping = loads(round_str)
     assert round_mapping == initial_mapping
+
+
+@pytest.mark.parametrize("s", ALL_BOOL_STRINGS)
+def test_bool_strings(s):
+    if s in TRUTHY_STRINGS:
+        b = True
+    elif s in FALSY_STRINGS:
+        b = False
+    S = s.upper()
+    data = loads(f"a {s} '{s}' {S}")
+    assert data == {"a": [b, s, S]}
 
 
 def test_section_init():
