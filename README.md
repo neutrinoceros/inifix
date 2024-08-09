@@ -25,6 +25,10 @@ the path of least resistance to support both.
 Known differences are:
 - Idefix allows booleans to be written as `yes` and `no`, as so does `inifix`,
   but these are not valid in Pluto (as of version 4.4).
+  Note that in contrast to Idefix, which is truly case-insensitive about
+  these special strings, `inifix` (from version 5.0.0) only parse a restricted
+  set of unescaped strings as booleans, like `true`, `TRUE`, `True`, `yes`,
+  `Yes` and `YES`, but `TruE` or `yES` for instance will be parsed as strings.
 - Idefix allows integers to be written using decimal notation (e.g. `1.0` or `1e3`).
   This creates some ambiguity when deserializing such strings, as the expected type
   (`int` or `float`) cannot be unambiguously guessed. By default, `inifix` (from
@@ -40,7 +44,8 @@ Known differences are:
 - values are represented in unicode characters
 - all values are considered numbers if possible (e.g., `1e3` is read as `1000`)
 - number values are read as integers if no loss of precision ensues, and floats otherwise
-- `true` and `false` (resp. `yes` and `no`) are cast to booleans (case-insensitive)
+- unescaped strings `true`, `false`, `yes` and `no` are cast to booleans, as well
+  as their respective upper-case and "title" variants (e.g. `TRUE` or `True`).
 - values that can't be read as number or booleans are read as strings.
 - string delimiters `"` and `'` can be used for strings containing whitespace, or to
   force string type for values that would otherwise be read as numbers and booleans.
