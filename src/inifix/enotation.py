@@ -13,7 +13,7 @@ class ENotationIO:
     def decode(s: str, /) -> int:
         """
         Cast an 'e' formatted string `s` to integer if such a conversion can
-        be perfomed without loss of data. Raise ValueError otherwise.
+        be performed without loss of data. Raise ValueError otherwise.
 
         Examples
         --------

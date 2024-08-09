@@ -13,7 +13,7 @@ N_FILES = 257
 
 
 @pytest.fixture
-def unformated_files(tmp_path):
+def unformatted_files(tmp_path):
     in_file = DATA_DIR / "format-in.ini"
     files = []
     for file_no in range(N_FILES):
@@ -24,8 +24,8 @@ def unformated_files(tmp_path):
     yield files
 
 
-def test_inifix_format_cli(unformated_files, capsys):
-    ret = inifix_format_cli([str(f) for f in unformated_files])
+def test_inifix_format_cli(unformatted_files, capsys):
+    ret = inifix_format_cli([str(f) for f in unformatted_files])
     assert ret != 0
 
     out, err = capsys.readouterr()
@@ -33,16 +33,16 @@ def test_inifix_format_cli(unformated_files, capsys):
 
     # order of lines doesn't matter and is not guaranteed
     err_lines = err.splitlines()
-    assert set(err_lines) == {f"Fixing {file}" for file in unformated_files}
+    assert set(err_lines) == {f"Fixing {file}" for file in unformatted_files}
 
     expected = (DATA_DIR / "format-out.ini").read_text()
-    for file in unformated_files:
+    for file in unformatted_files:
         body = file.read_text()
         assert body == expected
 
 
-def test_inifix_validate_cli(unformated_files, capsys):
-    ret = inifix_validate_cli([str(f) for f in unformated_files])
+def test_inifix_validate_cli(unformatted_files, capsys):
+    ret = inifix_validate_cli([str(f) for f in unformatted_files])
     assert ret == 0
 
     out, err = capsys.readouterr()
@@ -50,4 +50,4 @@ def test_inifix_validate_cli(unformated_files, capsys):
 
     # order of lines doesn't matter and is not guaranteed
     out_lines = out.splitlines()
-    assert set(out_lines) == {f"Validated {file}" for file in unformated_files}
+    assert set(out_lines) == {f"Validated {file}" for file in unformatted_files}

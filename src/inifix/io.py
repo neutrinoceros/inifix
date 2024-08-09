@@ -98,7 +98,7 @@ _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
 ]
 
 
-def _auto_cast_agressive(s: str) -> Scalar:
+def _auto_cast_aggressive(s: str) -> Scalar:
     try:
         f = float(s)
     except ValueError:
@@ -137,16 +137,16 @@ def _auto_cast_stable(s: str) -> Scalar:
 CasterFunction = Callable[[str], Scalar]
 
 
-def _get_caster(integer_casting: Literal["stable", "agressive"]) -> CasterFunction:
+def _get_caster(integer_casting: Literal["stable", "aggressive"]) -> CasterFunction:
     match integer_casting:
         case "stable":
             return _auto_cast_stable
-        case "agressive":
-            return _auto_cast_agressive
+        case "aggressive":
+            return _auto_cast_aggressive
         case _:
             raise ValueError(
                 f"Unknown integer_casting value {integer_casting!r}. "
-                "Exepected 'stable' or 'agressive'."
+                "Expected 'stable' or 'aggressive'."
             )
 
 
@@ -292,7 +292,7 @@ def load(
     *,
     parse_scalars_as_lists: bool = False,
     skip_validation: bool = False,
-    integer_casting: Literal["stable", "agressive"] = "stable",
+    integer_casting: Literal["stable", "aggressive"] = "stable",
 ) -> InifixConfT:
     """
     Parse data from a file, or a dict.
@@ -303,7 +303,7 @@ def load(
         - a dict (has to be inifix format-compliant)
         - the name of a file to read from, (str, bytes or os.PathLike)
         - a readable handle. Both text and binary file modes are supported,
-          though binary is prefered.
+          though binary is preferred.
           In binary mode, we assume UTF-8 encoding.
 
     parse_scalars_as_lists: bool
@@ -314,10 +314,10 @@ def load(
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
 
-    integer_casting: "stable" (default) or "agressive"
+    integer_casting: "stable" (default) or "aggressive"
         casting strategy for numbers written in decimal notations, such as '1.',
         '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
-        as Python floats). Setting `integer_casting='agressive'` will instead
+        as Python floats). Setting `integer_casting='aggressive'` will instead
         parse these as Python ints, matching the behavior of inifix 4.5
 
         New in inifix 5.0
@@ -355,7 +355,7 @@ def loads(
     *,
     parse_scalars_as_lists: bool = False,
     skip_validation: bool = False,
-    integer_casting: Literal["stable", "agressive"] = "stable",
+    integer_casting: Literal["stable", "aggressive"] = "stable",
 ) -> InifixConfT:
     """
     Parse data from a string.
@@ -373,10 +373,10 @@ def loads(
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
 
-    integer_casting: "stable" (default) or "agressive"
+    integer_casting: "stable" (default) or "aggressive"
         casting strategy for numbers written in decimal notations, such as '1.',
         '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
-        as Python floats). Setting `integer_casting='agressive'` will instead
+        as Python floats). Setting `integer_casting='aggressive'` will instead
         parse these as Python ints, matching the behavior of inifix 4.5
 
         New in inifix 5.0
@@ -409,7 +409,7 @@ def dump(
     file: any of the following
         - the name of a file to write to (str, bytes or os.PathLike)
         - a writable handle. Both text and binary file modes are supported,
-          though binary is prefered.
+          though binary is preferred.
           In binary mode, data is encoded as UTF-8.
 
     skip_validation: bool
