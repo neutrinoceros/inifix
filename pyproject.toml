@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inifix"
-description = "I/O facility for Idefix/Pluto configuration files"
+description = "An I/O library for Pluto-style ini files."
 authors = [
     { name = "C.M.T. Robert" },
 ]

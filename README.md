@@ -5,7 +5,8 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/charliermarsh/ruff)
 
 
-`inifix` is a small Python library of I/O functions to read and write 'ini'
+`inifix` is a small Python library offering a `load/dump` interface similar to
+standard library modules ``json` or `tomllib`(together with `tomli_w`) for ini
 configuration files in the style of [Pluto](http://plutocode.ph.unito.it) and
 [Idefix](https://github.com/idefix-code/idefix).
 
@@ -39,7 +40,7 @@ Known differences are:
 
 ## File format specifications details
 <details><summary>Unroll !</summary>
-- parameter names are strings
+- parameter names are alphanumeric strings
 - names and values are separated by non-newline white spaces
 - values are represented in unicode characters
 - all values are considered numbers if possible (e.g., `1e3` is read as `1000`)
@@ -81,9 +82,7 @@ and maps to
 }
 ```
 The following section-less format doesn't comply to Pluto/Idefix's
-specifications, but it is considered valid for inifix. This is the one
-intentional differences in specifications, which makes inifix format a superset
-of Pluto's inifile format.
+specifications, but is also valid in `inifix`
 ```ini
 mode   fargo
 
@@ -190,26 +189,42 @@ Aggressive casting may also lead to loss of precision beyond a certain range
 By default, `inifix.load` and `inifix.loads` validate input data. This step can
 be skipped by specifying `skip_validation=True`.
 
-### ... and writing back to disk
 
-`inifix.dump` writes data back to a file.
+### Writing to a file or a string
 
-This allows to change a value on the fly and create new
-configuration files programmatically, for instance.
+`inifix.dump` writes data to a file.
+
+One typical use case is to combine `inifix.load` and `inifix.dump` to
+programmatically update an existing configuration file at runtime via a
+load/patch/dump routine.
 ```python
-conf["Time"]["CFL"] = 0.1
-
-with open("pluto-mod.ini", "wb") as fh:
-    inifix.dump(conf, fh)
-
-# or equivalently
-inifix.dump(conf, "pluto-mod.ini")
+>>> import inifix
+>>> with open("pluto.ini", "rb") as fr:
+...    inifix.load(fr)
+>>> conf["Time"]["CFL"] = 0.1
+>>> with open("pluto-mod.ini", "wb") as fw:
+...    inifix.dump(conf, fw)
+```
+or, equivalently
+```python
+>>> import inifix
+>>> inifix.load("pluto.ini")
+>>> conf["Time"]["CFL"] = 0.1
+>>> inifix.dump(conf, "pluto-mod.ini")
 ```
 Data will be validated against inifix's format specification at write time.
 Files are always encoded as UTF-8.
 
 `inifix.dumps` is the same as `inifix.dump` except that it returns a string
 instead of writing to a file.
+```python
+>>> import inifix
+>>> data = {"option_a": 1, "option_b": True}
+>>> print(inifix.dumps(data))
+option_a 1
+option_b True
+
+```
 
 By default, `inifix.dump` and `inifix.dumps` validate input data. This step can
 be skipped by specifying `skip_validation=True`.
@@ -218,7 +233,7 @@ be skipped by specifying `skip_validation=True`.
 ### Schema Validation
 
 `inifix.validate_inifile_schema` can be used to validate an arbitrary
-dictionary as writable to an inifile, following Pluto/Idefix's format. This
+dictionary as writable to an inifile, following the library's format. This
 will raise an exception (`ValueError`) if the dictionary `data` is invalid.
 ```python
 inifix.validate_inifile_schema(data)
