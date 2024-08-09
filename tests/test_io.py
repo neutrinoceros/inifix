@@ -134,7 +134,8 @@ def test_bool_strings(s):
         b = True
     elif s in FALSY_STRINGS:
         b = False
-    S = s.upper()
+    # test unsupported case
+    S = s.title().swapcase()
     data = loads(f"a {s} '{s}' {S}")
     assert data == {"a": [b, s, S]}
 

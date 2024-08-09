@@ -86,8 +86,8 @@ def _split_tokens(data: str) -> list[str]:
     return _TOKEN.findall(data)
 
 
-TRUTHY_STRINGS = frozenset({"True", "true", "yes", "Yes"})
-FALSY_STRINGS = frozenset({"False", "false", "no", "No"})
+TRUTHY_STRINGS = frozenset({"true", "TRUE", "True", "yes", "YES", "Yes"})
+FALSY_STRINGS = frozenset({"false", "FALSE", "False", "no", "NO", "No"})
 ALL_BOOL_STRINGS = frozenset({*TRUTHY_STRINGS, *FALSY_STRINGS})
 
 _RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
