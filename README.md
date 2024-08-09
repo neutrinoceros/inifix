@@ -6,7 +6,7 @@
 
 
 `inifix` is a small Python library offering a `load/dump` interface similar to
-standard library modules ``json` or `tomllib`(together with `tomli_w`) for ini
+standard library modules `json` or `tomllib` (together with `tomli_w`) for ini
 configuration files in the style of [Pluto](http://plutocode.ph.unito.it) and
 [Idefix](https://github.com/idefix-code/idefix).
 
