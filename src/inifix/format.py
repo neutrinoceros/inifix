@@ -168,7 +168,8 @@ def main(argv: list[str] | None = None) -> int:
         args_report_noop=args.report_noop,
         args_diff=args.diff,
     )
-    with ThreadPoolExecutor(max_workers=int((os.cpu_count() or 2) / 2)) as executor:
+    cpu_count = os.cpu_count() or 1
+    with ThreadPoolExecutor(max_workers=max(1, int(cpu_count / 2))) as executor:
         futures = [executor.submit(closure, file) for file in args.files]
         results = [f.result() for f in futures]
 
