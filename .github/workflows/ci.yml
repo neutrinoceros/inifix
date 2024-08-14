@@ -149,3 +149,20 @@ jobs:
 
     - name: Run mypy
       run: mypy src/inifix
+
+
+  check-readme:
+    runs-on: ubuntu-latest
+    name: check README.md
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.x
+
+    - run: python scripts/check_readme.py
