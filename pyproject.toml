@@ -6,6 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "inifix"
+version = "5.0.1"
 description = "An I/O library for Pluto-style ini files."
 authors = [
     { name = "C.M.T. Robert" },
@@ -16,10 +17,6 @@ classifiers = [
     "Typing :: Typed",
 ]
 requires-python = ">=3.10"
-dynamic = ["version"]
-
-[tool.setuptools.dynamic]
-version = {attr = "inifix.__version__"}
 
 [project.license]
 text = "GPL-3.0"
