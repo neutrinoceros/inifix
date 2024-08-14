@@ -113,15 +113,16 @@ def format_string(s: str, /) -> str:
     --------
     >>> import inifix
     >>> print(inifix.format_string(
-    ...     "[Grid]\n"
-    ...     "X1-grid  1    0.0    1024          u    4.0\n"
-    ...     "X2-grid    1    0.0    256 u   1.0 # is ignored in 1D\n"
+    ...     "[Grid]\\n"
+    ...     "X1-grid  1    0.0    1024          u    4.0\\n"
+    ...     "X2-grid    1    0.0    256 u   1.0 # is ignored in 1D\\n"
     ...     "X3-grid      1    0.0    1       u    1.0  # is ignored in 1D and 2D"
     ... ))
     [Grid]
     X1-grid    1  0.0  1024  u  4.0
     X2-grid    1  0.0  256   u  1.0    # is ignored in 1D
     X3-grid    1  0.0  1     u  1.0    # is ignored in 1D and 2D
+    <BLANKLINE>
     """
     fh = StringIO(s)
     content = []
