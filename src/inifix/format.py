@@ -13,7 +13,7 @@ from io import StringIO
 from tempfile import TemporaryDirectory
 from typing import IO, Literal
 
-from inifix._cli import Message, TaskResults
+from inifix._cli import Message, TaskResults, get_cpu_count
 from inifix.io import _split_tokens, load
 
 __all__ = ["format_string"]
@@ -168,7 +168,7 @@ def main(argv: list[str] | None = None) -> int:
         args_report_noop=args.report_noop,
         args_diff=args.diff,
     )
-    cpu_count = os.cpu_count() or 1
+    cpu_count = get_cpu_count()
     with ThreadPoolExecutor(max_workers=max(1, int(cpu_count / 2))) as executor:
         futures = [executor.submit(closure, file) for file in args.files]
         results = [f.result() for f in futures]

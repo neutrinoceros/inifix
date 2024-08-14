@@ -6,6 +6,7 @@ from stat import S_IREAD
 
 import pytest
 
+import inifix.format
 from inifix import load
 from inifix.format import format_string, iniformat, main
 
@@ -198,3 +199,14 @@ def test_data_preservation(inifile, tmp_path):
     main([str(target)])
     round_mapping = load(target)
     assert round_mapping == initial_mapping
+
+
+def test_single_core(monkeypatch, tmp_path):
+    # regression test for gh-251
+    target = tmp_path / "spaces.ini"
+
+    inserted = '''Eggs 'Bacon Saussage'     "spam"'''
+    target.write_text(inserted)
+
+    monkeypatch.setattr(inifix.format, "get_cpu_count", lambda: 1)
+    inifix.format.main([str(target)])
