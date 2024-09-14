@@ -56,6 +56,7 @@ jobs:
         name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}
         path: .coverage.*
         if-no-files-found: ignore
+        include-hidden-files: true
 
   concurrency-tests:
     strategy:
