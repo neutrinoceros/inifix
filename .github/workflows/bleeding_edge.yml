@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - 3.13-dev
+        - 3.14-dev
         free-threading:
         - false
         - true
@@ -39,7 +39,7 @@ jobs:
 
     - name: Build
       run: |
-        uv venv --python-preference=only-system -p 3.13
+        uv venv --python-preference=only-system -p 3.14
         uv pip install git+https://github.com/pytest-dev/pytest.git
         uv sync --inexact --group test --group concurrency --no-editable
     - run: uv pip list
