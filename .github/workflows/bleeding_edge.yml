@@ -54,7 +54,18 @@ jobs:
       run: |
         source .venv/bin/activate
         pytest --color=yes --pyargs inifix --doctest-modules
-    - name: Run concurrency tests
+    - name: Run concurrency tests (GIL)
+      if: ${{ ! matrix.free-threading }}
       run: |
         source .venv/bin/activate
         pytest --color=yes --count 100 tests/test_concurrent.py
+    - name: Run concurrency tests (free-threading)
+      if: matrix.free-threading
+      run: |
+        source .venv/bin/activate
+        pytest --color=yes --count 100 tests/test_concurrent.py
+      # it *should* be possible to enforce GIL disabling with PYTHON_GIL
+      # but the deadsnake binary seems broken and chokes on it
+      # (last checked 2024-10-12)
+      #env:
+      #  PYTHON_GIL: 0

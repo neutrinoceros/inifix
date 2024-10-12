@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 
 import pytest
@@ -15,3 +16,14 @@ def datadir():
 @pytest.fixture(params=INIFILES, ids=INIFILES_IDS)
 def inifile(request):
     return request.param
+
+
+def pytest_report_header(config, start_path):
+    if sys.version_info >= (3, 13):
+        is_gil_enabled = sys._is_gil_enabled()
+    else:
+        is_gil_enabled = True
+
+    return [
+        f"{is_gil_enabled = }",
+    ]
