@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - 3.13-dev
+        - 3.14-dev
         free-threading:
         - false
         - true
@@ -39,7 +39,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        uv venv -p 3.13 --python-preference=only-system
+        uv venv -p 3.14 --python-preference=only-system
         uv pip install git+https://github.com/pytest-dev/pytest.git
         uv pip install pytest-repeat hypothesis
     - name: Build
