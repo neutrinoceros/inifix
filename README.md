@@ -1,6 +1,7 @@
 # `inifix`
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
+[![Conda Version](https://img.shields.io/conda/vn/conda-forge/inifix.svg?logo=condaforge&logoColor=white)](https://anaconda.org/conda-forge/inifix)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)](https://results.pre-commit.ci/badge/github/neutrinoceros/inifix/main.svg)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/charliermarsh/ruff)
 
