@@ -34,7 +34,6 @@ Changelog = "https://github.com/neutrinoceros/inifix/blob/main/CHANGELOG.md"
 
 [tool.hatch.build]
 exclude = [
-  "tests",
   "scripts",
   "_typos.toml",
 ]
