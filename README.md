@@ -340,14 +340,14 @@ following configuration (add to `.pre-commit-config.yaml`)
 
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v5.0.2
+    rev: v5.0.3
     hooks:
       - id: inifix-validate
 ```
 or
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v5.0.2
+    rev: v5.0.3
     hooks:
       - id: inifix-format
 ```
@@ -356,7 +356,7 @@ Note that `inifix-format` also validates data by default, so it is redundant to
 utilize both hooks. Validation and formatting may nonetheless be decoupled as
 ```patch
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v5.0.2
+    rev: v5.0.3
     hooks:
     - id: inifix-validate
     - id: inifix-format
