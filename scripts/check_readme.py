@@ -1,13 +1,18 @@
 # /// script
-# requires-python = ">=3.11"
-# dependencies = []
+# requires-python = ">=3.10"
+# dependencies = [
+#   "tomli ; python_version < '3.11'",
+# ]
 # ///
 import re
 import sys
 from difflib import unified_diff
 from pathlib import Path
 
-import tomllib
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 REV_REGEXP = re.compile(r"rev:\s+v.*")
 STABLE_VER_REGEXP = re.compile(r"^\d\.*\d\.\d$")
@@ -23,9 +28,11 @@ def main() -> int:
         current_version = tomllib.load(fh)["project"]["version"]
 
     if not STABLE_VER_REGEXP.match(current_version):
+        print("Nothing to check.")
         return 0
 
     if text == (expected := REV_REGEXP.sub(f"rev: v{current_version}", text)):
+        print("All ok.")
         return 0
 
     diff = "\n".join(

@@ -26,7 +26,11 @@ jobs:
         - 3.14-dev
         include:
         - os: macos-latest
+          python-version: '3.10'
+        - os: macos-latest
           python-version: '3.13'
+        - os: windows-latest
+          python-version: '3.10'
         - os: windows-latest
           python-version: '3.13'
 
@@ -37,16 +41,12 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: astral-sh/setup-uv@v3
 
     - name: Build
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install --requirement requirements/tests.txt
-        python -m pip install .
-
-    - run: python -m pip list
-
-    - run: python -m coverage run -m pytest --color=yes
+      run: uv sync --python-preference=only-system --group test --group covcheck --no-editable
+    - run: uv pip list
+    - run: uv run coverage run -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
       # only using reports from ubuntu because
@@ -75,16 +75,12 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: astral-sh/setup-uv@v3
 
     - name: Build
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install --requirement requirements/tests.txt
-        python -m pip install .
-
-    - run: python -m pip list
-
-    - run: pytest --color=yes --count 100 tests/test_concurrent.py
+      run: uv sync --python-preference=only-system --group test --group concurrency --no-editable
+    - run: uv pip list
+    - run: uv run pytest --color=yes --count 100 tests/test_concurrent.py
 
   coverage:
     name: Combine & check coverage
@@ -93,12 +89,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
-      with:
-        # Use latest Python, so it understands all syntax.
-        python-version: 3.x
-
-    - run: python -m pip install --upgrade coverage[toml]
+    - uses: astral-sh/setup-uv@v3
+    - run: uv sync --only-group covcheck
 
     - uses: actions/download-artifact@v4
       with:
@@ -107,9 +99,9 @@ jobs:
 
     - name: Check coverage
       run: |
-        python -m coverage combine
-        python -m coverage html --skip-covered --skip-empty
-        python -m coverage report --fail-under=100
+        uv run coverage combine
+        uv run coverage html --skip-covered --skip-empty
+        uv run coverage report --fail-under=100
 
     - name: Upload HTML report if check failed.
       uses: actions/upload-artifact@v4
@@ -138,19 +130,11 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-
+    - uses: astral-sh/setup-uv@v3
     - name: Build
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install --requirement requirements/typecheck.txt
-        python -m pip install .
-
+      run: uv sync -p ${{ matrix.python-version }} --group typecheck --no-editable
     - name: Run mypy
-      run: mypy src/inifix
+      run: uv run mypy src/inifix
 
 
   check-readme:
@@ -162,9 +146,5 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.x
-
-    - run: python scripts/check_readme.py
+    - uses: astral-sh/setup-uv@v3
+    - run: uv run scripts/check_readme.py

@@ -1,4 +1,0 @@
-coverage[toml]>=6.5
-hypothesis>=6.110.0
-pytest>=6.1
-pytest-repeat>=0.9.3

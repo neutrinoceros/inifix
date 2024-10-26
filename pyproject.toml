@@ -31,6 +31,20 @@ inifix-validate = "inifix.validate:main"
 Homepage = "https://github.com/neutrinoceros/inifix"
 Changelog = "https://github.com/neutrinoceros/inifix/blob/main/CHANGELOG.md"
 
+[dependency-groups]
+concurrency = [
+    "pytest-repeat>=0.9.3",
+]
+covcheck = [
+    "coverage[toml]>=6.5.0",
+]
+test = [
+    "hypothesis>=6.110.0",
+    "pytest>=6.1",
+]
+typecheck = [
+    "mypy>=1.11.2",
+]
 
 [tool.hatch.build]
 exclude = [
@@ -74,7 +88,7 @@ exclude_lines = [
 
 [tool.coverage.run]
 omit = [
-  "setup.py",
+  "scripts/*",
 ]
 parallel = true
 
@@ -96,3 +110,4 @@ minversion = "6.0"
 filterwarnings = [
     "error",
 ]
+addopts = "-ra"

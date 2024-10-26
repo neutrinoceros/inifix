@@ -370,13 +370,3 @@ It is possible to override this expression as, e.g.,
    - id: inifix-format
 +    files: (\.ini|\.par)$
 ```
-
-## Testing
-
-We use the [pytest](https://docs.pytest.org/en/latest/) framework to test
-`inifix`. The test suite can be run from the top level with a simple `pytest`
-invocation.
-```shell
-$ python -m pip install --requirement requirements/tests.txt
-$ pytest
-```
