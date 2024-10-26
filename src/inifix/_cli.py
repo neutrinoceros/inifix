@@ -25,7 +25,7 @@ def get_cpu_count() -> int:
         if hasattr(os, "sched_getaffinity"):
             # this function isn't available on all platforms
             base_cpu_count = len(os.sched_getaffinity(0))
-        else:
+        else:  # pragma: no cover
             # this proxy is good enough in most situations
             base_cpu_count = os.cpu_count()
     return base_cpu_count or 1
