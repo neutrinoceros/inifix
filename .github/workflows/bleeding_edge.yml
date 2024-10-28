@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: 'py${{ matrix.python-version }} (free-threading: ${{ matrix.free-threading }})'
+    name: py${{ matrix.python-version }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -19,43 +19,28 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - 3.13-dev
-        free-threading:
-        - false
-        - true
+        - '3.13'
+        - 3.13+freethreaded
 
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
-      if: ${{ !matrix.free-threading }}
-      with:
-        python-version: ${{ matrix.python-version }}
-    - uses: deadsnakes/action@e640ac8743173a67cca4d7d77cd837e514bf98e8 # v3.2.0
-      if: ${{ matrix.free-threading }}
-      with:
-        python-version: ${{ matrix.python-version }}
-        nogil: true
     - uses: astral-sh/setup-uv@3b9817b1bf26186f03ab8277bab9b827ea5cc254 # v3.2.0
+
+    - name: Set PYTHON_GIL
+      if: ${{ endswith( matrix.python-version , '+freethreaded' ) }}
+      run: |
+        echo "PYTHON_GIL=0" >> $GITHUB_ENV
 
     - name: Build
       run: |
-        uv venv --python-preference=only-system -p 3.13
-        uv pip install git+https://github.com/pytest-dev/pytest.git
-        uv sync --inexact --group test --group concurrency --no-editable
+        uv venv -p ${{ matrix.python-version }} --python-preference only-managed
+        uv pip install .
     - run: uv pip list
     - name: Run tests
       run: |
-        uv run --no-project pytest --color=yes --doctest-modules
-    - name: Run concurrency tests (GIL)
-      if: ${{ ! matrix.free-threading }}
+        uv run -p ${{ matrix.python-version }} --group test \
+          pytest --color=yes --doctest-modules
+    - name: Run concurrency tests
       run: |
-        uv run --no-project pytest --color=yes --count 100 tests/test_concurrent.py
-    - name: Run concurrency tests (free-threading)
-      if: matrix.free-threading
-      run: |
-        uv run --no-project pytest --color=yes --count 100 tests/test_concurrent.py
-      # it *should* be possible to enforce GIL disabling with PYTHON_GIL
-      # but the deadsnake binary seems broken and chokes on it
-      # (last checked 2024-10-12)
-      #env:
-      #  PYTHON_GIL: 0
+        uv run -p ${{ matrix.python-version }} --group test --group concurrency \
+          pytest --color=yes --count 100 tests/test_concurrent.py
