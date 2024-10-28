@@ -46,7 +46,7 @@ jobs:
     - name: Build
       run: uv sync --python-preference=only-system --group test --group covcheck --no-editable
     - run: uv pip list
-    - run: uv run coverage run -m pytest --color=yes --doctest-modules
+    - run: uv run --no-project coverage run -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
       # only using reports from ubuntu because
@@ -80,7 +80,7 @@ jobs:
     - name: Build
       run: uv sync --python-preference=only-system --group test --group concurrency --no-editable
     - run: uv pip list
-    - run: uv run pytest --color=yes --count 100 tests/test_concurrent.py
+    - run: uv run --no-project pytest --color=yes --count 100 tests/test_concurrent.py
 
   coverage:
     name: Combine & check coverage
@@ -99,9 +99,9 @@ jobs:
 
     - name: Check coverage
       run: |
-        uv run coverage combine
-        uv run coverage html --skip-covered --skip-empty
-        uv run coverage report --fail-under=100
+        uv run --no-project coverage combine
+        uv run --no-project coverage html --skip-covered --skip-empty
+        uv run --no-project coverage report --fail-under=100
 
     - name: Upload HTML report if check failed.
       uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
