@@ -220,9 +220,9 @@ def _format_single_file_cli(
                 data.splitlines(), fmted_data.splitlines(), fromfile=file
             )
         )
-        if diff:
-            status = 1
-            messages.append(Message(diff, sys.stdout))
+        assert diff
+        status = 1
+        messages.append(Message(diff, sys.stdout))
     else:
         status = 1
         messages.append(Message(f"Fixing {file}", sys.stderr))

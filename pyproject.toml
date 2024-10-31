@@ -69,6 +69,16 @@ select = [
 [tool.ruff.lint.isort]
 known-first-party = ["inifix"]
 
+[tool.coverage.run]
+branch = true
+source = [
+    "src/inifix",
+    "tests",
+]
+omit = [
+  "scripts/*",
+]
+
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
@@ -79,16 +89,9 @@ exclude_lines = [
     # allow defensive code
     "^\\s*raise NotImplementedError\\b",
 
-    # typing-related code
-    "^if TYPE_CHECKING:",
     ": \\.\\.\\.(\\s*#.*)?$",
     "^ +\\.\\.\\.$",
     "-> ['\"]?NoReturn['\"]?:",
-]
-
-[tool.coverage.run]
-omit = [
-  "scripts/*",
 ]
 
 [tool.mypy]

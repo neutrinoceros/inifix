@@ -12,7 +12,7 @@ from inifix._typing import InifixConfT, IterableOrSingle, Scalar, StrLike
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from _typeshed import GenericPath
 
 __all__ = ["load", "loads", "dump", "dumps"]
@@ -334,7 +334,8 @@ def load(
             parse_scalars_as_lists=parse_scalars_as_lists,
             caster=caster,
         )
-    elif isinstance(source, str | bytes | os.PathLike):
+    else:
+        assert isinstance(source, str | bytes | os.PathLike)
         source = _from_path(
             source,
             parse_scalars_as_lists=parse_scalars_as_lists,
