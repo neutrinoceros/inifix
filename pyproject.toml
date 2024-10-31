@@ -90,7 +90,6 @@ exclude_lines = [
 omit = [
   "scripts/*",
 ]
-parallel = true
 
 [tool.mypy]
 python_version = "3.10"

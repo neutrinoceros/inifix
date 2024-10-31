@@ -43,10 +43,26 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - uses: astral-sh/setup-uv@3b9817b1bf26186f03ab8277bab9b827ea5cc254 # v3.2.0
 
-    - name: Build
+    - name: Build (without coverage)
+      if: matrix.os != 'ubuntu-latest'
+      run: uv sync --python-preference=only-system --group test --no-editable
+
+    - name: Build (with coverage)
+      if: matrix.os == 'ubuntu-latest'
       run: uv sync --python-preference=only-system --group test --group covcheck --no-editable
+
     - run: uv pip list
-    - run: uv run --no-project coverage run -m pytest --color=yes --doctest-modules
+
+    - name: Run tests (without coverage)
+      if: matrix.os != 'ubuntu-latest'
+      run: |
+        uv run --no-project pytest --color=yes --doctest-modules
+
+    - name: Run tests (with coverage)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        uv run --no-project coverage run --parallel-mode \
+          -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
       # only using reports from ubuntu because
