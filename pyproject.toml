@@ -69,6 +69,12 @@ select = [
 [tool.ruff.lint.isort]
 known-first-party = ["inifix"]
 
+[tool.coverage.run]
+branch = true
+omit = [
+  "scripts/*",
+]
+
 [tool.coverage.report]
 show_missing = true
 skip_covered = false
@@ -84,11 +90,6 @@ exclude_lines = [
     ": \\.\\.\\.(\\s*#.*)?$",
     "^ +\\.\\.\\.$",
     "-> ['\"]?NoReturn['\"]?:",
-]
-
-[tool.coverage.run]
-omit = [
-  "scripts/*",
 ]
 
 [tool.mypy]
