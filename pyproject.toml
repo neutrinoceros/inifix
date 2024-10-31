@@ -71,6 +71,10 @@ known-first-party = ["inifix"]
 
 [tool.coverage.run]
 branch = true
+source = [
+    "src/inifix",
+    "tests",
+]
 omit = [
   "scripts/*",
 ]
@@ -85,8 +89,6 @@ exclude_lines = [
     # allow defensive code
     "^\\s*raise NotImplementedError\\b",
 
-    # typing-related code
-    "^if TYPE_CHECKING:",
     ": \\.\\.\\.(\\s*#.*)?$",
     "^ +\\.\\.\\.$",
     "-> ['\"]?NoReturn['\"]?:",

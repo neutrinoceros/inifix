@@ -134,6 +134,8 @@ def test_bool_strings(s):
         b = True
     elif s in FALSY_STRINGS:
         b = False
+    else:  # pragma: no cover
+        raise RuntimeError
     # test unsupported case
     S = s.title().swapcase()
     data = loads(f"a {s} '{s}' {S}")
@@ -199,13 +201,13 @@ def test_dump_to_file_path(inifile, tmp_path):
 
     # pathlib.Path obj
     file1 = tmp_path / "save1.ini"
-    dump(conf, file1)
+    dump(conf, file1, skip_validation=True)
     body1 = file1.read_text()
 
     # str
     file2 = tmp_path / "save2.ini"
     sfile2 = str(file2)
-    dump(conf, sfile2)
+    dump(conf, sfile2, skip_validation=True)
     body2 = file2.read_text()
 
     assert body1 == body2

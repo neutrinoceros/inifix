@@ -13,13 +13,14 @@ from inifix.format import format_string, iniformat, main
 DATA_DIR = Path(__file__).parent / "data"
 
 
-def test_format_keep_data(inifile, capsys, tmp_path):
+@pytest.mark.parametrize("args", [(), ("--skip-validation",)])
+def test_format_keep_data(args, inifile, capsys, tmp_path):
     target = tmp_path / inifile.name
 
     ref_data = load(inifile)
     shutil.copyfile(inifile, target)
 
-    ret = main([str(target)])
+    ret = main([str(target), *args])
     assert isinstance(ret, int)
 
     out, err = capsys.readouterr()
