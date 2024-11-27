@@ -137,8 +137,7 @@ class ENotationIO:
             return "0e0"
         max_ndigit = len(base.replace(".", "")) - 1
         fmt = f".{max_ndigit}e"
-        s = "{:^{}}".format(r, fmt)
-        return ENotationIO.simplify(s)
+        return ENotationIO.simplify(f"{r:{fmt}}")
 
     @staticmethod
     def encode_preferential(r: float, /) -> str:
