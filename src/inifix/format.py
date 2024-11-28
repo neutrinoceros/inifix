@@ -1,14 +1,11 @@
-import argparse
 import os
 import re
 import sys
 import warnings
 from collections.abc import Iterable
-from concurrent.futures import ThreadPoolExecutor
 from difflib import unified_diff
 from functools import partial
 from io import StringIO
-from tempfile import TemporaryDirectory
 from typing import IO, Literal
 
 from inifix._cli import Message, TaskResults, get_cpu_count
@@ -141,7 +138,10 @@ def iniformat(s: str, /) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser()
+    from argparse import ArgumentParser
+    from concurrent.futures import ThreadPoolExecutor
+
+    parser = ArgumentParser()
     parser.add_argument("files", nargs="+")
     parser.add_argument(
         "--diff",
@@ -231,6 +231,8 @@ def _format_single_file_cli(
                 )
             )
             return TaskResults(status, messages)
+
+        from tempfile import TemporaryDirectory
 
         with TemporaryDirectory(dir=os.path.dirname(file)) as tmpdir:
             tmpfile = os.path.join(tmpdir, "ini")
