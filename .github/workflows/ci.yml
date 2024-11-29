@@ -152,6 +152,26 @@ jobs:
     - name: Run mypy
       run: uv run mypy src/inifix
 
+  optimized_python:
+    runs-on: ubuntu-latest
+    name: optimized Python
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}-optimized
+      cancel-in-progress: true
+
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      with:
+        fetch-depth: 0
+
+    - uses: astral-sh/setup-uv@d8db0a86d3d88f3017a4e6b8a1e2b234e7a0a1b5 # v4.0.0
+    - name: Build
+      run: uv sync -p 3.13 --group test --no-editable
+    - name: Run pytest with PYTHONOPTIMIZE=2
+      run: uv run --no-project pytest --color=yes --doctest-modules
+      env:
+        PYTHONOPTIMIZE: 2
 
   check-readme:
     runs-on: ubuntu-latest
