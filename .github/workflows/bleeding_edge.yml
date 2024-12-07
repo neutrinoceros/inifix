@@ -40,5 +40,5 @@ jobs:
           pytest --color=yes --doctest-modules
     - name: Run concurrency tests
       run: |
-        uv run --frozen --no-editable --group test --group concurrency \
+        uv run --frozen --no-editable --group concurrency \
           pytest --color=yes --count 100 tests/test_concurrent.py
