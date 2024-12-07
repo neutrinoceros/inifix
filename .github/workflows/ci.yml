@@ -50,7 +50,7 @@ jobs:
     - name: Run tests (with coverage)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        uv run --frozen --no-editable --group test --group covcheck \
+        uv run --frozen --no-editable --group covcheck \
           coverage run --parallel-mode -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
@@ -80,7 +80,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - run: |
-        uv run --frozen --no-editable --group test --group concurrency \
+        uv run --frozen --no-editable --group concurrency \
           pytest --color=yes --count 100 tests/test_concurrent.py
 
   coverage:
