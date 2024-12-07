@@ -32,15 +32,18 @@ Homepage = "https://github.com/neutrinoceros/inifix"
 Changelog = "https://github.com/neutrinoceros/inifix/blob/main/CHANGELOG.md"
 
 [dependency-groups]
-concurrency = [
-    "pytest-repeat>=0.9.3",
-]
-covcheck = [
-    "coverage[toml]>=6.5.0",
-]
 test = [
     "hypothesis>=6.110.0",
     "pytest>=6.1",
+]
+concurrency = [
+    {include-group = "test"},
+    "pytest-repeat>=0.9.3",
+]
+covcheck = [
+    {include-group = "test"},
+    "coverage[toml]>=6.5.0 ; python_version == '3.10'",
+    "coverage>=6.5.0 ; python_version >= '3.11'",
 ]
 typecheck = [
     "mypy>=1.11.2",

@@ -1,5 +1,9 @@
 version = 1
 requires-python = ">=3.10"
+resolution-markers = [
+    "python_full_version < '3.11'",
+    "python_full_version >= '3.11'",
+]
 
 [[package]]
 name = "attrs"
@@ -80,7 +84,7 @@ wheels = [
 
 [package.optional-dependencies]
 toml = [
-    { name = "tomli", marker = "python_full_version <= '3.11'" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 
 [[package]]
@@ -122,10 +126,15 @@ source = { editable = "." }
 
 [package.dev-dependencies]
 concurrency = [
+    { name = "hypothesis" },
+    { name = "pytest" },
     { name = "pytest-repeat" },
 ]
 covcheck = [
-    { name = "coverage", extra = ["toml"] },
+    { name = "coverage" },
+    { name = "coverage", extra = ["toml"], marker = "python_full_version < '3.11'" },
+    { name = "hypothesis" },
+    { name = "pytest" },
 ]
 test = [
     { name = "hypothesis" },
@@ -138,8 +147,17 @@ typecheck = [
 [package.metadata]
 
 [package.metadata.requires-dev]
-concurrency = [{ name = "pytest-repeat", specifier = ">=0.9.3" }]
-covcheck = [{ name = "coverage", extras = ["toml"], specifier = ">=6.5.0" }]
+concurrency = [
+    { name = "hypothesis", specifier = ">=6.110.0" },
+    { name = "pytest", specifier = ">=6.1" },
+    { name = "pytest-repeat", specifier = ">=0.9.3" },
+]
+covcheck = [
+    { name = "coverage", marker = "python_full_version >= '3.11'", specifier = ">=6.5.0" },
+    { name = "coverage", extras = ["toml"], marker = "python_full_version == '3.10.*'", specifier = ">=6.5.0" },
+    { name = "hypothesis", specifier = ">=6.110.0" },
+    { name = "pytest", specifier = ">=6.1" },
+]
 test = [
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=6.1" },
