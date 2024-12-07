@@ -23,7 +23,6 @@ jobs:
         - '3.11'
         - '3.12'
         - '3.13'
-        - 3.14-dev
         include:
         - os: macos-latest
           python-version: '3.10'
@@ -37,32 +36,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - name: Setup Python
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+    - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
-
-    - name: Build (without coverage)
-      if: matrix.os != 'ubuntu-latest'
-      run: uv sync --python-preference=only-system --group test --no-editable
-
-    - name: Build (with coverage)
-      if: matrix.os == 'ubuntu-latest'
-      run: uv sync --python-preference=only-system --group test --group covcheck --no-editable
-
-    - run: uv pip list
 
     - name: Run tests (without coverage)
       if: matrix.os != 'ubuntu-latest'
+      shell: bash  # for windows portability
       run: |
-        uv run --no-project pytest --color=yes --doctest-modules
+        uv run --frozen --no-editable --group test --group test \
+          pytest --color=yes --doctest-modules
 
     - name: Run tests (with coverage)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        uv run --no-project coverage run --parallel-mode \
-          -m pytest --color=yes --doctest-modules
+        uv run --frozen --no-editable --group test --group covcheck \
+          coverage run --parallel-mode -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
       # only using reports from ubuntu because
@@ -82,21 +71,17 @@ jobs:
         - ubuntu-latest
         python-version:
         - '3.13'
-        - 3.14-dev
+        # - '3.13t'
 
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - name: Setup Python
-      uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+    - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
-
-    - name: Build
-      run: uv sync --python-preference=only-system --group test --group concurrency --no-editable
-    - run: uv pip list
-    - run: uv run --no-project pytest --color=yes --count 100 tests/test_concurrent.py
+    - run: |
+        uv run --frozen --no-editable --group test --group concurrency \
+          pytest --color=yes --count 100 tests/test_concurrent.py
 
   coverage:
     name: Combine & check coverage
@@ -127,7 +112,6 @@ jobs:
       if: ${{ failure() }}
 
   type-check:
-
     strategy:
       matrix:
         python-version:
@@ -147,10 +131,10 @@ jobs:
         fetch-depth: 0
 
     - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
-    - name: Build
-      run: uv sync -p ${{ matrix.python-version }} --group typecheck --no-editable
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: Run mypy
-      run: uv run mypy src/inifix
+      run: uv run --frozen --no-editable --group typecheck mypy src/inifix
 
   optimized_python:
     runs-on: ubuntu-latest
@@ -166,10 +150,12 @@ jobs:
         fetch-depth: 0
 
     - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
-    - name: Build
-      run: uv sync -p 3.13 --group test --no-editable
+      with:
+        python-version: '3.13'
     - name: Run pytest with PYTHONOPTIMIZE=2
-      run: uv run --no-project pytest --color=yes --doctest-modules
+      run: |
+        uv run --frozen --no-editable --group test \
+          pytest --color=yes --doctest-modules
       env:
         PYTHONOPTIMIZE: 2
 

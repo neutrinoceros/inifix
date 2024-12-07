@@ -25,22 +25,20 @@ jobs:
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
-
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: Set PYTHON_GIL
       if: ${{ endswith( matrix.python-version , '+freethreaded' ) }}
       run: |
         echo "PYTHON_GIL=0" >> $GITHUB_ENV
 
-    - name: Build
-      run: |
-        uv venv -p ${{ matrix.python-version }} --python-preference only-managed
-        uv pip install .
-    - run: uv pip list
+    - run: uv lock --upgrade --prerelease=allow
+
     - name: Run tests
       run: |
-        uv run -p ${{ matrix.python-version }} --group test \
+        uv run --frozen --no-editable --group test \
           pytest --color=yes --doctest-modules
     - name: Run concurrency tests
       run: |
-        uv run -p ${{ matrix.python-version }} --group test --group concurrency \
+        uv run --frozen --no-editable --group test --group concurrency \
           pytest --color=yes --count 100 tests/test_concurrent.py
