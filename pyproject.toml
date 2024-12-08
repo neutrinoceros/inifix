@@ -49,10 +49,12 @@ typecheck = [
     "mypy>=1.11.2",
 ]
 
-[tool.hatch.build]
+[tool.hatch.build.targets.sdist]
 exclude = [
-  "scripts",
-  "_typos.toml",
+    ".*",  # exclude dot files (.gitignore is still included)
+    "_typos.toml",
+    "scripts",
+    "uv.lock",
 ]
 
 [tool.ruff.lint]
