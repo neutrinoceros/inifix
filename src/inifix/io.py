@@ -15,7 +15,12 @@ from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 if TYPE_CHECKING:  # pragma: no cover
     from _typeshed import GenericPath
 
-__all__ = ["load", "loads", "dump", "dumps"]
+__all__ = [
+    "dump",
+    "dumps",
+    "load",
+    "loads",
+]
 
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
