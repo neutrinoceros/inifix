@@ -12,6 +12,16 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:  # pragma: no cover
     from typing import Any
 
+__all__ = [
+    "dump",
+    "dumps",
+    "load",
+    "loads",
+    "validate_inifile_schema",
+    "format_string",
+    "__version__",
+]
+
 
 def __getattr__(name: str) -> Any:
     if name == "__version__":
