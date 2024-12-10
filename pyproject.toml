@@ -69,6 +69,7 @@ select = [
     "YTT", # flake8-2020
     "I",   # isort
     "UP",  # pyupgrade
+    "RUF022" # unsorted-dunder-all
 ]
 
 [tool.ruff.lint.isort]
