@@ -8,11 +8,13 @@ from io import BufferedIOBase, IOBase
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 from inifix._more import always_iterable
-from inifix._typing import InifixConfT, IterableOrSingle, Scalar, StrLike
+from inifix._typing import InifixConfT, Scalar, StrLike
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 
 if TYPE_CHECKING:  # pragma: no cover
+    from collections.abc import Iterable
+
     from _typeshed import GenericPath
 
 __all__ = [
@@ -37,7 +39,7 @@ def _is_numeric(s: str) -> bool:
 class Section(dict):
     def __init__(
         self,
-        data: Mapping[str, IterableOrSingle[Scalar]] | None = None,
+        data: Mapping[str, Iterable[Scalar] | Scalar] | None = None,
         /,
         *,
         name: str | None = None,
@@ -260,7 +262,7 @@ def _write(content: str, buffer: IOBase) -> None:
         buffer.write(content)
 
 
-def _write_line(key: str, values: IterableOrSingle[Scalar], buffer: IOBase) -> None:
+def _write_line(key: str, values: Iterable[Scalar] | Scalar, buffer: IOBase) -> None:
     val_repr = [_encode(v) for v in always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
@@ -347,7 +349,7 @@ def load(
             caster=caster,
         )
 
-    source = cast(Mapping, source)
+    source = cast(InifixConfT, source)
 
     if not skip_validation:
         validate_inifile_schema(source)

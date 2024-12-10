@@ -6,10 +6,13 @@ from collections.abc import Iterable
 from difflib import unified_diff
 from functools import partial
 from io import StringIO
-from typing import IO, Literal
+from typing import IO, TYPE_CHECKING, Literal
 
 from inifix._cli import Message, TaskResults, get_cpu_count
 from inifix.io import _split_tokens, load
+
+if TYPE_CHECKING:  # pragma: no cover
+    from inifix._typing import InifixConfT
 
 __all__ = ["format_string"]
 
@@ -190,6 +193,7 @@ def _format_single_file_cli(
         messages.append(Message(f"Error: could not find {file}", sys.stderr))
         return TaskResults(status, messages)
 
+    validate_baseline: InifixConfT = {}
     if args_validate:
         try:
             validate_baseline = load(file)
