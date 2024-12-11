@@ -159,14 +159,12 @@ jobs:
       env:
         PYTHONOPTIMIZE: 2
 
-  check-readme:
+  pre-publish-checks:
     runs-on: ubuntu-latest
-    name: check README.md
-
+    name: pre-publication checks
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         fetch-depth: 0
-
     - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
-    - run: uv run scripts/check_readme.py
+    - run: uv run scripts/pre_publish_checks.py
