@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TYP: add missing `__all__` symbol to inifix's root namespace
 - TYP: fix errors reported by `pyright`
 - ENH: add `inifix.__version_tuple__`
+- ENH: add sections-mode selection to `inifix.validate_inifile_schema`
 
 ## [5.0.4] - 2024-11-29
 

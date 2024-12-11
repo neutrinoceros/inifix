@@ -4,8 +4,19 @@ from pathlib import Path
 import pytest
 
 DATA_DIR = Path(__file__).parent / "data"
-INIFILES = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))
-INIFILES_IDS = [inifile.name[:-4] for inifile in INIFILES]
+INIFILES_PATHS = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))
+INIFILES_IDS = [inifile.name[:-4] for inifile in INIFILES_PATHS]
+
+INIFILES = dict(zip(INIFILES_PATHS, INIFILES_IDS, strict=True))
+
+INIFILES_WO_SECTIONS = {
+    path: id
+    for path, id in INIFILES.items()
+    if "fargo" not in id and path.suffix != ".cfg"
+}
+INIFILES_W_SECTIONS = {
+    path: id for path, id in INIFILES.items() if path not in INIFILES_WO_SECTIONS
+}
 
 
 @pytest.fixture()
@@ -13,8 +24,18 @@ def datadir():
     return DATA_DIR
 
 
-@pytest.fixture(params=INIFILES, ids=INIFILES_IDS)
+@pytest.fixture(params=INIFILES.keys(), ids=INIFILES.values())
 def inifile(request):
+    return request.param
+
+
+@pytest.fixture(params=INIFILES_W_SECTIONS.keys(), ids=INIFILES_W_SECTIONS.values())
+def inifile_with_sections(request):
+    return request.param
+
+
+@pytest.fixture(params=INIFILES_WO_SECTIONS.keys(), ids=INIFILES_WO_SECTIONS.values())
+def inifile_without_sections(request):
     return request.param
 
 
