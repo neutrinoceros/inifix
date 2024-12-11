@@ -22,6 +22,8 @@ __all__ = [
     "__version__",
 ]
 
+__version__: str
+
 
 def __getattr__(name: str) -> Any:
     if name == "__version__":
@@ -29,6 +31,3 @@ def __getattr__(name: str) -> Any:
 
         return version("inifix")
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-
-del TYPE_CHECKING
