@@ -1,7 +1,9 @@
 import pytest
 
-from inifix.io import dump, load
+from inifix.io import dump, dumps, load, loads
 from inifix.validation import validate_inifile_schema
+
+from .utils import assert_dict_equal
 
 
 def test_validate_known_files(inifile):
@@ -13,31 +15,84 @@ def test_validate_known_files(inifile):
     validate_inifile_schema(conf, sections="allow")
 
 
-def test_validate_known_files_with_sections(inifile_with_sections):
-    conf = load(inifile_with_sections)
-    validate_inifile_schema(conf, sections="forbid")
-    with pytest.raises(
-        ValueError,
-        match=(
-            "Invalid schema: sections were explicitly required, "
-            "but the following key/value pair was found outside of "
-            "any section"
-        ),
-    ):
-        validate_inifile_schema(conf, sections="require")
+def test_validate_known_files_without_sections(inifile_without_sections, tmp_path):
+    conf1 = load(inifile_without_sections)
+    validate_inifile_schema(conf1, sections="forbid")
+
+    expected_msg = (
+        "Invalid schema: sections were explicitly required, "
+        "but the following key/value pair was found outside of "
+        "any section"
+    )
+    with pytest.raises(ValueError, match=expected_msg):
+        validate_inifile_schema(conf1, sections="require")
+
+    with pytest.raises(ValueError, match=expected_msg):
+        load(inifile_without_sections, sections="require")
+
+    # check that sections=... doesn't have any effect when combined with skip_validation=True
+    conf2 = load(inifile_without_sections, sections="require", skip_validation=True)
+    assert_dict_equal(conf2, conf1)
+
+    save_file = tmp_path / "test"
+    with pytest.raises(ValueError, match=expected_msg):
+        dump(conf1, save_file, sections="require")
+    assert not save_file.exists()
+
+    dump(conf1, save_file, sections="require", skip_validation=True)
+    assert save_file.is_file()
+
+    with pytest.raises(ValueError, match=expected_msg):
+        dumps(conf1, sections="require")
+
+    s = dumps(conf1, sections="require", skip_validation=True)
+
+    conf3 = loads(s)
+    assert_dict_equal(conf3, conf1)
+    with pytest.raises(ValueError, match=expected_msg):
+        loads(s, sections="require")
+
+    conf4 = loads(s, sections="require", skip_validation=True)
+    assert_dict_equal(conf4, conf3)
 
 
-def test_validate_known_files_without_sections(inifile_without_sections):
-    conf = load(inifile_without_sections)
-    validate_inifile_schema(conf, sections="require")
-    with pytest.raises(
-        ValueError,
-        match=(
-            "Invalid schema: sections were explicitly forbidden, "
-            "but one was found under key"
-        ),
-    ):
-        validate_inifile_schema(conf, sections="forbid")
+def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
+    conf1 = load(inifile_with_sections)
+    validate_inifile_schema(conf1, sections="require")
+    expected_msg = (
+        "Invalid schema: sections were explicitly forbidden, "
+        "but one was found under key"
+    )
+    with pytest.raises(ValueError, match=expected_msg):
+        validate_inifile_schema(conf1, sections="forbid")
+
+    with pytest.raises(ValueError, match=expected_msg):
+        load(inifile_with_sections, sections="forbid")
+
+    # check that sections=... doesn't have any effect when combined with skip_validation=True
+    conf2 = load(inifile_with_sections, sections="forbid", skip_validation=True)
+    assert_dict_equal(conf2, conf1)
+
+    save_file = tmp_path / "test"
+    with pytest.raises(ValueError, match=expected_msg):
+        dump(conf1, save_file, sections="forbid")
+    assert not save_file.exists()
+
+    dump(conf1, save_file, sections="forbid", skip_validation=True)
+    assert save_file.is_file()
+
+    with pytest.raises(ValueError, match=expected_msg):
+        dumps(conf1, sections="forbid")
+
+    s = dumps(conf1, sections="forbid", skip_validation=True)
+
+    conf3 = loads(s)
+    assert_dict_equal(conf3, conf1)
+    with pytest.raises(ValueError, match=expected_msg):
+        loads(s, sections="forbid")
+
+    conf4 = loads(s, sections="forbid", skip_validation=True)
+    assert_dict_equal(conf4, conf3)
 
 
 @pytest.mark.parametrize(

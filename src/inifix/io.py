@@ -297,9 +297,12 @@ def load(
     source: InifixConfT | GenericPath | IOBase,
     /,
     *,
+    # parsing options
     parse_scalars_as_lists: bool = False,
-    skip_validation: bool = False,
     integer_casting: Literal["stable", "aggressive"] = "stable",
+    # validation options
+    sections: Literal["allow", "forbid", "require"] = "allow",
+    skip_validation: bool = False,
 ) -> InifixConfT:
     """
     Parse data from a file, or a dict.
@@ -317,9 +320,7 @@ def load(
         if set to True, all values will be parses as lists of scalars,
         even for parameters comprised of a single scalar.
 
-    skip_validation: bool
-        if set to True, input is not validated. This can be used to speedup io operations
-        trusted input or to work around bugs with the validation routine. Use with caution.
+        .. versionadded: 3.1.0
 
     integer_casting: "stable" (default) or "aggressive"
         casting strategy for numbers written in decimal notations, such as '1.',
@@ -327,7 +328,21 @@ def load(
         as Python floats). Setting `integer_casting='aggressive'` will instead
         parse these as Python ints, matching the behavior of inifix 4.5
 
-        New in inifix 5.0
+        .. versionadded: 5.0.0
+
+    sections: 'allow', 'forbid' or 'require' (default: 'allow')
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        This parameter has no effect at runtime when combined with skip_validation=True.
+
+        .. versionadded: 5.1.0
+
+    skip_validation: bool
+        if set to True, input is not validated. This can be used to speedup io operations
+        trusted input or to work around bugs with the validation routine. Use with caution.
+
+        .. versionadded: 4.1.0
 
     See Also
     --------
@@ -352,7 +367,7 @@ def load(
     source = cast(InifixConfT, source)
 
     if not skip_validation:
-        validate_inifile_schema(source)
+        validate_inifile_schema(source, sections=sections)
     source = cast(InifixConfT, source)
     return source
 
@@ -361,9 +376,12 @@ def loads(
     source: str,
     /,
     *,
+    # parsing options
     parse_scalars_as_lists: bool = False,
-    skip_validation: bool = False,
     integer_casting: Literal["stable", "aggressive"] = "stable",
+    # validation options
+    sections: Literal["allow", "forbid", "require"] = "allow",
+    skip_validation: bool = False,
 ) -> InifixConfT:
     """
     Parse data from a string.
@@ -377,9 +395,7 @@ def loads(
         if set to True, all values will be parses as lists of scalars,
         even for parameters comprised of a single scalar.
 
-    skip_validation: bool
-        if set to True, input is not validated. This can be used to speedup io operations
-        trusted input or to work around bugs with the validation routine. Use with caution.
+        .. versionadded: 3.1.0
 
     integer_casting: "stable" (default) or "aggressive"
         casting strategy for numbers written in decimal notations, such as '1.',
@@ -387,7 +403,21 @@ def loads(
         as Python floats). Setting `integer_casting='aggressive'` will instead
         parse these as Python ints, matching the behavior of inifix 4.5
 
-        New in inifix 5.0
+        .. versionadded: 5.0.0
+
+    sections: 'allow', 'forbid' or 'require' (default: 'allow')
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        This parameter has no effect at runtime when combined with skip_validation=True.
+
+        .. versionadded: 5.1.0
+
+    skip_validation: bool
+        if set to True, input is not validated. This can be used to speedup io operations
+        trusted input or to work around bugs with the validation routine. Use with caution.
+
+        .. versionadded: 4.1.0
 
     See Also
     --------
@@ -399,12 +429,18 @@ def loads(
     )
 
     if not skip_validation:
-        validate_inifile_schema(retv)
+        validate_inifile_schema(retv, sections=sections)
     return retv
 
 
 def dump(
-    data: InifixConfT, /, file: GenericPath | IOBase, *, skip_validation: bool = False
+    data: InifixConfT,
+    /,
+    file: GenericPath | IOBase,
+    *,
+    # validation options
+    sections: Literal["allow", "forbid", "require"] = "allow",
+    skip_validation: bool = False,
 ) -> None:
     """
     Write data to a file.
@@ -420,16 +456,26 @@ def dump(
           though binary is preferred.
           In binary mode, data is encoded as UTF-8.
 
+    sections: 'allow', 'forbid' or 'require' (default: 'allow')
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        This parameter has no effect at runtime when combined with skip_validation=True.
+
+        .. versionadded: 5.1.0
+
     skip_validation: bool
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
+
+        .. versionadded: 4.1.0
 
     See Also
     --------
     inifix.dumps
     """
     if not skip_validation:
-        validate_inifile_schema(data)
+        validate_inifile_schema(data, sections=sections)
 
     if isinstance(file, IOBase):
         _write_to_buffer(data, file)
@@ -437,7 +483,14 @@ def dump(
         _write_to_file(data, file)
 
 
-def dumps(data: InifixConfT, /, *, skip_validation: bool = False) -> str:
+def dumps(
+    data: InifixConfT,
+    /,
+    *,
+    # validation options
+    sections: Literal["allow", "forbid", "require"] = "allow",
+    skip_validation: bool = False,
+) -> str:
     """
     Convert data to a string.
 
@@ -446,9 +499,19 @@ def dumps(data: InifixConfT, /, *, skip_validation: bool = False) -> str:
     data: dict
         has to be inifix format-compliant
 
+    sections: 'allow', 'forbid' or 'require' (default: 'allow')
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        This parameter has no effect at runtime when combined with skip_validation=True.
+
+        .. versionadded: 5.1.0
+
     skip_validation: bool
         if set to True, input is not validated. This can be used to speedup io operations
         trusted input or to work around bugs with the validation routine. Use with caution.
+
+        .. versionadded: 4.1.0
 
     Returns
     -------
@@ -461,5 +524,5 @@ def dumps(data: InifixConfT, /, *, skip_validation: bool = False) -> str:
     from io import BytesIO
 
     s = BytesIO()
-    dump(data, file=s, skip_validation=skip_validation)
+    dump(data, file=s, skip_validation=skip_validation, sections=sections)
     return s.getvalue().decode("utf-8")

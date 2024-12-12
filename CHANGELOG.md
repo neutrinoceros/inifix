@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TYP: fix errors reported by `pyright`
 - ENH: add `inifix.__version_tuple__`
 - ENH: add sections-mode selection to `inifix.validate_inifile_schema`
+- ENH: expose sections-mode selection in IO API
 
 ## [5.0.4] - 2024-11-29
 
