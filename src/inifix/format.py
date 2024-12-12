@@ -12,7 +12,7 @@ from inifix._cli import Message, TaskResults, get_cpu_count
 from inifix.io import _split_tokens, load
 
 if TYPE_CHECKING:  # pragma: no cover
-    from inifix._typing import InifixConfT
+    from inifix._typing import AnyConfig
 
 __all__ = ["format_string"]
 
@@ -193,7 +193,7 @@ def _format_single_file_cli(
         messages.append(Message(f"Error: could not find {file}", sys.stderr))
         return TaskResults(status, messages)
 
-    validate_baseline: InifixConfT = {}
+    validate_baseline: AnyConfig = {}
     if args_validate:
         try:
             validate_baseline = load(file)
