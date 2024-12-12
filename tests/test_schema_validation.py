@@ -6,7 +6,38 @@ from inifix.validation import validate_inifile_schema
 
 def test_validate_known_files(inifile):
     conf = load(inifile)
+    # implicit form
     validate_inifile_schema(conf)
+
+    # explicit form
+    validate_inifile_schema(conf, sections="allow")
+
+
+def test_validate_known_files_with_sections(inifile_with_sections):
+    conf = load(inifile_with_sections)
+    validate_inifile_schema(conf, sections="forbid")
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Invalid schema: sections were explicitly required, "
+            "but the following key/value pair was found outside of "
+            "any section"
+        ),
+    ):
+        validate_inifile_schema(conf, sections="require")
+
+
+def test_validate_known_files_without_sections(inifile_without_sections):
+    conf = load(inifile_without_sections)
+    validate_inifile_schema(conf, sections="require")
+    with pytest.raises(
+        ValueError,
+        match=(
+            "Invalid schema: sections were explicitly forbidden, "
+            "but one was found under key"
+        ),
+    ):
+        validate_inifile_schema(conf, sections="forbid")
 
 
 @pytest.mark.parametrize(
@@ -29,3 +60,8 @@ def test_validate_known_files(inifile):
 def test_dump_invalid_conf(invalid_conf, tmp_path):
     with pytest.raises(ValueError, match=r"^(Invalid schema)"):
         dump(invalid_conf, tmp_path / "save.ini")
+
+
+def test_unknown_sections_value():
+    with pytest.raises(TypeError):
+        validate_inifile_schema({}, sections="unknown-value")
