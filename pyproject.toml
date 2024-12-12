@@ -16,7 +16,7 @@ classifiers = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "typing-extensions>=4.1.0 ; python_full_version < '3.11'",
+    "typing-extensions>=4.2.0 ; python_full_version < '3.11'",
 ]
 
 [project.license]

@@ -5,10 +5,18 @@ import re
 from collections.abc import Callable, Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal, cast, overload
 
 from inifix._more import always_iterable
-from inifix._typing import InifixConfT, Scalar, StrLike
+from inifix._typing import (
+    AnyConfig,
+    Config_SectionsForbidden_ScalarsAllowed,
+    Config_SectionsForbidden_ScalarsForbidden,
+    Config_SectionsRequired_ScalarsAllowed,
+    Config_SectionsRequired_ScalarsForbidden,
+    Scalar,
+    StrLike,
+)
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 
@@ -16,6 +24,8 @@ if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Iterable
 
     from _typeshed import GenericPath
+
+    from inifix._typing import Config_SectionsAllowed_ScalarsForbidden
 
 __all__ = [
     "dump",
@@ -65,10 +75,20 @@ class Section(dict):
 
         super().__setitem__(k, v)
 
-    def _dump_to(self, storage: InifixConfT) -> None:
+    def _dump_to(self, storage: AnyConfig) -> None:
         if self.name is None:
+            storage = cast(
+                Config_SectionsForbidden_ScalarsAllowed
+                | Config_SectionsForbidden_ScalarsForbidden,
+                storage,
+            )
             storage.update(self)
         else:
+            storage = cast(
+                Config_SectionsRequired_ScalarsAllowed
+                | Config_SectionsRequired_ScalarsAllowed,
+                storage,
+            )
             storage[self.name] = dict(self)
 
 
@@ -179,8 +199,8 @@ def _from_string(
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
     filename: str | None = None,
-) -> InifixConfT:
-    container: InifixConfT = {}
+) -> AnyConfig:
+    container: AnyConfig = {}
     lines = _normalize_data(data)
     section = Section()  # the default target is a nameless section
     for line_number, line in enumerate(lines, start=1):
@@ -209,7 +229,7 @@ def _from_file_descriptor(
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
-) -> InifixConfT:
+) -> AnyConfig:
     filename = str(getattr(file, "name", repr(file)))
     data = file.read()
     lines = _normalize_data(data)
@@ -228,7 +248,7 @@ def _from_path(
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
-) -> InifixConfT:
+) -> AnyConfig:
     file = os.fspath(file)
     with open(file, "rb") as fh:
         return _from_file_descriptor(
@@ -267,7 +287,7 @@ def _write_line(key: str, values: Iterable[Scalar] | Scalar, buffer: IOBase) -> 
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
 
-def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
+def _write_to_buffer(data: AnyConfig, buffer: IOBase) -> None:
     last = len(data) - 1
     for i, (key, val) in enumerate(data.items()):
         if not isinstance(val, dict):
@@ -280,7 +300,7 @@ def _write_to_buffer(data: InifixConfT, buffer: IOBase) -> None:
             _write("\n", buffer)
 
 
-def _write_to_file(data: InifixConfT, file: GenericPath, /) -> None:
+def _write_to_file(data: AnyConfig, file: GenericPath, /) -> None:
     if os.path.exists(file) and not os.access(file, os.W_OK):
         raise PermissionError(f"Cannot write to {file} (permission denied)")
 
@@ -293,8 +313,85 @@ def _write_to_file(data: InifixConfT, file: GenericPath, /) -> None:
         os.replace(tmpfile, file)
 
 
+# narrowing return type on *two* keyword arguments at once:
+# sections and parse_scalars_as_list
+
+# these overloads are tricky to get right:
+# - to avoid signature overlaps, we need to indicate default values in overloads
+#   as often as possible
+# - default values can only be specified where they match the annotated type
+# - all arguments with default values need to come last in the signature
+# - only keyword-only arguments can be re-arranged
+# - since I'm overloading over two arguments at the same time, the above
+#   *implies* that I can only do it for keyword-only arguments
+
+# overloads are sorted from most to lease strict return type
+
+
+@overload
 def load(
-    source: InifixConfT | GenericPath | IOBase,
+    source: GenericPath | IOBase,
+    /,
+    *,
+    sections: Literal["forbid"],
+    parse_scalars_as_lists: Literal[True],
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsForbidden_ScalarsForbidden: ...
+@overload
+def load(
+    source: GenericPath | IOBase,
+    /,
+    *,
+    sections: Literal["require"],
+    parse_scalars_as_lists: Literal[True],
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsRequired_ScalarsForbidden: ...
+@overload
+def load(
+    source: GenericPath | IOBase,
+    /,
+    *,
+    sections: Literal["forbid"],
+    parse_scalars_as_lists: Literal[False] = False,
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsForbidden_ScalarsAllowed: ...
+@overload
+def load(
+    source: GenericPath | IOBase,
+    /,
+    *,
+    sections: Literal["require"],
+    parse_scalars_as_lists: Literal[False] = False,
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsRequired_ScalarsAllowed: ...
+@overload
+def load(
+    source: GenericPath | IOBase,
+    /,
+    *,
+    parse_scalars_as_lists: Literal[True],
+    sections: Literal["allow"] = "allow",
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsAllowed_ScalarsForbidden: ...
+@overload
+def load(
+    source: GenericPath | IOBase,
+    /,
+    *,
+    parse_scalars_as_lists: Literal[False] = False,
+    sections: Literal["allow"] = "allow",
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> AnyConfig: ...
+
+
+def load(
+    source: GenericPath | IOBase,
     /,
     *,
     # parsing options
@@ -303,14 +400,13 @@ def load(
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
     skip_validation: bool = False,
-) -> InifixConfT:
+) -> AnyConfig:
     """
     Parse data from a file, or a dict.
 
     Parameters
     ----------
     source: any of the following
-        - a dict (has to be inifix format-compliant)
         - the name of a file to read from, (str, bytes or os.PathLike)
         - a readable handle. Both text and binary file modes are supported,
           though binary is preferred.
@@ -351,25 +447,84 @@ def load(
     caster = _get_caster(integer_casting)
 
     if isinstance(source, IOBase):
-        source = _from_file_descriptor(
+        config = _from_file_descriptor(
             source,
             parse_scalars_as_lists=parse_scalars_as_lists,
             caster=caster,
         )
     else:
         assert isinstance(source, str | bytes | os.PathLike)
-        source = _from_path(
+        config = _from_path(
             source,
             parse_scalars_as_lists=parse_scalars_as_lists,
             caster=caster,
         )
 
-    source = cast(InifixConfT, source)
-
     if not skip_validation:
-        validate_inifile_schema(source, sections=sections)
-    source = cast(InifixConfT, source)
-    return source
+        validate_inifile_schema(config, sections=sections)
+    return config
+
+
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    sections: Literal["forbid"],
+    parse_scalars_as_lists: Literal[True],
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsForbidden_ScalarsForbidden: ...
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    sections: Literal["require"],
+    parse_scalars_as_lists: Literal[True],
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsRequired_ScalarsForbidden: ...
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    sections: Literal["forbid"],
+    parse_scalars_as_lists: Literal[False] = False,
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsForbidden_ScalarsAllowed: ...
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    sections: Literal["require"],
+    parse_scalars_as_lists: Literal[False] = False,
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsRequired_ScalarsAllowed: ...
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    parse_scalars_as_lists: Literal[True],
+    sections: Literal["allow"] = "allow",
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> Config_SectionsAllowed_ScalarsForbidden: ...
+@overload
+def loads(
+    source: str,
+    /,
+    *,
+    parse_scalars_as_lists: Literal[False] = False,
+    sections: Literal["allow"] = "allow",
+    integer_casting: Literal["stable", "aggressive"] = "stable",
+    skip_validation: bool = False,
+) -> AnyConfig: ...
 
 
 def loads(
@@ -382,7 +537,7 @@ def loads(
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
     skip_validation: bool = False,
-) -> InifixConfT:
+) -> AnyConfig:
     """
     Parse data from a string.
 
@@ -434,7 +589,7 @@ def loads(
 
 
 def dump(
-    data: InifixConfT,
+    data: AnyConfig,
     /,
     file: GenericPath | IOBase,
     *,
@@ -484,7 +639,7 @@ def dump(
 
 
 def dumps(
-    data: InifixConfT,
+    data: AnyConfig,
     /,
     *,
     # validation options
