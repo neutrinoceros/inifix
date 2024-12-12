@@ -9,13 +9,13 @@ INIFILES_IDS = [inifile.name[:-4] for inifile in INIFILES_PATHS]
 
 INIFILES = dict(zip(INIFILES_PATHS, INIFILES_IDS, strict=True))
 
-INIFILES_WO_SECTIONS = {
+INIFILES_W_SECTIONS = {
     path: id
     for path, id in INIFILES.items()
     if "fargo" not in id and path.suffix != ".cfg"
 }
-INIFILES_W_SECTIONS = {
-    path: id for path, id in INIFILES.items() if path not in INIFILES_WO_SECTIONS
+INIFILES_WO_SECTIONS = {
+    path: id for path, id in INIFILES.items() if path not in INIFILES_W_SECTIONS
 }
 
 

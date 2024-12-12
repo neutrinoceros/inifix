@@ -15,8 +15,8 @@ def test_validate_known_files(inifile):
     validate_inifile_schema(conf, sections="allow")
 
 
-def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
-    conf1 = load(inifile_with_sections)
+def test_validate_known_files_without_sections(inifile_without_sections, tmp_path):
+    conf1 = load(inifile_without_sections)
     validate_inifile_schema(conf1, sections="forbid")
 
     expected_msg = (
@@ -28,10 +28,10 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
         validate_inifile_schema(conf1, sections="require")
 
     with pytest.raises(ValueError, match=expected_msg):
-        load(inifile_with_sections, sections="require")
+        load(inifile_without_sections, sections="require")
 
     # check that sections=... doesn't have any effect when combined with skip_validation=True
-    conf2 = load(inifile_with_sections, sections="require", skip_validation=True)
+    conf2 = load(inifile_without_sections, sections="require", skip_validation=True)
     assert_dict_equal(conf2, conf1)
 
     save_file = tmp_path / "test"
@@ -56,8 +56,8 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
     assert_dict_equal(conf4, conf3)
 
 
-def test_validate_known_files_without_sections(inifile_without_sections, tmp_path):
-    conf1 = load(inifile_without_sections)
+def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
+    conf1 = load(inifile_with_sections)
     validate_inifile_schema(conf1, sections="require")
     expected_msg = (
         "Invalid schema: sections were explicitly forbidden, "
@@ -67,10 +67,10 @@ def test_validate_known_files_without_sections(inifile_without_sections, tmp_pat
         validate_inifile_schema(conf1, sections="forbid")
 
     with pytest.raises(ValueError, match=expected_msg):
-        load(inifile_without_sections, sections="forbid")
+        load(inifile_with_sections, sections="forbid")
 
     # check that sections=... doesn't have any effect when combined with skip_validation=True
-    conf2 = load(inifile_without_sections, sections="forbid", skip_validation=True)
+    conf2 = load(inifile_with_sections, sections="forbid", skip_validation=True)
     assert_dict_equal(conf2, conf1)
 
     save_file = tmp_path / "test"
