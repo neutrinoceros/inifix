@@ -6,6 +6,7 @@ on:
   pull_request:
     paths-ignore:
     - README.md
+    - CHANGELOG.md
 
 concurrency:
   # auto-cancel any in-progress job *on the same branch*
