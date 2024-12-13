@@ -64,7 +64,11 @@ def check_static_version(md: Metadata) -> int:
 
 def check_readme(md: Metadata) -> int:
     text = README.read_text()
-    if text != (expected := REV_REGEXP.sub(f"rev: {md.latest_git_tag}", text)):
+    if md.current_static_version.is_devrelease:
+        expected_tag = md.latest_git_tag
+    else:
+        expected_tag = f"v{md.current_static_version}"
+    if text != (expected := REV_REGEXP.sub(f"rev: {expected_tag}", text)):
         diff = "\n".join(
             line.removesuffix("\n")
             for line in unified_diff(
