@@ -50,6 +50,7 @@ covcheck = [
 ]
 typecheck = [
     "mypy>=1.11.2",
+    "pyright>=1.1.390",
 ]
 
 [tool.hatch]
