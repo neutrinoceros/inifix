@@ -148,7 +148,7 @@ typecheck = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.1.0" }]
+requires-dist = [{ name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.2.0" }]
 
 [package.metadata.requires-dev]
 concurrency = [
