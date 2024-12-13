@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import os
 import re
-import sys
 from collections.abc import Callable, Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
@@ -403,7 +402,7 @@ def load(
     skip_validation: bool = False,
 ) -> AnyConfig:
     """
-    Parse data from a file, or a dict.
+    Parse data from a file.
 
     Parameters
     ----------
@@ -412,8 +411,41 @@ def load(
         - a readable handle. Both text and binary file modes are supported,
           though binary is preferred.
           In binary mode, we assume UTF-8 encoding.
-    {parsing_options}
-    {validation_options}
+
+    parse_scalars_as_lists: bool (default: False)
+        if set to True, all values will be parses as lists of scalars,
+        even for parameters comprised of a single scalar.
+        This also has the effect of narrowing down the return type as seen
+        by static type checkers.
+
+        .. versionadded: 3.1.0
+
+    integer_casting: 'stable' (default) or 'aggressive'
+        casting strategy for numbers written in decimal notations, such as '1.',
+        '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
+        as Python floats). Setting `integer_casting='aggressive'` will instead
+        parse these as Python ints, matching the behavior of inifix 4.5
+
+        .. versionadded: 5.0.0
+
+    sections: 'allow' (default), 'forbid' or 'require'
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        sections='forbid' and sections='require' both have the effect of
+        narrowing down the return type as seen by static type checkers.
+        This parameter has no effect at runtime when combined with
+        skip_validation=True.
+
+        .. versionadded: 5.1.0
+
+    skip_validation: bool (default: False)
+        if set to True, input is not validated. This can be used to speedup
+        io operations trusted input or to work around bugs with the validation
+        routine. Use with caution.
+        This parameter intentionally has no effect on static type checking.
+
+        .. versionadded: 4.1.0
 
     See Also
     --------
@@ -520,8 +552,41 @@ def loads(
     ----------
     source: str
         The content of a parameter file (has to be inifix format-compliant)
-    {parsing_options}
-    {validation_options}
+
+    parse_scalars_as_lists: bool (default: False)
+        if set to True, all values will be parses as lists of scalars,
+        even for parameters comprised of a single scalar.
+        This also has the effect of narrowing down the return type as seen
+        by static type checkers.
+
+        .. versionadded: 3.1.0
+
+    integer_casting: 'stable' (default) or 'aggressive'
+        casting strategy for numbers written in decimal notations, such as '1.',
+        '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
+        as Python floats). Setting `integer_casting='aggressive'` will instead
+        parse these as Python ints, matching the behavior of inifix 4.5
+
+        .. versionadded: 5.0.0
+
+    sections: 'allow' (default), 'forbid' or 'require'
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        sections='forbid' and sections='require' both have the effect of
+        narrowing down the return type as seen by static type checkers.
+        This parameter has no effect at runtime when combined with
+        skip_validation=True.
+
+        .. versionadded: 5.1.0
+
+    skip_validation: bool (default: False)
+        if set to True, input is not validated. This can be used to speedup
+        io operations trusted input or to work around bugs with the validation
+        routine. Use with caution.
+        This parameter intentionally has no effect on static type checking.
+
+        .. versionadded: 4.1.0
 
     See Also
     --------
@@ -559,7 +624,25 @@ def dump(
         - a writable handle. Both text and binary file modes are supported,
           though binary is preferred.
           In binary mode, data is encoded as UTF-8.
-    {validation_options}
+
+    sections: 'allow' (default), 'forbid' or 'require'
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        sections='forbid' and sections='require' both have the effect of
+        narrowing down the return type as seen by static type checkers.
+        This parameter has no effect at runtime when combined with
+        skip_validation=True.
+
+        .. versionadded: 5.1.0
+
+    skip_validation: bool (default: False)
+        if set to True, input is not validated. This can be used to speedup
+        io operations trusted input or to work around bugs with the validation
+        routine. Use with caution.
+        This parameter intentionally has no effect on static type checking.
+
+        .. versionadded: 4.1.0
 
     See Also
     --------
@@ -589,7 +672,25 @@ def dumps(
     ----------
     data: dict
         has to be inifix format-compliant
-    {validation_options}
+
+    sections: 'allow' (default), 'forbid' or 'require'
+        use sections='forbid' to invalidate any section found,
+        or sections='require' to invalidate a sectionless structure.
+        Default mode (sections='allow') permits both.
+        sections='forbid' and sections='require' both have the effect of
+        narrowing down the return type as seen by static type checkers.
+        This parameter has no effect at runtime when combined with
+        skip_validation=True.
+
+        .. versionadded: 5.1.0
+
+    skip_validation: bool (default: False)
+        if set to True, input is not validated. This can be used to speedup
+        io operations trusted input or to work around bugs with the validation
+        routine. Use with caution.
+        This parameter intentionally has no effect on static type checking.
+
+        .. versionadded: 4.1.0
 
     Returns
     -------
@@ -604,84 +705,3 @@ def dumps(
     s = BytesIO()
     dump(data, file=s, skip_validation=skip_validation, sections=sections)
     return s.getvalue().decode("utf-8")
-
-
-if sys.flags.optimize < 2:
-    from inspect import cleandoc
-    from textwrap import dedent, indent
-
-    if sys.version_info >= (3, 13):
-        _prefix = ""
-    else:
-        _prefix = "    "
-
-    def _assemble(*args: str) -> str:
-        return "".join(indent(dedent(s), _prefix) for s in args).rstrip(os.linesep)
-
-    _parsing_options = _assemble(
-        """
-        parse_scalars_as_lists: bool (default: False)
-            if set to True, all values will be parses as lists of scalars,
-            even for parameters comprised of a single scalar.
-            This also has the effect of narrowing down the return type as seen
-            by static type checkers.
-
-            .. versionadded: 3.1.0
-        """,
-        """
-        integer_casting: 'stable' (default) or 'aggressive'
-            casting strategy for numbers written in decimal notations, such as '1.',
-            '2.0' or '3e0'. By default, perform roundtrip-stable casting (i.e., cast
-            as Python floats). Setting `integer_casting='aggressive'` will instead
-            parse these as Python ints, matching the behavior of inifix 4.5
-
-            .. versionadded: 5.0.0
-        """,
-    )
-
-    _validation_options = _assemble(
-        """
-        sections: 'allow' (default), 'forbid' or 'require'
-            use sections='forbid' to invalidate any section found,
-            or sections='require' to invalidate a sectionless structure.
-            Default mode (sections='allow') permits both.
-            sections='forbid' and sections='require' both have the effect of
-            narrowing down the return type as seen by static type checkers.
-            This parameter has no effect at runtime when combined with skip_validation=True.
-
-            .. versionadded: 5.1.0
-        """,
-        """
-        skip_validation: bool (default: False)
-            if set to True, input is not validated. This can be used to speedup io operations
-            trusted input or to work around bugs with the validation routine. Use with caution.
-            This parameter intentionally has no effect on static type checking.
-
-            .. versionadded: 4.1.0
-        """,
-    )
-
-    load.__doc__ = cleandoc(
-        load.__doc__.format(  # type: ignore
-            parsing_options=_parsing_options,
-            validation_options=_validation_options,
-        )
-    )
-    loads.__doc__ = cleandoc(
-        loads.__doc__.format(  # type: ignore
-            parsing_options=_parsing_options,
-            validation_options=_validation_options,
-        )
-    )
-    dump.__doc__ = cleandoc(
-        dump.__doc__.format(  # type: ignore
-            validation_options=_validation_options,
-        )
-    )
-    dumps.__doc__ = cleandoc(
-        dumps.__doc__.format(  # type: ignore
-            validation_options=_validation_options,
-        )
-    )
-else:  # pragma: no cover
-    pass
