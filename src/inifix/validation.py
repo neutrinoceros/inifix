@@ -71,7 +71,7 @@ def validate_inifile_schema(
     data: dict
       the candidate configuration to be (in)validated.
 
-    sections: 'allow', 'forbid' or 'require' (default: 'allow')
+    sections: 'allow' (default), 'forbid' or 'require'
       use sections='forbid' to invalidate any section found,
       or sections='require' to invalidate a sectionless structure.
       Default mode (sections='allow') permits both.
