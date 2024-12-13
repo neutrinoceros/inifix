@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from .io import dump
 from .io import dumps
 from .io import load
