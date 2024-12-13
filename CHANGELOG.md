@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TYP: narrow return type of `inifix.load` and `inifix.loads` following
   `parse_scalars_as_lists` and `sections` arguments
 - TYP: systematically typecheck with pyright as well as mypy
+- DOC: add narrative docs for sections argument and type narrowing
 
 ## [5.0.4] - 2024-11-29
 

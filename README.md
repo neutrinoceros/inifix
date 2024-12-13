@@ -138,7 +138,7 @@ conf = inifix.load("pluto.ini")
 ```
 Files are assumed to be encoded as UTF-8.
 
-#### Reading options
+#### Parsing options
 
 `inifix.load` and `inifix.loads` accept an optional boolean flag
 `parse_scalars_as_lists` (new in `inifix` v4.0.0), that is useful to simplify
@@ -187,8 +187,10 @@ Aggressive casting may also lead to loss of precision beyond a certain range
 {'option_b': 9007199254740992}
 ```
 
-By default, `inifix.load` and `inifix.loads` validate input data. This step can
-be skipped by specifying `skip_validation=True`.
+By default, `inifix.load` and `inifix.loads` validate input data, see
+[Schema Validation](#schema-validation) for details.
+Also see [Type Checking](#type-checking) for how `parse_scalars_as_lists` affects
+type checking.
 
 
 ### Writing to a file or a string
@@ -227,31 +229,65 @@ option_b True
 
 ```
 
-By default, `inifix.dump` and `inifix.dumps` validate input data. This step can
-be skipped by specifying `skip_validation=True`.
+By default, `inifix.dump` and `inifix.dumps` validate input data, see
+[Schema Validation](#schema-validation) for details.
 
 
 ### Schema Validation
 
-`inifix.validate_inifile_schema` can be used to validate an arbitrary
-dictionary as writable to an inifile, following the library's format. This
-will raise an exception (`ValueError`) if the dictionary `data` is invalid.
-```python
-inifix.validate_inifile_schema(data)
-```
+By default, I/O functions (`inifix.dump`, `inifix.dumps`, `inifix.load` and
+`inifix.loads`) all validate that output/input data structures conform to the
+library's specification:
+- readers (`inifix.load` and `inifix.loads`) validate data post parsing,
+  and before returning
+- writers (`inifix.dump` and `inifix.dumps`) validate input data before writing
+  to their respective output channels
+
+In case the data is invalid, a `ValueError` is raised.
+This behavior can be turned off by passing `skip_validation=True`.
+
+Additionally, all four functions support a `sections` argument (new in `inifix`
+v5.1.0), which controls
+whether sections (starting with headers, e.g., `[MySection]`) are allowed
+(`sections='allow'`, default), forbidden (`sections='forbid'`), or required
+(`sections='require'`) at validation.
+This argument does not have any effect at runtime if combined with `skip_validation=True`.
+However, it will affect the return type of readers, as seen by typecheckers (e.g. `mypy`
+or `pyright`), regardless if validation is enabled, see [Type Checking](#type-checking)
+
+`inifix.validate_inifile_schema` can also be used directly and supports the
+`sections` argument.
+
 
 ### Runtime formatting
 
 `inifix.format_string` formats a string representing the contents of an ini file.
 See [Formatting CLI](#formatting-cli) for how to use this at scale.
 
-### Writing type-safe applications of `inifix.load(s)`
+### Type Checking
+
+### Narrowing return type of readers
+
+Readers (`inifix.load` and `inifix.loads`) support a diversity of input and output
+formats such that their default return type, while technically correct, is too broad
+to be really useful in a type checking context. However, passing
+`parse_scalars_as_list=True`, `sections='forbid'` or `sections='require'` can
+narrow the return type, as seen by a typechecker (e.g. `mypy` or `pyright`).
+Note that this effect is intentionally not disabled with `skip_validation=True`,
+eventhough the `sections` argument's runtime effect *is* disabled; such a
+combination allows to get both optimal runtime performance and type-consistency.
+However, `skip_validation=True` may create situations where your code type-checks
+but fails at runtime, so this option is only meant to be used if validation is
+known to cause a performance bottleneck or a crash in your application. If such
+a situation occurs, please report it !
+
+#### Writing type-safe applications of `inifix.load(s)`
 
 `inifix.load` has no built-in expectations on the type of any specific parameter;
 instead, all types are inferred at runtime, which allows the function to work
 seamlessly with arbitrary parameter files.
 
-However, this also means that the output is not (and cannot be) type-safe.
+However, this also means that the output is not (and cannot be) perfectly type-safe.
 In other words, type checkers (e.g. `mypy`) cannot infer exact types of outputs,
 which is a problem in applications relying on type-checking.
 
