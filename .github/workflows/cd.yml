@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
     - .github/workflows/cd.yml
+    - README.md
+    - pyproject.toml
 
 jobs:
   pre-publish-checks:
