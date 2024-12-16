@@ -1,10 +1,10 @@
 import re
 import sys
-from collections.abc import Mapping
 from enum import Enum, auto
 from typing import Any, Literal
 
 from inifix._more import always_iterable
+from inifix._typing import AnyConfig
 
 if sys.version_info >= (3, 11):
     from typing import assert_never
@@ -58,7 +58,7 @@ def validate_elementary_item(key: Any, value: Any) -> None:
 
 
 def validate_inifile_schema(
-    data: Mapping,
+    data: AnyConfig,
     /,
     *,
     sections: Literal["allow", "forbid", "require"] = "allow",

@@ -46,7 +46,7 @@ def _is_numeric(s: str) -> bool:
         return True
 
 
-class Section(dict):
+class Section(dict[str, Any]):
     def __init__(
         self,
         data: Mapping[str, Iterable[Scalar] | Scalar] | None = None,
@@ -244,7 +244,7 @@ def _from_file_descriptor(
 
 
 def _from_path(
-    file: GenericPath,
+    file: GenericPath[str],
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
@@ -300,7 +300,7 @@ def _write_to_buffer(data: AnyConfig, buffer: IOBase) -> None:
             _write("\n", buffer)
 
 
-def _write_to_file(data: AnyConfig, file: GenericPath, /) -> None:
+def _write_to_file(data: AnyConfig, file: GenericPath[str], /) -> None:
     if os.path.exists(file) and not os.access(file, os.W_OK):
         raise PermissionError(f"Cannot write to {file} (permission denied)")
 
@@ -330,7 +330,7 @@ def _write_to_file(data: AnyConfig, file: GenericPath, /) -> None:
 
 @overload
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     sections: Literal["forbid"],
@@ -340,7 +340,7 @@ def load(
 ) -> Config_SectionsForbidden_ScalarsForbidden: ...
 @overload
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     sections: Literal["require"],
@@ -350,7 +350,7 @@ def load(
 ) -> Config_SectionsRequired_ScalarsForbidden: ...
 @overload
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     sections: Literal["forbid"],
@@ -360,7 +360,7 @@ def load(
 ) -> Config_SectionsForbidden_ScalarsAllowed: ...
 @overload
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     sections: Literal["require"],
@@ -370,7 +370,7 @@ def load(
 ) -> Config_SectionsRequired_ScalarsAllowed: ...
 @overload
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     parse_scalars_as_lists: Literal[True],
@@ -380,7 +380,7 @@ def load(
 ) -> Config_SectionsAllowed_ScalarsForbidden: ...
 @overload
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     parse_scalars_as_lists: Literal[False] = False,
@@ -391,7 +391,7 @@ def load(
 
 
 def load(
-    source: GenericPath | IOBase,
+    source: GenericPath[str] | IOBase,
     /,
     *,
     # parsing options
@@ -605,7 +605,7 @@ def loads(
 def dump(
     data: AnyConfig,
     /,
-    file: GenericPath | IOBase,
+    file: GenericPath[str] | IOBase,
     *,
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
