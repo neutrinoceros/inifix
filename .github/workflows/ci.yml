@@ -139,6 +139,12 @@ jobs:
         uv run --frozen --no-editable --group typecheck \
           ${{ matrix.typechecker }} src/inifix typechecks
 
+    - name: Verify Types (pyright only)
+      if: matrix.typechecker == 'pyright'
+      run: |
+        uv run --frozen --no-editable --group typecheck \
+          pyright --verifytypes inifix
+
   optimized_python:
     runs-on: ubuntu-latest
     name: optimized Python
