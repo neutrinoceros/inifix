@@ -1,9 +1,9 @@
 import os
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import TYPE_CHECKING, Any, Literal, cast, overload
+from typing import Any, Literal, cast, overload
 
 from inifix._more import always_iterable
 from inifix._typing import (
@@ -18,11 +18,6 @@ from inifix._typing import (
 )
 from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
-
-if TYPE_CHECKING:  # pragma: no cover
-    import collections.abc
-
-    import _typeshed
 
 __all__ = [
     "dump",
@@ -46,7 +41,7 @@ def _is_numeric(s: str) -> bool:
 class Section(dict[str, Any]):
     def __init__(
         self,
-        data: "Mapping[str, collections.abc.Iterable[Scalar] | Scalar] | None" = None,
+        data: Mapping[str, Iterable[Scalar] | Scalar] | None = None,
         /,
         *,
         name: str | None = None,
@@ -241,7 +236,7 @@ def _from_file_descriptor(
 
 
 def _from_path(
-    file: "_typeshed.GenericPath[str]",
+    file: str | os.PathLike[str],
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
@@ -279,9 +274,7 @@ def _write(content: str, buffer: IOBase) -> None:
         buffer.write(content)
 
 
-def _write_line(
-    key: str, values: "collections.abc.Iterable[Scalar] | Scalar", buffer: IOBase
-) -> None:
+def _write_line(key: str, values: Iterable[Scalar] | Scalar, buffer: IOBase) -> None:
     val_repr = [_encode(v) for v in always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
@@ -299,7 +292,7 @@ def _write_to_buffer(data: AnyConfig, buffer: IOBase) -> None:
             _write("\n", buffer)
 
 
-def _write_to_file(data: AnyConfig, file: "_typeshed.GenericPath[str]", /) -> None:
+def _write_to_file(data: AnyConfig, file: str | os.PathLike[str], /) -> None:
     if os.path.exists(file) and not os.access(file, os.W_OK):
         raise PermissionError(f"Cannot write to {file} (permission denied)")
 
@@ -329,7 +322,7 @@ def _write_to_file(data: AnyConfig, file: "_typeshed.GenericPath[str]", /) -> No
 
 @overload
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     sections: Literal["forbid"],
@@ -339,7 +332,7 @@ def load(
 ) -> Config_SectionsForbidden_ScalarsForbidden: ...
 @overload
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     sections: Literal["require"],
@@ -349,7 +342,7 @@ def load(
 ) -> Config_SectionsRequired_ScalarsForbidden: ...
 @overload
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     sections: Literal["forbid"],
@@ -359,7 +352,7 @@ def load(
 ) -> Config_SectionsForbidden_ScalarsAllowed: ...
 @overload
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     sections: Literal["require"],
@@ -369,7 +362,7 @@ def load(
 ) -> Config_SectionsRequired_ScalarsAllowed: ...
 @overload
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     parse_scalars_as_lists: Literal[True],
@@ -379,7 +372,7 @@ def load(
 ) -> Config_SectionsAllowed_ScalarsForbidden: ...
 @overload
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     parse_scalars_as_lists: Literal[False] = False,
@@ -390,7 +383,7 @@ def load(
 
 
 def load(
-    source: "_typeshed.GenericPath[str] | IOBase",
+    source: str | os.PathLike[str] | IOBase,
     /,
     *,
     # parsing options
@@ -604,7 +597,7 @@ def loads(
 def dump(
     data: AnyConfig,
     /,
-    file: "_typeshed.GenericPath[str] | IOBase",
+    file: str | os.PathLike[str] | IOBase,
     *,
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
