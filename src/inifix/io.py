@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import re
 from collections.abc import Callable, Mapping
@@ -10,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast, overload
 from inifix._more import always_iterable
 from inifix._typing import (
     AnyConfig,
+    Config_SectionsAllowed_ScalarsForbidden,
     Config_SectionsForbidden_ScalarsAllowed,
     Config_SectionsForbidden_ScalarsForbidden,
     Config_SectionsRequired_ScalarsAllowed,
@@ -21,11 +20,9 @@ from inifix.enotation import ENotationIO
 from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 
 if TYPE_CHECKING:  # pragma: no cover
-    from collections.abc import Iterable
+    import collections.abc
 
-    from _typeshed import GenericPath
-
-    from inifix._typing import Config_SectionsAllowed_ScalarsForbidden
+    import _typeshed
 
 __all__ = [
     "dump",
@@ -49,7 +46,7 @@ def _is_numeric(s: str) -> bool:
 class Section(dict[str, Any]):
     def __init__(
         self,
-        data: Mapping[str, Iterable[Scalar] | Scalar] | None = None,
+        data: "Mapping[str, collections.abc.Iterable[Scalar] | Scalar] | None" = None,
         /,
         *,
         name: str | None = None,
@@ -244,7 +241,7 @@ def _from_file_descriptor(
 
 
 def _from_path(
-    file: GenericPath[str],
+    file: "_typeshed.GenericPath[str]",
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
@@ -282,7 +279,9 @@ def _write(content: str, buffer: IOBase) -> None:
         buffer.write(content)
 
 
-def _write_line(key: str, values: Iterable[Scalar] | Scalar, buffer: IOBase) -> None:
+def _write_line(
+    key: str, values: "collections.abc.Iterable[Scalar] | Scalar", buffer: IOBase
+) -> None:
     val_repr = [_encode(v) for v in always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
@@ -300,7 +299,7 @@ def _write_to_buffer(data: AnyConfig, buffer: IOBase) -> None:
             _write("\n", buffer)
 
 
-def _write_to_file(data: AnyConfig, file: GenericPath[str], /) -> None:
+def _write_to_file(data: AnyConfig, file: "_typeshed.GenericPath[str]", /) -> None:
     if os.path.exists(file) and not os.access(file, os.W_OK):
         raise PermissionError(f"Cannot write to {file} (permission denied)")
 
@@ -330,7 +329,7 @@ def _write_to_file(data: AnyConfig, file: GenericPath[str], /) -> None:
 
 @overload
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     sections: Literal["forbid"],
@@ -340,7 +339,7 @@ def load(
 ) -> Config_SectionsForbidden_ScalarsForbidden: ...
 @overload
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     sections: Literal["require"],
@@ -350,7 +349,7 @@ def load(
 ) -> Config_SectionsRequired_ScalarsForbidden: ...
 @overload
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     sections: Literal["forbid"],
@@ -360,7 +359,7 @@ def load(
 ) -> Config_SectionsForbidden_ScalarsAllowed: ...
 @overload
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     sections: Literal["require"],
@@ -370,7 +369,7 @@ def load(
 ) -> Config_SectionsRequired_ScalarsAllowed: ...
 @overload
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     parse_scalars_as_lists: Literal[True],
@@ -380,7 +379,7 @@ def load(
 ) -> Config_SectionsAllowed_ScalarsForbidden: ...
 @overload
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     parse_scalars_as_lists: Literal[False] = False,
@@ -391,7 +390,7 @@ def load(
 
 
 def load(
-    source: GenericPath[str] | IOBase,
+    source: "_typeshed.GenericPath[str] | IOBase",
     /,
     *,
     # parsing options
@@ -605,7 +604,7 @@ def loads(
 def dump(
     data: AnyConfig,
     /,
-    file: GenericPath[str] | IOBase,
+    file: "_typeshed.GenericPath[str] | IOBase",
     *,
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
