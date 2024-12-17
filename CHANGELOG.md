@@ -6,7 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-TYP: prefer absolute forward references and avoid `__future__.annotations`
+- TYP: prefer absolute forward references and avoid `__future__.annotations`
+- TYP: ensure type annotations of the IO API are accessible at runtime in Python 3.14
 
 ## [5.1.2] - 2024-12-16
 

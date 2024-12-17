@@ -1,6 +1,7 @@
 import difflib
 import os
 import re
+import sys
 import tempfile
 from io import BytesIO
 from pathlib import Path
@@ -368,3 +369,18 @@ def test_unknown_integer_casting():
         match="Unknown integer_casting value 'unknown_strategy'.",
     ):
         loads(input_data, integer_casting="unknown_strategy")
+
+
+@pytest.mark.skipif(
+    sys.version_info < (3, 14),
+    reason="annotationlib is new in Python 3.14",
+)
+@pytest.mark.parametrize("func", [load, loads, dump, dumps])
+@pytest.mark.parametrize("format", ["VALUE", "FORWARDREF", "STRING"])
+def test_runtime_annotations(func, format):  # pragma: no cover
+    from annotationlib import Format, get_annotations
+
+    # check that no exception is raised
+    # this test *may* be refined once Python 3.14 is out of beta
+    get_annotations(func, format=getattr(Format, format))
+    get_annotations(func, eval_str=True)
