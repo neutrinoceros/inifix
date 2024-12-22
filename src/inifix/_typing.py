@@ -7,6 +7,8 @@ Scalar: TypeAlias = int | float | bool | str
 Section_ScalarsAllowed: TypeAlias = dict[str, list[Scalar] | Scalar]
 Section_ScalarsForbidden: TypeAlias = dict[str, list[Scalar]]
 
+AnySection = Section_ScalarsAllowed | Section_ScalarsForbidden
+
 Config_SectionsRequired_ScalarsForbidden: TypeAlias = dict[
     str, Section_ScalarsForbidden
 ]
