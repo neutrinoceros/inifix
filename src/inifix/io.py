@@ -109,7 +109,7 @@ TRUTHY_STRINGS = frozenset({"true", "TRUE", "True", "yes", "YES", "Yes"})
 FALSY_STRINGS = frozenset({"false", "FALSE", "False", "no", "NO", "No"})
 ALL_BOOL_STRINGS = frozenset({*TRUTHY_STRINGS, *FALSY_STRINGS})
 
-_RE_CASTERS: list[tuple[re.Pattern, Callable[[str], Any]]] = [
+_RE_CASTERS: list[tuple[re.Pattern[str], Callable[[str], Scalar]]] = [
     (re.compile("(" + "|".join(TRUTHY_STRINGS) + ")"), lambda _: True),
     (re.compile("(" + "|".join(FALSY_STRINGS) + ")"), lambda _: False),
     (re.compile(r"^'.*'$"), lambda s: s[1:-1]),
@@ -274,7 +274,7 @@ def _write(content: str, buffer: IOBase) -> None:
         buffer.write(content)
 
 
-def _write_line(key: str, values: Iterable[Scalar] | Scalar, buffer: IOBase) -> None:
+def _write_line(key: str, values: Scalar | list[Scalar], buffer: IOBase) -> None:
     val_repr = [_encode(v) for v in always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 

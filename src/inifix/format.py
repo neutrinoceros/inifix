@@ -21,10 +21,10 @@ PADDING_SIZE = 2
 
 def _format_section(data: str) -> str:
     lines = data.splitlines()
-    contents = []
-    comments = []
-    parameters = []
-    values = []
+    contents: list[str] = []
+    comments: list[str] = []
+    parameters: list[str] = []
+    values: list[list[str]] = []
     for line in lines:
         content, _, comment = line.partition("#")
         content = content.strip()
@@ -57,7 +57,7 @@ def _format_section(data: str) -> str:
     padded_name_col_size = max_name_size + 2 * PADDING_SIZE
     content_size = padded_name_col_size + sum(column_sizes) + PADDING_SIZE
 
-    new_lines = []
+    new_lines: list[str] = []
     parameter_idx = 0
     for content, comment in zip(contents, comments, strict=True):
         new_line = ""
@@ -123,7 +123,7 @@ def format_string(s: str, /) -> str:
     <BLANKLINE>
     """
     fh = StringIO(s)
-    content = []
+    content: list[str] = []
     for s in _iter_sections(fh):
         content.append(_format_section(s))
     return _finalize("\n".join(content))
