@@ -3,6 +3,9 @@
   extends: [
     "config:recommended"
   ],
+  labels: [
+      "dependencies",
+  ],
   schedule: [
     // at 2 a.m. on the first day of the month
     // note that the first slot (minutes) must be '*'
