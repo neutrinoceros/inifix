@@ -1,8 +1,8 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
-#     "packaging",
-#     "tomli ; python_version < '3.11'",
+#     "packaging==24.2",
+#     "tomli==2.2.1 ; python_version < '3.11'",
 # ]
 # ///
 import re
