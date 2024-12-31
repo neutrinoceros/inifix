@@ -3,7 +3,7 @@
       "config:base"
     ],
     "schedule": [
-      "earlyWednesdays"
+      "before 6am on the first wednesday of the month"
     ],
     "packageRules": [
       {
