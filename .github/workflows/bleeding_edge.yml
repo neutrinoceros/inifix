@@ -32,7 +32,7 @@ jobs:
     - uses: Quansight-Labs/setup-python@b9ab292c751a42bcd2bb465b7fa202ea2c3f5796 # v5.3.1
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: astral-sh/setup-uv@38f3f104447c67c051c4a08e39b64a148898af3a # v4.2.0
+    - uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5.1.0
     - name: Configure uv
       run: |
         echo "UV_PYTHON_PREFERENCE=only-system" >> $GITHUB_ENV
