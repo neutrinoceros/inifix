@@ -1,13 +1,15 @@
 import os
 import re
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable
 from functools import partial
 from io import BufferedIOBase, IOBase
-from typing import Any, Literal, cast, overload
+from itertools import pairwise
+from typing import Literal, overload
 
 from inifix._more import always_iterable
 from inifix._typing import (
     AnyConfig,
+    AnySection,
     Config_SectionsAllowed_ScalarsForbidden,
     Config_SectionsForbidden_ScalarsAllowed,
     Config_SectionsForbidden_ScalarsForbidden,
@@ -38,50 +40,18 @@ def _is_numeric(s: str) -> bool:
         return True
 
 
-class Section(dict[str, Any]):
-    def __init__(
-        self,
-        data: Mapping[str, Iterable[Scalar] | Scalar] | None = None,
-        /,
-        *,
-        name: str | None = None,
-    ) -> None:
-        super().__init__()
-        if data is not None:
-            for k, v in data.items():
-                self[k] = v
-        self.name = name
+def _validate_section_item(key: str, value: Scalar | list[Scalar]) -> None:
+    if not isinstance(key, str):
+        raise TypeError(f"Expected str keys. Received invalid key: {key}")
 
-    def __setitem__(self, k: Any, v: Any) -> None:
-        if not isinstance(k, str):
-            raise TypeError(f"Expected str keys. Received invalid key: {k}")
-
-        if not (
-            isinstance(v, SCALAR_TYPES)
-            or (isinstance(v, list) and all(isinstance(_, SCALAR_TYPES) for _ in v))
-        ):
-            raise TypeError(
-                "Expected all values to be scalars or lists of scalars. "
-                f"Received invalid values {v}"
-            )
-
-        super().__setitem__(k, v)
-
-    def _dump_to(self, storage: AnyConfig) -> None:
-        if self.name is None:
-            storage = cast(
-                Config_SectionsForbidden_ScalarsAllowed
-                | Config_SectionsForbidden_ScalarsForbidden,
-                storage,
-            )
-            storage.update(self)
-        else:
-            storage = cast(
-                Config_SectionsRequired_ScalarsAllowed
-                | Config_SectionsRequired_ScalarsAllowed,
-                storage,
-            )
-            storage[self.name] = dict(self)
+    if not (
+        isinstance(value, SCALAR_TYPES)
+        or (isinstance(value, list) and all(isinstance(_, SCALAR_TYPES) for _ in value))
+    ):
+        raise TypeError(
+            "Expected all values to be scalars or lists of scalars. "
+            f"Received invalid values {value}"
+        )
 
 
 # load helper functions
@@ -185,6 +155,54 @@ def _tokenize_line(
     return key, [caster(v) for v in raw_values]
 
 
+def _section_from_lines(
+    lines: list[str],
+    *,
+    parse_scalars_as_lists: bool,
+    caster: CasterFunction,
+    filename: str | None,
+) -> AnySection:
+    section: AnySection = {}
+    for line_number, line in enumerate(lines, start=1):
+        if not line:
+            continue
+        values: Scalar | list[Scalar]
+        key, values = _tokenize_line(
+            line,
+            filename=filename,
+            line_number=line_number,
+            caster=caster,
+        )
+        if (not parse_scalars_as_lists) and len(values) == 1:
+            values = values[0]
+        _validate_section_item(key, values)
+        section[key] = values
+    return section
+
+
+def _config_from_string_with_sections(
+    lines: list[str],
+    *,
+    section_linenos: list[int],
+    parse_scalars_as_lists: bool,
+    caster: CasterFunction,
+    filename: str | None = None,
+) -> Config_SectionsRequired_ScalarsAllowed | Config_SectionsRequired_ScalarsForbidden:
+    config = {}
+    section_limits = [*section_linenos, len(lines)]
+    for line_begin, line_end in pairwise(section_limits):
+        section_lines = lines[line_begin:line_end]
+        if (match := SECTION_REGEXP.fullmatch(section_lines[0])) is None:
+            raise RuntimeError  # pragma: no cover
+        config[match["title"]] = _section_from_lines(
+            section_lines[1:],
+            parse_scalars_as_lists=parse_scalars_as_lists,
+            caster=caster,
+            filename=filename,
+        )
+    return config
+
+
 def _from_string(
     data: StrLike,
     *,
@@ -192,28 +210,27 @@ def _from_string(
     caster: CasterFunction,
     filename: str | None = None,
 ) -> AnyConfig:
-    container: AnyConfig = {}
     lines = _normalize_data(data)
-    section = Section()  # the default target is a nameless section
-    for line_number, line in enumerate(lines, start=1):
-        if not line:
-            continue
-        match = SECTION_REGEXP.fullmatch(line)
-        if match is not None:
-            if section:
-                section._dump_to(container)
-            section = Section(name=match["title"])
-            continue
+    section_linenos: list[int] = []
+    for i, line in enumerate(lines):
+        if SECTION_REGEXP.fullmatch(line):
+            section_linenos.append(i)
 
-        values: Scalar | list[Scalar]
-        key, values = _tokenize_line(
-            line, filename=filename, line_number=line_number, caster=caster
+    if section_linenos:
+        return _config_from_string_with_sections(
+            lines,
+            section_linenos=section_linenos,
+            parse_scalars_as_lists=parse_scalars_as_lists,
+            caster=caster,
+            filename=filename,
         )
-        if (not parse_scalars_as_lists) and len(values) == 1:
-            values = values[0]
-        section[key] = values
-    section._dump_to(container)
-    return container
+    else:
+        return _section_from_lines(
+            lines,
+            parse_scalars_as_lists=parse_scalars_as_lists,
+            caster=caster,
+            filename=filename,
+        )
 
 
 def _from_file_descriptor(
