@@ -142,7 +142,7 @@ def test_error_read_only_file(inifile, capsys, tmp_path):
     assert f"Error: could not write to {target} (permission denied)\n" in err
 
 
-def test_informat_depr():
+def test_depr():
     body = (DATA_DIR / "format-in.ini").read_text()
     s1 = format_string(body)
     with pytest.warns(
