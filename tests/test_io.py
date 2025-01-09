@@ -299,7 +299,7 @@ def test_skip_validation(monkeypatch, tmp_path):
     )
     ctx = pytest.raises(ValueError, match="gotcha")
 
-    data = "[Static Grid Output]\n" "dbl.h5    -1.0  -1"
+    data = "[Static Grid Output]\ndbl.h5    -1.0  -1"
 
     with ctx:
         loads(data)
