@@ -85,23 +85,29 @@ def test_exact_format_inplace(capsys, tmp_path):
 def test_no_parameters(tmp_path):
     target = tmp_path / "no_params.ini"
     target.write_text(
-        "    # comment 1\n"
-        "[Section A]\n"
-        "  # comment 2\n"
-        " # comment 3\n"
-        "[Section B]"
+        "\n".join(
+            [
+                "    # comment 1",
+                "[Section A]",
+                "  # comment 2",
+                " # comment 3",
+                "[Section B]",
+            ]
+        )
     )
     ret = main([str(target)])
     assert ret != 0
 
-    expected = (
-        "# comment 1\n"
-        "\n"
-        "[Section A]\n"
-        "# comment 2\n"
-        "# comment 3\n"
-        "\n"
-        "[Section B]\n"
+    expected = "\n".join(
+        [
+            "# comment 1",
+            "",
+            "[Section A]",
+            "# comment 2",
+            "# comment 3",
+            "",
+            "[Section B]\n",
+        ]
     )
     assert target.read_text() == expected
 
