@@ -1,14 +1,17 @@
 import os
 import sys
-from typing import Literal, NamedTuple, TextIO
+from dataclasses import dataclass
+from typing import Literal, TextIO
 
 
-class Message(NamedTuple):
+@dataclass(frozen=True, slots=True)
+class Message:
     content: str
     dest: TextIO
 
 
-class TaskResults(NamedTuple):
+@dataclass(frozen=True, slots=True)
+class TaskResults:
     status: Literal[0, 1]
     messages: list[Message]
 
