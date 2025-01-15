@@ -19,38 +19,28 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - 3.14-dev
-        - 3.13t
+        - '3.14'
+        - 3.14t
 
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-    # TODO: ditch Quansight-Labs/setup-python when either condition is met
-    # - setup-uv support Python pre-releases
-    # - actions/setup-python support free-threaded versions
-    # see https://github.com/actions/setup-python/issues/771
-    - uses: Quansight-Labs/setup-python@b9ab292c751a42bcd2bb465b7fa202ea2c3f5796 # v5.3.1
+    - uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5.1.0
       with:
         python-version: ${{ matrix.python-version }}
-    - uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5.1.0
-    - name: Configure uv
-      run: |
-        echo "UV_PYTHON_PREFERENCE=only-system" >> $GITHUB_ENV
-        pin=${{ matrix.python-version }}
-        echo "UV_PYTHON=${pin%-dev}" >> $GITHUB_ENV
     - name: Set PYTHON_GIL
       if: ${{ endswith( matrix.python-version , 't' ) }}
       run: |
         echo "PYTHON_GIL=0" >> $GITHUB_ENV
-        echo
 
     - run: uv lock --upgrade --prerelease=allow
-
+    - run: uv sync --frozen --no-editable --group test
     - name: Run tests
       run: |
-        uv run --frozen --no-editable --group test \
+        uv run --no-sync \
           pytest --color=yes --doctest-modules
+
+    - run: uv sync --frozen --no-editable --group concurrency
     - name: Run concurrency tests
       run: |
-        uv run --frozen --no-editable --group concurrency \
+        uv run --no-sync \
           pytest --color=yes --count 100 tests/test_concurrent.py

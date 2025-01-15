@@ -45,7 +45,7 @@ jobs:
       if: matrix.os != 'ubuntu-latest'
       shell: bash  # for windows portability
       run: |
-        uv run --frozen --no-editable --group test --group test \
+        uv run --frozen --no-editable --group test \
           pytest --color=yes --doctest-modules
 
     - name: Run tests (with coverage)
@@ -71,8 +71,9 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
+        - 3.10.0
         - '3.13'
-        # - '3.13t'
+        - 3.13t
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -80,8 +81,9 @@ jobs:
     - uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5.1.0
       with:
         python-version: ${{ matrix.python-version }}
+    - run: uv sync --frozen --no-editable --group concurrency
     - run: |
-        uv run --frozen --no-editable --group concurrency \
+        uv run --no-sync \
           pytest --color=yes --count 100 tests/test_concurrent.py
 
   coverage:
