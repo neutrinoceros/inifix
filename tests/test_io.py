@@ -15,9 +15,9 @@ from inifix.io import (
     ALL_BOOL_STRINGS,
     FALSY_STRINGS,
     TRUTHY_STRINGS,
-    Section,
     _auto_cast_stable,
     _tokenize_line,
+    _validate_section_item,
     dump,
     dumps,
     load,
@@ -143,25 +143,8 @@ def test_bool_strings(s):
     assert data == {"a": [b, s, S]}
 
 
-def test_section_init():
-    data = {
-        "dummy": [0.0001, True],
-        "thisparameternameshouldprobablybeshorter": [45, 68],
-        "thisoneisshorter": [15, 68, 774, 6, 7, 5],
-        "faultyTowers": 42,
-    }
-    s1 = Section(data)
-    assert s1.name is None
-
-    s2 = Section(data, name="test")
-    assert s2.name == "test"
-
-
 def test_invalid_section_value():
     val = frozenset((1, 2, 3))
-    data = {
-        "yes": val,
-    }
     with pytest.raises(
         TypeError,
         match=re.escape(
@@ -169,17 +152,15 @@ def test_invalid_section_value():
             f"Received invalid values {val}"
         ),
     ):
-        Section(data)
+        _validate_section_item("key", val)
 
 
 def test_invalid_section_key():
-    data = {
-        1: True,
-    }
     with pytest.raises(
-        TypeError, match=re.escape("Expected str keys. Received invalid key: 1")
+        TypeError,
+        match=re.escape("Expected str keys. Received invalid key: 1"),
     ):
-        Section(data)
+        _validate_section_item(1, True)
 
 
 @pytest.mark.parametrize("mode", ("w", "wb"))
