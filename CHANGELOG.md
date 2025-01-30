@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- RFC/DEP/API: ``inifix``'s command line interfaces were re-written as a unified ``typer`` application. `inifix-validate` and `inifix-format` are now subcommands to a single `inifix` entry point (`inifix validate` and `inifix format` respectively). Support for these commands now requires `typer` and `rich`, which can be installed directly under `pip install 'inifix[cli]'`.
+
+
 ## [5.1.3] - 2024-12-17
 
 - TYP: prefer absolute forward references and avoid `__future__.annotations`

@@ -1,7 +1,6 @@
 import pytest
 
-from inifix.io import dump, dumps, load, loads
-from inifix.validation import validate_inifile_schema
+from inifix import dump, dumps, load, loads, validate_inifile_schema
 
 from .utils import assert_dict_equal
 
