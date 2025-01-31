@@ -1,11 +1,10 @@
 from math import isnan
-from typing import Any
 
 
-def assert_item_equal(i1: Any, i2: Any) -> None:
+def assert_item_equal(i1: object, i2: object) -> None:
     __tracebackhide__ = True
     assert type(i1) is type(i2)
-    if type(i2) is float and isnan(i2):
+    if type(i1) is float and type(i2) is float and isnan(i2):
         assert isnan(i1)
     else:
         assert i1 == i2

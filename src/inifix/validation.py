@@ -1,7 +1,7 @@
 import re
 import sys
 from enum import Enum, auto
-from typing import Any, Literal
+from typing import Literal
 
 from inifix._more import always_iterable
 from inifix._typing import AnyConfig
@@ -26,7 +26,7 @@ def _uses_invalid_chars(s: str) -> bool:
     return ma is None
 
 
-def validate_elementary_item(key: Any, value: Any) -> None:
+def validate_elementary_item(key: object, value: object) -> None:
     if not isinstance(key, str):
         raise ValueError(
             f"Invalid schema: received key '{key}' with type '{type(key)}', "
