@@ -5,24 +5,13 @@ from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
 from typing import TYPE_CHECKING, Annotated, Literal
+import typer
+from rich.console import Console
 
 import inifix
 
 if TYPE_CHECKING:  # pragma: no cover
     from inifix._typing import AnyConfig
-
-
-exc: Exception
-try:
-    import typer
-    from rich.console import Console
-except ImportError as exc:
-    note = "Running inifix as a CLI requires typer and rich"
-    if sys.version_info >= (3, 11):
-        exc.add_note(note)
-        raise
-    else:
-        raise ImportError(note) from exc
 
 out_console: Console = Console(soft_wrap=True)
 err_console: Console = Console(soft_wrap=True, stderr=True)

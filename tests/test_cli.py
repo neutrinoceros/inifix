@@ -6,22 +6,19 @@ from pathlib import Path
 from stat import S_IREAD
 
 import pytest
+import typer.testing
 
 import inifix
+import inifix_cli
+from inifix_cli import app
 
-typer_testing = pytest.importorskip("typer.testing")
-
-from inifix.__main__ import app  # noqa: E402
-
-runner = typer_testing.CliRunner(mix_stderr=False)
-
-DATA_DIR = Path(__file__).parent / "data"
+runner = typer.testing.CliRunner(mix_stderr=False)
 N_FILES = 257
 
 
 @pytest.fixture
-def unformatted_files(tmp_path):
-    in_file = DATA_DIR / "format-in.ini"
+def unformatted_files(datadir, tmp_path):
+    in_file = datadir / "format-in.ini"
     files = []
     for file_no in range(N_FILES):
         new_file = tmp_path / f"{file_no}.ini"
@@ -109,7 +106,7 @@ class TestValidate:
 
 class TestFormat:
     @pytest.mark.parametrize("args", [(), ("--skip-validation",)])
-    def test_format_keep_data(self, args, inifile, tmp_path):
+    def test_format_keep_data(self, args, datadir, inifile, tmp_path):
         target = tmp_path / inifile.name
 
         ref_data = inifix.load(inifile)
@@ -126,7 +123,7 @@ class TestFormat:
         "infile, expect_diff",
         [("format-in.ini", True), ("format-out.ini", False)],
     )
-    def test_exact_format_diff(self, infile, expect_diff):
+    def test_exact_format_diff(self, datadir, infile, expect_diff):
         def diff_file(f1: Path, f2: Path) -> str:
             return (
                 "\n".join(
@@ -140,12 +137,12 @@ class TestFormat:
                 + "\n"
             )
 
-        body = (DATA_DIR / infile).read_text()
+        body = (datadir / infile).read_text()
 
-        result = runner.invoke(app, ["format", str(DATA_DIR / infile), "--diff"])
+        result = runner.invoke(app, ["format", str(datadir / infile), "--diff"])
         if expect_diff:
             assert result.exit_code != 0
-            expected = diff_file(DATA_DIR / infile, DATA_DIR / "format-out.ini")
+            expected = diff_file(datadir / infile, datadir / "format-out.ini")
             assert result.stdout == expected
             assert result.stderr == ""
         else:
@@ -153,18 +150,17 @@ class TestFormat:
             assert result.stdout == ""
             assert result.stderr == ""
 
-        assert (DATA_DIR / infile).read_text() == body
+        assert (datadir / infile).read_text() == body
 
-    def test_exact_format_inplace(self, tmp_path):
-        DATA_DIR = Path(__file__).parent / "data"
+    def test_exact_format_inplace(self, datadir, tmp_path):
         target = tmp_path / "result.stdout.ini"
-        shutil.copyfile(DATA_DIR / "format-in.ini", target)
+        shutil.copyfile(datadir / "format-in.ini", target)
 
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
         assert_text_equal(result.stderr, f"Fixing {target}")
 
-        expected = (DATA_DIR / "format-out.ini").read_text()
+        expected = (datadir / "format-out.ini").read_text()
         res = target.read_text()
         assert res == expected
 
@@ -246,8 +242,8 @@ class TestFormat:
             assert result.stdout != ""
             assert result.stderr == ""
 
-    def test_report_noop(self, tmp_path):
-        inifile = DATA_DIR / "format-out.ini"
+    def test_report_noop(self, datadir, tmp_path):
+        inifile = datadir / "format-out.ini"
         target = tmp_path / inifile.name
 
         shutil.copyfile(inifile, target)
@@ -284,10 +280,10 @@ class TestFormat:
         inserted = '''Eggs 'Bacon Saussage'     "spam"'''
         target.write_text(inserted)
 
-        monkeypatch.setattr(inifix.__main__, "get_cpu_count", lambda: 1)
+        monkeypatch.setattr(inifix_cli, "get_cpu_count", lambda: 1)
         runner.invoke(app, ["format", str(target)])
 
-    def test_concurrency(self, unformatted_files):
+    def test_concurrency(self, datadir, unformatted_files):
         result = runner.invoke(app, ["format", *(str(f) for f in unformatted_files)])
         assert result.exit_code != 0
         assert result.stdout == ""
@@ -296,7 +292,7 @@ class TestFormat:
         err_lines = result.stderr.splitlines()
         assert set(err_lines) == {f"Fixing {file}" for file in unformatted_files}
 
-        expected = (DATA_DIR / "format-out.ini").read_text()
+        expected = (datadir / "format-out.ini").read_text()
         for file in unformatted_files:
             body = file.read_text()
             assert body == expected

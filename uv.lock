@@ -5,6 +5,12 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 
+[manifest]
+members = [
+    "inifix",
+    "inifix-cli",
+]
+
 [[package]]
 name = "attrs"
 version = "24.3.0"
@@ -134,13 +140,20 @@ wheels = [
 [[package]]
 name = "inifix"
 version = "5.1.3"
-source = { editable = "." }
+source = { editable = "lib/inifix" }
 dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 
-[package.optional-dependencies]
-cli = [
+[package.metadata]
+requires-dist = [{ name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.2.0" }]
+
+[[package]]
+name = "inifix-cli"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "inifix" },
     { name = "rich" },
     { name = "typer" },
 ]
@@ -148,7 +161,6 @@ cli = [
 [package.dev-dependencies]
 concurrency = [
     { name = "hypothesis" },
-    { name = "inifix", extra = ["cli"] },
     { name = "pytest" },
     { name = "pytest-repeat" },
 ]
@@ -163,22 +175,20 @@ test = [
     { name = "pytest" },
 ]
 typecheck = [
-    { name = "inifix", extra = ["cli"] },
     { name = "mypy" },
     { name = "pyright" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "rich", marker = "extra == 'cli'", specifier = ">=13.9.4" },
-    { name = "typer", marker = "extra == 'cli'", specifier = ">=0.15.1" },
-    { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.2.0" },
+    { name = "inifix", editable = "lib/inifix" },
+    { name = "rich", specifier = ">=13.9.4" },
+    { name = "typer", specifier = ">=0.15.1" },
 ]
 
 [package.metadata.requires-dev]
 concurrency = [
     { name = "hypothesis", specifier = ">=6.110.0" },
-    { name = "inifix", extras = ["cli"] },
     { name = "pytest", specifier = ">=6.1" },
     { name = "pytest-repeat", specifier = ">=0.9.3" },
 ]
@@ -193,7 +203,6 @@ test = [
     { name = "pytest", specifier = ">=6.1" },
 ]
 typecheck = [
-    { name = "inifix", extras = ["cli"] },
     { name = "mypy", specifier = ">=1.11.2" },
     { name = "pyright", specifier = ">=1.1.390" },
 ]

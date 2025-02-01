@@ -24,9 +24,6 @@ jobs:
         - '3.11'
         - '3.12'
         - '3.13'
-        sync-options:
-        - --extra cli
-        - ''
         include:
         - os: macos-latest
           python-version: 3.10.0
@@ -54,7 +51,7 @@ jobs:
     - name: Run tests (with coverage)
       if: matrix.os == 'ubuntu-latest'
       run: |
-        uv run --frozen --no-editable --group covcheck ${{ matrix.sync-options }} \
+        uv run --frozen --no-editable --group covcheck \
           coverage run --parallel-mode -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
@@ -63,7 +60,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
       with:
-        name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.sync-options }}
+        name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}
         path: .coverage.*
         if-no-files-found: ignore
         include-hidden-files: true
@@ -135,16 +132,15 @@ jobs:
     - uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5.1.0
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Typecheck source code
-      run: |
-        uv run --frozen --no-editable --group typecheck \
-          ${{ matrix.typechecker }} src/inifix typechecks
 
+    - run: uv sync --frozen --group typecheck
+    - name: Typecheck source code (inifix-cli)
+      run: uv run --no-sync ${{ matrix.typechecker }} src
+    - name: Typecheck source code (inifix)
+      run: uv run --no-sync ${{ matrix.typechecker }} lib/inifix/src typechecks
     - name: Verify Types (pyright only)
       if: matrix.typechecker == 'pyright'
-      run: |
-        uv run --frozen --no-editable --group typecheck \
-          pyright --ignoreexternal --verifytypes inifix
+      run: uv run --no-sync pyright --verifytypes inifix
 
   optimized_python:
     runs-on: ubuntu-latest
