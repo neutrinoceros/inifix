@@ -58,7 +58,9 @@ def get_cpu_count() -> int:
 
 @app.command()
 def validate(files: list[str]) -> None:
-    "validate my files"
+    """
+    Validate files as inifix format-compliant.
+    """
     retv = 0
     for file in files:
         if not os.path.isfile(file):
@@ -83,20 +85,28 @@ def format(
     diff: Annotated[
         bool,
         typer.Option(
-            help="Print the unified diff to stdout instead of editing files inplace"
+            "--diff",
+            help="Print the unified diff to stdout instead of editing files inplace",
         ),
     ] = False,
     report_noop: Annotated[
         bool,
-        typer.Option(help="Explicitly log noops for files that are already formatted"),
+        typer.Option(
+            "--report-noop",
+            help="Explicitly log noops for files that are already formatted",
+        ),
     ] = False,
     skip_validation: Annotated[
         bool,
         typer.Option(
-            help="Skip validation step (formatting unvalidated data may lead to undefined behaviour)"
+            "--skip-validation",
+            help="Skip validation step (formatting unvalidated data may lead to undefined behaviour)",
         ),
     ] = False,
 ) -> None:
+    """
+    Format files.
+    """
     closure = partial(
         _format_single_file,
         diff=diff,
