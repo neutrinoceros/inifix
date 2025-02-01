@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - RFC/DEP/API: ``inifix``'s command line interfaces were re-written as a unified ``typer`` application. `inifix-validate` and `inifix-format` are now subcommands to a single `inifix` entry point (`inifix validate` and `inifix format` respectively). Support for these commands now requires `typer` and `rich`, which can be installed directly under `pip install 'inifix[cli]'`.
 
+- API: all submodules (`inifix._io`, `inifix._validation` ...) are now explicitly private. The only public namespace is `inifix`.
+
 
 ## [5.1.3] - 2024-12-17
 

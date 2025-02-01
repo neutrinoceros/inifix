@@ -1,8 +1,8 @@
-from inifix.io import load
+import inifix
 
 
 def test_fargo_dummy(datadir):
-    conf = load(datadir / "fargo-dummy.ini")
+    conf = inifix.load(datadir / "fargo-dummy.ini")
     expected = {
         "x": 1,
         "y": 2,

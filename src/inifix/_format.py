@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from io import StringIO
 from typing import IO, TYPE_CHECKING
 
-from inifix.io import _split_tokens
+from inifix._io import _split_tokens
 
 if TYPE_CHECKING:  # pragma: no cover
     pass

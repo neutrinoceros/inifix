@@ -6,6 +6,7 @@ from io import BufferedIOBase, IOBase
 from itertools import pairwise
 from typing import Literal, overload
 
+from inifix._enotation import ENotationIO
 from inifix._more import always_iterable
 from inifix._typing import (
     AnyConfig,
@@ -20,7 +21,6 @@ from inifix._typing import (
     StrLike,
 )
 from inifix._validation import SCALAR_TYPES, validate_inifile_schema
-from inifix.enotation import ENotationIO
 
 __all__ = [
     "dump",
