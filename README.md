@@ -336,24 +336,35 @@ care about.
 
 ### CLI
 
-Command line tools are shipped with the package to validate or format compatible
-inifiles.
+Inifix comes with an optional Command Line Interface (CLI) to validate or
+format compatible inifiles.
+
+Starting in inifix 6.0.0, it is installed as
+```shell
+$ python -m pip install 'inifix[cli]'
+```
+To check your installation, run
+```shell
+$ python -m inifix --help
+```
+or
+```shell
+$ inifix --help
+```
 
 #### Validation CLI
 
 This checks that your inifiles can be loaded with `inifix.load` from the command line
 ```shell
-$ inifix-validate pluto.ini
+$ python -m inifix validate pluto.ini
 Validated pluto.ini
 ```
-This CLI can also be called as `python -m inifix.validate`.
-
 
 #### Formatting CLI
 
 To format a file in place, use
 ```shell
-$ inifix-format pluto.ini
+$ python -m inifix format pluto.ini
 ```
 inifix-format is guaranteed to preserve comments and to *only* edit (add or remove)
 whitespace characters.
@@ -362,11 +373,10 @@ Files are always encoded as UTF-8.
 
 To print a diff patch to stdout instead of editing the file, use the `--diff` flag
 ```shell
-$ inifix-format pluto.ini --diff
+$ python -m inifix format pluto.ini --diff
 ```
-This CLI can also be called as `python -m inifix.format`.
 
-By default, `inifix-format` also validates input data. This step can be skipped with the
+By default, `inifix format` also validates input data. This step can be skipped with the
 `--skip-validation` flag
 
 ### pre-commit hooks
