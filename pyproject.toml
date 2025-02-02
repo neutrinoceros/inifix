@@ -36,6 +36,7 @@ covcheck = [
     "coverage>=6.5.0 ; python_version >= '3.11'",
 ]
 typecheck = [
+    "basedpyright>=1.26.0",
     "mypy>=1.11.2",
     "pyright>=1.1.390",
 ]

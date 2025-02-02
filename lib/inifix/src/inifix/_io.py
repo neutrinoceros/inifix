@@ -1,13 +1,12 @@
 import os
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
 from functools import partial
 from io import BufferedIOBase, IOBase
 from itertools import pairwise
-from typing import Literal, overload
+from typing import Literal, Protocol, overload
 
 from inifix._enotation import ENotationIO
-from inifix._more import always_iterable
 from inifix._typing import (
     AnyConfig,
     Config_SectionsAllowed_ScalarsForbidden,
@@ -32,9 +31,20 @@ __all__ = [
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 
+def _always_iterable(obj: Scalar | list[Scalar], /) -> Iterator[Scalar]:
+    # adapted from more_iterools 10.1.0 (MIT)
+    if isinstance(obj, str):
+        return iter((obj,))
+
+    if isinstance(obj, list):
+        return iter(obj)
+    else:
+        return iter((obj,))
+
+
 def _is_numeric(s: str) -> bool:
     try:
-        float(s)
+        _ = float(s)
     except ValueError:
         return False
     else:
@@ -72,7 +82,7 @@ def _normalize_data(data: StrLike) -> list[str]:
 _TOKEN = re.compile(r"""'[^']*'|"[^"]*"|\S+""")
 
 
-def _split_tokens(data: str) -> list[str]:
+def split_tokens(data: str) -> list[str]:
     return _TOKEN.findall(data)
 
 
@@ -146,7 +156,7 @@ def _tokenize_line(
     filename: str | None,
     caster: CasterFunction,
 ) -> tuple[str, list[Scalar]]:
-    key, *raw_values = _split_tokens(line)
+    key, *raw_values = split_tokens(line)
     if not raw_values:
         if filename is None:
             raise ValueError(f"Failed to parse line {line_number}: {line!r}")
@@ -251,8 +261,12 @@ def _from_string(
         return _unwrap_section(section)
 
 
+class StrLikeReader(Protocol):
+    def read(self) -> StrLike: ...
+
+
 def _from_file_descriptor(
-    file: IOBase,
+    file: StrLikeReader,
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
@@ -304,13 +318,13 @@ def _encode(v: Scalar) -> str:
 
 def _write(content: str, buffer: IOBase) -> None:
     if isinstance(buffer, BufferedIOBase):
-        buffer.write(content.encode("utf-8"))
+        _ = buffer.write(content.encode("utf-8"))
     else:
         buffer.write(content)
 
 
 def _write_line(key: str, values: Scalar | list[Scalar], buffer: IOBase) -> None:
-    val_repr = [_encode(v) for v in always_iterable(values)]
+    val_repr = [_encode(v) for v in _always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
 

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API: all submodules are now explicitly marked as private. The only public
   namespace is `inifix`.
 - TST: test against oldest versions of dependencies
+- TYP: add basedpyright to type checking test matrix
 
 ## [5.1.3] - 2024-12-17
 
