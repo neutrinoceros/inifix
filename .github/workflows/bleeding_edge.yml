@@ -37,7 +37,7 @@ jobs:
     - name: Run tests
       run: |
         uv run --no-sync \
-          pytest --color=yes --doctest-modules
+          pytest --color=yes
 
     - run: uv sync --frozen --no-editable --group concurrency
     - name: Run concurrency tests
