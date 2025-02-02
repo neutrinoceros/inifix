@@ -4,13 +4,17 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Literal, TextIO, NewType
+from typing import TYPE_CHECKING, Annotated, Literal, NewType
+
 import typer
 
 import inifix
 
 if TYPE_CHECKING:  # pragma: no cover
     from inifix._typing import AnyConfig
+
+
+__all__ = ["app"]
 
 app: typer.Typer = typer.Typer()
 
@@ -186,7 +190,3 @@ def _format_single_file(
             os.replace(tmpfile, file)
 
     return TaskResults(status, messages)
-
-
-if __name__ == "__main__":  # pragma: no cover
-    app()
