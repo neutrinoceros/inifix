@@ -69,22 +69,18 @@ class TestValidate:
         target.touch()
         result = runner.invoke(app, ["validate", str(target)])
         assert result.exit_code != 0
-        assert result.stdout == ""
-        assert_text_includes(result.stderr, f"Failed to validate {target}:")
-        assert "appears to be empty.\n" in result.stderr
+        assert_text_includes(result.stdout, f"Failed to validate {target}:")
+        assert_text_includes(result.stdout, "appears to be empty.\n")
 
     def test_missing_file(self, tmp_path):
         target = tmp_path / "not_a_file"
         result = runner.invoke(app, ["validate", str(target)])
         assert result.exit_code != 0
-        assert result.stdout == ""
-        assert_text_includes(result.stderr, f"Error: could not find {target}")
+        assert_text_includes(result.stdout, f"Error: could not find {target}")
 
     def test_invalid_files(self, invalid_file):
         result = runner.invoke(app, ["validate", str(invalid_file)])
-
-        assert result.stdout == ""
-        assert result.stderr.startswith("Failed to validate")
+        assert result.stdout.startswith("Failed to validate")
         assert result.exit_code != 0
 
     def test_valid_files(self, inifile):
@@ -115,7 +111,6 @@ class TestFormat:
         result = runner.invoke(app, ["format", str(target), *args])
         assert isinstance(result.exit_code, int)
 
-        assert result.stdout == ""
         data_new = inifix.load(target)
         assert data_new == ref_data
 
@@ -158,7 +153,7 @@ class TestFormat:
 
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
-        assert_text_equal(result.stderr, f"Fixing {target}")
+        assert_text_equal(result.stdout, f"Fixing {target}")
 
         expected = (datadir / "format-out.ini").read_text()
         res = target.read_text()
@@ -197,17 +192,15 @@ class TestFormat:
         target = tmp_path / "not_a_file"
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
-        assert result.stdout == ""
-        assert_text_equal(result.stderr, f"Error: could not find {target}")
+        assert_text_equal(result.stdout, f"Error: could not find {target}")
 
     def test_empty_file(self, tmp_path):
         target = tmp_path / "invalid_file"
         target.touch()
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
-        assert result.stdout == ""
         assert_text_includes(
-            result.stderr, f"Error: {str(target)!r} appears to be empty.\n"
+            result.stdout, f"Error: {str(target)!r} appears to be empty.\n"
         )
 
     def test_error_read_only_file(self, inifile, tmp_path):
@@ -222,9 +215,8 @@ class TestFormat:
 
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
-        assert result.stdout == ""
         assert_text_includes(
-            result.stderr,
+            result.stdout,
             f"Error: could not write to {target} (permission denied)\n",
         )
 
@@ -240,7 +232,6 @@ class TestFormat:
             assert result.stdout == ""
         else:
             assert result.stdout != ""
-            assert result.stderr == ""
 
     def test_report_noop(self, datadir, tmp_path):
         inifile = datadir / "format-out.ini"
@@ -250,8 +241,7 @@ class TestFormat:
 
         result = runner.invoke(app, ["format", str(target), "--report-noop"])
         assert result.exit_code == 0
-        assert result.stdout == ""
-        assert result.stderr == f"{target} is already formatted\n"
+        assert result.stdout == f"{target} is already formatted\n"
 
     def test_format_quoted_strings_with_whitespaces(self, tmp_path):
         target = tmp_path / "spaces.ini"
@@ -286,10 +276,9 @@ class TestFormat:
     def test_concurrency(self, datadir, unformatted_files):
         result = runner.invoke(app, ["format", *(str(f) for f in unformatted_files)])
         assert result.exit_code != 0
-        assert result.stdout == ""
 
         # order of lines doesn't matter and is not guaranteed
-        err_lines = result.stderr.splitlines()
+        err_lines = result.stdout.splitlines()
         assert set(err_lines) == {f"Fixing {file}" for file in unformatted_files}
 
         expected = (datadir / "format-out.ini").read_text()

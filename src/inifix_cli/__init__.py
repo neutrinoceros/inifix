@@ -4,24 +4,18 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Literal, TextIO, NewType
 import typer
-from rich.console import Console
 
 import inifix
 
 if TYPE_CHECKING:  # pragma: no cover
     from inifix._typing import AnyConfig
 
-out_console: Console = Console(soft_wrap=True)
-err_console: Console = Console(soft_wrap=True, stderr=True)
 app: typer.Typer = typer.Typer()
 
 
-@dataclass(frozen=True, slots=True)
-class Message:
-    content: str
-    dest: Console
+Message = NewType("Message", str)
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,16 +47,16 @@ def validate(files: list[str]) -> None:
     retv = 0
     for file in files:
         if not os.path.isfile(file):
-            err_console.print(f"Error: could not find {file}")
+            print(f"Error: could not find {file}")
             retv = 1
             continue
         try:
             _ = inifix.load(file)
         except ValueError as exc:
-            err_console.print(f"Failed to validate {file}:\n  {exc}")
+            print(f"Failed to validate {file}:\n  {exc}")
             retv = 1
         else:
-            out_console.print(f"Validated {file}")
+            print(f"Validated {file}")
 
     raise typer.Exit(code=retv)
 
@@ -109,7 +103,7 @@ def format(
 
     for res in results:
         for message in res.messages:
-            message.dest.print(message.content)
+            print(message)
 
     if any(res.status for res in results):
         raise typer.Exit(code=1)
@@ -123,7 +117,7 @@ def _format_single_file(
 
     if not os.path.isfile(file):
         status = 1
-        messages.append(Message(f"Error: could not find {file}", err_console))
+        messages.append(Message(f"Error: could not find {file}"))
         return TaskResults(status, messages)
 
     validate_baseline: AnyConfig = {}
@@ -132,7 +126,7 @@ def _format_single_file(
             validate_baseline = inifix.load(file)
         except ValueError as exc:
             status = 1
-            messages.append(Message(f"Error: {exc}", err_console))
+            messages.append(Message(f"Error: {exc}"))
             return TaskResults(status, messages)
 
     with open(file, mode="rb") as fh:
@@ -145,7 +139,7 @@ def _format_single_file(
     if fmted_data == data:
         if report_noop:
             # printing to stderr so that we can pipe into cdiff in --diff mode
-            messages.append(Message(f"{file} is already formatted", err_console))
+            messages.append(Message(f"{file} is already formatted"))
         return TaskResults(status, messages)
 
     if diff:
@@ -157,15 +151,13 @@ def _format_single_file(
         )
         assert diff_
         status = 1
-        messages.append(Message(diff_, out_console))
+        messages.append(Message(diff_))
     else:
         status = 1
-        messages.append(Message(f"Fixing {file}", err_console))
+        messages.append(Message(f"Fixing {file}"))
         if not os.access(file, os.W_OK):
             messages.append(
-                Message(
-                    f"Error: could not write to {file} (permission denied)", err_console
-                )
+                Message(f"Error: could not write to {file} (permission denied)")
             )
             return TaskResults(status, messages)
 
@@ -183,7 +175,6 @@ def _format_single_file(
                     Message(
                         f"Error: failed to format {file}: "
                         "formatted data compares unequal to unformatted data",
-                        err_console,
                     )
                 )
                 return TaskResults(status, messages)
