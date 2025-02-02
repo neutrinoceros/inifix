@@ -19,6 +19,11 @@ INIFILES_WO_SECTIONS = {
 }
 
 
+def pytest_ignore_collect(collection_path: Path):
+    if "scripts" in str(collection_path):
+        return True
+
+
 @pytest.fixture()
 def datadir():
     return DATA_DIR

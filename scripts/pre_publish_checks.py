@@ -1,6 +1,7 @@
 # /// script
 # requires-python = ">=3.10"
 # dependencies = [
+#     "loguru==0.7.3",
 #     "packaging==24.2",
 #     "tomli==2.2.1 ; python_version < '3.11'",
 # ]
@@ -12,6 +13,7 @@ from dataclasses import dataclass
 from difflib import unified_diff
 from pathlib import Path
 
+from loguru import logger
 from packaging.requirements import Requirement
 from packaging.specifiers import Specifier
 from packaging.version import Version
@@ -20,6 +22,10 @@ if sys.version_info >= (3, 11):
     import tomllib
 else:
     import tomli as tomllib
+
+
+logger.remove()
+logger.add(sys.stderr, colorize=True, format="<level>{level:<5} {message}</level>")
 
 REV_REGEXP = re.compile(r"rev:\s+v.*")
 STABLE_VER_REGEXP = re.compile(r"^\d+\.*\d+\.\d+$")
@@ -42,56 +48,50 @@ class Metadata:
     @property
     def latest_git_version(self) -> Version:
         if not STABLE_TAG_REGEXP.match(self.latest_git_tag):
-            print(
-                f"Failed to parse git tag (got {self.latest_git_tag})", file=sys.stderr
-            )
+            logger.error(f"Failed to parse git tag (got {self.latest_git_tag})")
             raise SystemExit(1)
         return Version(self.latest_git_tag)
 
 
 def check_static_version(md: Metadata) -> int:
     if not STABLE_VER_REGEXP.match(str(md.current_lib_static_version)):
-        print(
+        logger.error(
             f"Current static version {md.current_lib_static_version} doesn't "
             "conform to expected pattern for a stable sem-ver version.",
-            file=sys.stderr,
         )
         return 1
     elif md.current_lib_static_version < md.latest_git_version:
-        print(
+        logger.error(
             f"Current static version {md.current_lib_static_version} appears "
             f"to be older than latest git tag {md.latest_git_tag}",
-            file=sys.stderr,
         )
         return 1
     else:
-        print("Check static version: ok", file=sys.stderr)
+        logger.info("Check static version: ok", file=sys.stderr)
         return 0
 
 
 def check_inifix_cli_requirement(md: Metadata) -> int:
     if md.current_cli_requirement.specifier != f"=={md.current_lib_static_version}":
-        print(
+        logger.error(
             f"inifix-cli is requiring inifix as {md.current_cli_requirement} "
             f"which is out of sync with inifix's version (expected =={md.current_lib_static_version})",
-            file=sys.stderr,
         )
         return 1
     else:
-        print("Check pinned version: ok", file=sys.stderr)
+        logger.info("Check pinned version: ok", file=sys.stderr)
         return 0
 
 
 def check_requires_python(md: Metadata) -> int:
     if md.cli_requires_python != md.lib_requires_python:
-        print(
+        logger.error(
             f"inifix-cli's python requirement ({md.cli_requires_python}) "
             f"is out of sync with inifix's ({md.lib_requires_python})",
-            file=sys.stderr,
         )
         return 1
     else:
-        print("Check requires-python: ok")
+        logger.info("Check requires-python: ok")
         return 0
 
 
@@ -110,10 +110,10 @@ def check_readme(md: Metadata) -> int:
                 fromfile=str(LIB_PYPROJECT_TOML),
             )
         )
-        print(diff, file=sys.stderr)
+        logger.error(diff)
         return 1
     else:
-        print("Check README.md: ok", file=sys.stderr)
+        logger.info("Check README.md: ok")
         return 0
 
 
@@ -152,9 +152,9 @@ def main() -> int:
 
     return (
         check_static_version(md)
-        or check_inifix_cli_requirement(md)
-        or check_requires_python(md)
-        or check_readme(md)
+        + check_inifix_cli_requirement(md)
+        + check_requires_python(md)
+        + check_readme(md)
     )
 
 
