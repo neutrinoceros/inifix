@@ -187,18 +187,18 @@ requires-dist = [
 [package.metadata.requires-dev]
 concurrency = [
     { name = "hypothesis", specifier = ">=6.110.0" },
-    { name = "pytest", specifier = ">=6.1" },
+    { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-repeat", specifier = ">=0.9.3" },
 ]
 covcheck = [
     { name = "coverage", marker = "python_full_version >= '3.11'", specifier = ">=6.5.0" },
     { name = "coverage", extras = ["toml"], marker = "python_full_version == '3.10.*'", specifier = ">=6.5.0" },
     { name = "hypothesis", specifier = ">=6.110.0" },
-    { name = "pytest", specifier = ">=6.1" },
+    { name = "pytest", specifier = ">=7.0.0" },
 ]
 test = [
     { name = "hypothesis", specifier = ">=6.110.0" },
-    { name = "pytest", specifier = ">=6.1" },
+    { name = "pytest", specifier = ">=7.0.0" },
 ]
 typecheck = [
     { name = "mypy", specifier = ">=1.11.2" },

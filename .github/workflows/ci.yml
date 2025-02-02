@@ -20,11 +20,13 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.10.0
         - '3.11'
         - '3.12'
         - '3.13'
         include:
+        - os: ubuntu-20.04
+          python-version: 3.10.0
+          label: oldestdeps
         - os: macos-latest
           python-version: 3.10.0
         - os: macos-latest
@@ -41,23 +43,26 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
+    - if: ${{ matrix.label == 'oldestdeps' }}
+      run: echo "UV_RESOLUTION=lowest-direct" >> $GITHUB_ENV
+
     - name: Run tests (without coverage)
-      if: matrix.os != 'ubuntu-latest'
+      if: ${{ ! startswith( matrix.os, 'ubuntu' ) }}
       shell: bash  # for windows portability
       run: |
         uv run --frozen --no-editable --group test \
           pytest --color=yes --doctest-modules
 
     - name: Run tests (with coverage)
-      if: matrix.os == 'ubuntu-latest'
+      if: ${{ startswith( matrix.os, 'ubuntu' ) }}
       run: |
-        uv run --frozen --no-editable --group covcheck \
+        uv run --no-editable --group covcheck \
           coverage run --parallel-mode -m pytest --color=yes --doctest-modules
 
     - name: Upload coverage data
       # only using reports from ubuntu because
       # combining reports from multiple platforms is tricky (or impossible ?)
-      if: matrix.os == 'ubuntu-latest'
+      if: ${{ startswith( matrix.os, 'ubuntu' ) }}
       uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
       with:
         name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}

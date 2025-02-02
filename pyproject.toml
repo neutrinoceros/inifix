@@ -24,7 +24,7 @@ inifix = "inifix_cli:app"
 [dependency-groups]
 test = [
     "hypothesis>=6.110.0",
-    "pytest>=6.1",
+    "pytest>=7.0.0",
 ]
 concurrency = [
     {include-group = "test"},
