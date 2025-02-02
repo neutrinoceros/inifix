@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from io import StringIO
 from typing import IO
 
-from inifix.io import _split_tokens
+from inifix._io import _split_tokens
 
 __all__ = ["format_string"]
 

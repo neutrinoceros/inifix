@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and `inifix-format`) were removed from the `inifix` package and now exist
   as a separate, private package `inifix-cli`, which is still used under the
   hood by `inifix`'s pre-commit hooks.
+- API: all submodules are now explicitly marked as private. The only public
+  namespace is `inifix`.
 
 ## [5.1.3] - 2024-12-17
 
