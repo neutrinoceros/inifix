@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hood by `inifix`'s pre-commit hooks.
 - API: all submodules are now explicitly marked as private. The only public
   namespace is `inifix`.
+- TST: test against oldest versions of dependencies
 
 ## [5.1.3] - 2024-12-17
 
