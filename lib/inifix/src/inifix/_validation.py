@@ -3,7 +3,6 @@ import sys
 from enum import Enum, auto
 from typing import Literal
 
-from inifix._more import always_iterable
 from inifix._typing import AnyConfig
 
 if sys.version_info >= (3, 11):
@@ -44,17 +43,18 @@ def validate_elementary_item(key: object, value: object) -> None:
             f"Invalid schema: received key {key!r}, "
             "keys are expected to start with a letter"
         )
-    if not isinstance(value, (*SCALAR_TYPES, list)):
+    if isinstance(value, list):
+        for ev in value:  # pyright: ignore[reportUnknownVariableType]
+            if not isinstance(ev, SCALAR_TYPES):
+                raise ValueError(
+                    f"Invalid schema: received value '{ev}' with type '{type(ev)}', "  # pyright: ignore[reportUnknownArgumentType]
+                    "expected an int, float, bool or str"
+                )
+    elif not isinstance(value, SCALAR_TYPES):
         raise ValueError(
             f"Invalid schema: received value with type '{type(value)}', "
             "expected an int, float, bool, str, or list"
         )
-    for ev in always_iterable(value):
-        if not isinstance(ev, SCALAR_TYPES):
-            raise ValueError(
-                f"Invalid schema: received value '{ev}' with type '{type(ev)}', "
-                "expected an int, float, bool or str"
-            )
 
 
 def validate_inifile_schema(

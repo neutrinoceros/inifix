@@ -4,7 +4,7 @@ from collections.abc import Iterable
 from io import StringIO
 from typing import IO
 
-from inifix._io import _split_tokens
+from inifix._io import split_tokens
 
 __all__ = ["format_string"]
 
@@ -26,7 +26,7 @@ def _format_section(data: str) -> str:
         comments.append(comment.strip())
         if content.startswith("[") or not content:
             continue
-        parameter, *value = _split_tokens(content)
+        parameter, *value = split_tokens(content)
         parameters.append(parameter)
         values.append(value)
 
