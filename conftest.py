@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).parent / "lib" / "inifix" / "tests" / "data"
 INIFILES_PATHS = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))
 INIFILES_IDS = [inifile.name[:-4] for inifile in INIFILES_PATHS]
 
@@ -17,6 +17,11 @@ INIFILES_W_SECTIONS = {
 INIFILES_WO_SECTIONS = {
     path: id for path, id in INIFILES.items() if path not in INIFILES_W_SECTIONS
 }
+
+
+def pytest_ignore_collect(collection_path: Path):
+    if "scripts" in str(collection_path):
+        return True
 
 
 @pytest.fixture()

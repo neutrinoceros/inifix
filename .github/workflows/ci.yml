@@ -84,7 +84,7 @@ jobs:
     - run: uv sync --frozen --no-editable --group concurrency
     - run: |
         uv run --no-sync \
-          pytest --color=yes --count 100 tests/test_concurrent.py
+          pytest --color=yes --count 100 -k concurrency
 
   coverage:
     name: Combine & check coverage
@@ -132,16 +132,15 @@ jobs:
     - uses: astral-sh/setup-uv@887a942a15af3a7626099df99e897a18d9e5ab3a # v5.1.0
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Typecheck source code
-      run: |
-        uv run --frozen --no-editable --group typecheck \
-          ${{ matrix.typechecker }} src/inifix typechecks
 
+    - run: uv sync --frozen --group typecheck
+    - name: Typecheck source code (inifix-cli)
+      run: uv run --no-sync ${{ matrix.typechecker }} src
+    - name: Typecheck source code (inifix)
+      run: uv run --no-sync ${{ matrix.typechecker }} lib/inifix/src typechecks
     - name: Verify Types (pyright only)
       if: matrix.typechecker == 'pyright'
-      run: |
-        uv run --frozen --no-editable --group typecheck \
-          pyright --verifytypes inifix
+      run: uv run --no-sync pyright --verifytypes inifix
 
   optimized_python:
     runs-on: ubuntu-latest

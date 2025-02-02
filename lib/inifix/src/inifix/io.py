@@ -19,8 +19,8 @@ from inifix._typing import (
     Section_ScalarsForbidden,
     StrLike,
 )
+from inifix._validation import SCALAR_TYPES, validate_inifile_schema
 from inifix.enotation import ENotationIO
-from inifix.validation import SCALAR_TYPES, validate_inifile_schema
 
 __all__ = [
     "dump",

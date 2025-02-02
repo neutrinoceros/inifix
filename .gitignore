@@ -8,4 +8,4 @@ htmlcov
 .hypothesis
 .coverage*
 tmp/*
-src/inifix/_version.py
+_version.py

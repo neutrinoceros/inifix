@@ -43,4 +43,4 @@ jobs:
     - name: Run concurrency tests
       run: |
         uv run --no-sync \
-          pytest --color=yes --count 100 tests/test_concurrent.py
+          pytest --color=yes --count 100 -k concurrency
