@@ -5,8 +5,8 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 import inifix
-from inifix.enotation import ENotationIO
-from inifix.io import _auto_cast_aggressive, _auto_cast_stable
+from inifix._enotation import ENotationIO
+from inifix._io import _auto_cast_aggressive, _auto_cast_stable
 
 BASE_BOOLS = [
     ("True", True),

@@ -11,17 +11,14 @@ import pytest
 from hypothesis import example, given
 from hypothesis import strategies as st
 
-from inifix.io import (
+from inifix import dump, dumps, load, loads
+from inifix._io import (
     ALL_BOOL_STRINGS,
     FALSY_STRINGS,
     TRUTHY_STRINGS,
     _auto_cast_stable,
     _tokenize_line,
     _validate_section_item,
-    dump,
-    dumps,
-    load,
-    loads,
 )
 
 from .utils import assert_dict_equal
@@ -276,7 +273,7 @@ def test_skip_validation(monkeypatch, tmp_path):
 
     # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
     monkeypatch.setattr(
-        inifix.io, "validate_inifile_schema", _mp_validate_inifile_schema
+        inifix._io, "validate_inifile_schema", _mp_validate_inifile_schema
     )
     ctx = pytest.raises(ValueError, match="gotcha")
 

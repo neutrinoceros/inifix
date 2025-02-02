@@ -1,4 +1,4 @@
-from inifix.io import load
+from inifix import load
 
 
 def test_pluto_disk_planet(datadir):
