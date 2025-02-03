@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from inifix import format_string
-from inifix._format import iniformat
+from inifix.format import iniformat
 
 DATA_DIR = Path(__file__).parent / "data"
 
