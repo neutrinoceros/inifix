@@ -1,5 +1,4 @@
 import re
-import warnings
 from collections.abc import Iterable
 from io import StringIO
 from typing import IO
@@ -119,14 +118,3 @@ def format_string(s: str, /) -> str:
     for s in _iter_sections(fh):
         content.append(_format_section(s))
     return _finalize("\n".join(content))
-
-
-def iniformat(s: str, /) -> str:
-    warnings.warn(
-        "inifix.format.iniformat is deprecated since v5.0.0"
-        "and will be removed in a future version. "
-        "Please use inifix.format_string instead.",
-        category=DeprecationWarning,
-        stacklevel=2,
-    )
-    return format_string(s)
