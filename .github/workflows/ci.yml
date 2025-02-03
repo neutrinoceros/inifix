@@ -51,13 +51,13 @@ jobs:
       shell: bash  # for windows portability
       run: |
         uv run --frozen --no-editable --group test \
-          pytest --color=yes --doctest-modules
+          pytest --color=yes
 
     - name: Run tests (with coverage)
       if: ${{ startswith( matrix.os, 'ubuntu' ) }}
       run: |
-        uv run --no-editable --group covcheck \
-          coverage run --parallel-mode -m pytest --color=yes --doctest-modules
+        uv run --group covcheck \
+          coverage run --parallel-mode -m pytest --color=yes
 
     - name: Upload coverage data
       # only using reports from ubuntu because
@@ -167,7 +167,7 @@ jobs:
     - name: Run pytest with PYTHONOPTIMIZE=2
       run: |
         uv run --frozen --no-editable --group test \
-          pytest --color=yes --doctest-modules
+          pytest --color=yes
       env:
         PYTHONOPTIMIZE: 2
 
