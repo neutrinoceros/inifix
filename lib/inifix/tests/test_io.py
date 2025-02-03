@@ -349,6 +349,32 @@ def test_unknown_integer_casting():
         loads(input_data, integer_casting="unknown_strategy")
 
 
+def test_fargo_compat(datadir):
+    conf = load(datadir / "fargo-dummy.ini")
+    expected = {
+        "x": 1,
+        "y": 2,
+        "z": 3,
+    }
+    assert conf == expected
+
+
+def test_pluto_compat(datadir):
+    conf = load(datadir / "pluto-DiskPlanet.ini")
+    expected = [
+        "Grid",
+        "Chombo Refinement",
+        "Time",
+        "Solver",
+        "Boundary",
+        "Static Grid Output",
+        "Chombo HDF5 output",
+        "Parameters",
+    ]
+    sections = list(conf.keys())
+    assert sections == expected
+
+
 @pytest.mark.skipif(
     sys.version_info < (3, 14),
     reason="annotationlib is new in Python 3.14",
