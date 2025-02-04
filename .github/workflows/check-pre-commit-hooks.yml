@@ -8,8 +8,9 @@ on:
     paths:
     - src/*
     - pyproject.toml
+    - lib/inifix/*
     - .pre-commit-hooks.yaml
-    - .github/workflows.check-pre-commit-hooks.yml
+    - .github/workflows/check-pre-commit-hooks.yml
 
   schedule:
   # On day-of-month 15 at 3 am UTC
@@ -55,4 +56,5 @@ jobs:
     - name: Run pre-commit hooks
       run: |
         cd downstream
-        uvx pre-commit@${{ matrix.pre-commit-version }} try-repo ../main --all-files
+        uvx pre-commit@${{ matrix.pre-commit-version }} try-repo ../main \
+          --all-files --show-diff-on-failure
