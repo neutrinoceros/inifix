@@ -4,7 +4,7 @@ import pytest
 from hypothesis import example, given
 from hypothesis import strategies as st
 
-from inifix._enotation import Enotation
+from inifix._floatencoder import FloatEncoder
 
 
 @pytest.mark.parametrize(
@@ -19,43 +19,30 @@ from inifix._enotation import Enotation
     ],
 )
 def test_simplify(input, expected):
-    assert Enotation._simplify(input) == expected
+    assert FloatEncoder._simplify(input) == expected
 
 
 @pytest.mark.parametrize(
     "input, expected",
     [
-        (1, "1e0"),
-        (0.000_000_1, "1e-7"),
-        (10_000_000, "1e7"),
-        (156_000, "1.56e5"),
-        (0.0056, "5.6e-3"),
-        (3.141592653589793, "3.141592653589793e0"),
-        (1e-15, "1e-15"),
-        (0.0, "0e0"),
-        (0, "0e0"),
+        (1, ("1.0", "1e0", "1.0")),
+        (0.000_000_1, ("1e-07", "1e-7", "1e-7")),
+        (10_000_000, ("10000000.0", "1e7", "1e7")),
+        (156_000, ("156000.0", "1.56e5", "1.56e5")),
+        (0.0056, ("0.0056", "5.6e-3", "0.0056")),
+        (
+            3.141592653589793,
+            ("3.141592653589793", "3.141592653589793e0", "3.141592653589793"),
+        ),
+        (1e-15, ("1e-15", "1e-15", "1e-15")),
+        (0.0, ("0.0", "0e0", "0.0")),
+        (0, ("0.0", "0e0", "0.0")),
     ],
 )
-def test_always_encode(input, expected):
-    assert Enotation.ALWAYS.encode(input) == expected
-
-
-@pytest.mark.parametrize(
-    "input, expected",
-    [
-        (1, "1.0"),
-        (0.000_000_1, "1e-7"),
-        (10_000_000, "1e7"),
-        (156_000, "1.56e5"),
-        (0.0056, "0.0056"),
-        (3.141592653589793, "3.141592653589793"),
-        (1e-15, "1e-15"),
-        (0.0, "0.0"),
-        (0, "0.0"),
-    ],
-)
-def test_only_shorter_encode(input, expected):
-    assert Enotation.ONLY_SHORTER.encode(input) == expected
+def test_encoders(input, expected):
+    assert FloatEncoder.SIMPLE.encode(input) == expected[0]
+    assert FloatEncoder.ENOTATION.encode(input) == expected[1]
+    assert FloatEncoder.ENOTATION_IFF_SHORTER.encode(input) == expected[2]
 
 
 # for reliable coverage, include a mandatory example for
@@ -66,9 +53,9 @@ def test_only_shorter_encode(input, expected):
 @example(float("nan"))
 @given(st.floats())
 def test_strategies_comparison(r):
-    s0 = str(r)
-    s1 = Enotation.ALWAYS.encode(r)
-    s2 = Enotation.ONLY_SHORTER.encode(r)
+    s0 = FloatEncoder.SIMPLE.encode(r)
+    s1 = FloatEncoder.ENOTATION.encode(r)
+    s2 = FloatEncoder.ENOTATION_IFF_SHORTER.encode(r)
 
     if isnan(r):
         assert isnan(float(s1))
