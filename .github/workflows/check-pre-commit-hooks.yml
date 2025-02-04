@@ -1,0 +1,58 @@
+name: Check pre-commit-hooks.yaml
+on:
+  push:
+    branches:
+    - main
+
+  pull_request:
+    paths:
+    - src/*
+    - pyproject.toml
+    - .pre-commit-hooks.yaml
+    - .github/workflows.check-pre-commit-hooks.yml
+
+  schedule:
+  # On day-of-month 15 at 3 am UTC
+  - cron: 0 3 15 * *
+
+  workflow_dispatch:
+
+concurrency:
+  # auto-cancel any in-progress job *on the same branch*
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: py${{ matrix.python-version }} VS pre-commit ${{ matrix.pre-commit-version }} VS ${{ matrix.downstream }}
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        python-version:
+        - 3.10.0
+        - '3.13'
+        pre-commit-version:
+        - 2.21.0
+        - latest
+        downstream:
+        - idefix-code/idefix
+        - volodia99/nonos
+        - neutrinoceros/yt_idefix
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683   # v4.2.2
+      with:
+        path: main
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683   # v4.2.2
+      with:
+        path: downstream
+        repository: ${{ matrix.downstream }}
+    - uses: astral-sh/setup-uv@4db96194c378173c656ce18a155ffc14a9fc4355   # v5.2.2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Run pre-commit hooks
+      run: |
+        cd downstream
+        uvx pre-commit@${{ matrix.pre-commit-version }} try-repo ../main --all-files
