@@ -6,7 +6,7 @@ from io import BufferedIOBase, IOBase
 from itertools import pairwise
 from typing import Literal, Protocol, overload
 
-from inifix._enotation import Enotation
+from inifix._floatencoder import FloatEncoder
 from inifix._typing import (
     AnyConfig,
     Config_SectionsAllowed_ScalarsForbidden,
@@ -304,7 +304,7 @@ def _from_path(
 
 def _encode(v: Scalar) -> str:
     if isinstance(v, float):
-        return Enotation.ONLY_SHORTER.encode(v)
+        return FloatEncoder.ENOTATION_IFF_SHORTER.encode(v)
     elif isinstance(v, str) and (
         v == ""
         or re.search(r"\s", v) is not None

@@ -5,7 +5,7 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 import inifix
-from inifix._enotation import Enotation
+from inifix._floatencoder import FloatEncoder
 from inifix._io import _auto_cast_aggressive, _auto_cast_stable
 
 BASE_BOOLS = [
@@ -67,7 +67,7 @@ def test_unambiguous_int_cast_aggressive(i):
 @given(st.integers())
 def test_int_like_floats_casting(caster, expected_type, i):
     f = float(i)
-    for s in (str(f), Enotation.ALWAYS.encode(i)):
+    for s in (str(f), FloatEncoder.ENOTATION.encode(i)):
         res = caster(s)
         assert res == f
         assert type(res) is expected_type
