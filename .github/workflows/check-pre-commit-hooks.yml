@@ -34,7 +34,7 @@ jobs:
         - 3.10.0
         - '3.13'
         pre-commit-version:
-        - 2.21.0
+        - 3.8.0 # minimal requirement for pre-commit-uv
         - latest
         downstream:
         - idefix-code/idefix
@@ -54,7 +54,11 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Run pre-commit hooks
+      # we use pre-commit-uv to ensure that the workspace configuration is read from
+      # the root pyproject.toml, so that we run against the dev branch of inifix
+      # rather than a tagged version from PyPI
       run: |
         cd downstream
-        uvx pre-commit@${{ matrix.pre-commit-version }} try-repo ../main \
-          --all-files --show-diff-on-failure
+        uvx --with pre-commit-uv \
+          pre-commit@${{ matrix.pre-commit-version }} try-repo ../main \
+            --all-files --show-diff-on-failure
