@@ -86,6 +86,7 @@ exclude_lines = [
 
     # allow defensive code
     "^\\s*raise NotImplementedError\\b",
+    "^\\s*assert_never\\b",
 
     ": \\.\\.\\.(\\s*#.*)?$",
     "^ +\\.\\.\\.$",

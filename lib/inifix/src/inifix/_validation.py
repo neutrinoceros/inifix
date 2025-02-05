@@ -114,7 +114,7 @@ def validate_inifile_schema(
                         "Invalid schema: sections were explicitly forbidden, "
                         f"but one was found under key '{k}'"
                     )
-                case _:  # pragma: no cover
+                case _:
                     assert_never(sections_mode)
 
         else:
@@ -127,5 +127,5 @@ def validate_inifile_schema(
                         "but the following key/value pair was found outside of "
                         f"any section: '{k}', {v}"
                     )
-                case _:  # pragma: no cover
+                case _:
                     assert_never(sections_mode)
