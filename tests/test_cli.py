@@ -17,8 +17,8 @@ N_FILES = 257
 
 
 @pytest.fixture
-def unformatted_files(datadir, tmp_path):
-    in_file = datadir / "format-in.ini"
+def unformatted_files(datadir_root, tmp_path):
+    in_file = datadir_root / "format-in.ini"
     files = []
     for file_no in range(N_FILES):
         new_file = tmp_path / f"{file_no}.ini"
@@ -83,10 +83,10 @@ class TestValidate:
         assert result.stdout.startswith("Failed to validate")
         assert result.exit_code != 0
 
-    def test_valid_files(self, inifile):
-        result = runner.invoke(app, ["validate", str(inifile)])
+    def test_valid_files(self, inifile_root):
+        result = runner.invoke(app, ["validate", str(inifile_root)])
 
-        assert result.stdout == f"Validated {inifile}\n"
+        assert result.stdout == f"Validated {inifile_root}\n"
         assert result.stderr == ""
         assert result.exit_code == 0
 
@@ -102,11 +102,11 @@ class TestValidate:
 
 class TestFormat:
     @pytest.mark.parametrize("args", [(), ("--skip-validation",)])
-    def test_format_keep_data(self, args, datadir, inifile, tmp_path):
-        target = tmp_path / inifile.name
+    def test_format_keep_data(self, args, datadir_root, inifile_root, tmp_path):
+        target = tmp_path / inifile_root.name
 
-        ref_data = inifix.load(inifile)
-        shutil.copyfile(inifile, target)
+        ref_data = inifix.load(inifile_root)
+        shutil.copyfile(inifile_root, target)
 
         result = runner.invoke(app, ["format", str(target), *args])
         assert isinstance(result.exit_code, int)
@@ -118,7 +118,7 @@ class TestFormat:
         "infile, expect_diff",
         [("format-in.ini", True), ("format-out.ini", False)],
     )
-    def test_exact_format_diff(self, datadir, infile, expect_diff):
+    def test_exact_format_diff(self, datadir_root, infile, expect_diff):
         def diff_file(f1: Path, f2: Path) -> str:
             return (
                 "\n".join(
@@ -132,12 +132,12 @@ class TestFormat:
                 + "\n"
             )
 
-        body = (datadir / infile).read_text()
+        body = (datadir_root / infile).read_text()
 
-        result = runner.invoke(app, ["format", str(datadir / infile), "--diff"])
+        result = runner.invoke(app, ["format", str(datadir_root / infile), "--diff"])
         if expect_diff:
             assert result.exit_code != 0
-            expected = diff_file(datadir / infile, datadir / "format-out.ini")
+            expected = diff_file(datadir_root / infile, datadir_root / "format-out.ini")
             assert result.stdout == expected
             assert result.stderr == ""
         else:
@@ -145,17 +145,17 @@ class TestFormat:
             assert result.stdout == ""
             assert result.stderr == ""
 
-        assert (datadir / infile).read_text() == body
+        assert (datadir_root / infile).read_text() == body
 
-    def test_exact_format_inplace(self, datadir, tmp_path):
+    def test_exact_format_inplace(self, datadir_root, tmp_path):
         target = tmp_path / "result.stdout.ini"
-        shutil.copyfile(datadir / "format-in.ini", target)
+        shutil.copyfile(datadir_root / "format-in.ini", target)
 
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
         assert_text_equal(result.stdout, f"Fixing {target}")
 
-        expected = (datadir / "format-out.ini").read_text()
+        expected = (datadir_root / "format-out.ini").read_text()
         res = target.read_text()
         assert res == expected
 
@@ -203,9 +203,9 @@ class TestFormat:
             result.stdout, f"Error: {str(target)!r} appears to be empty.\n"
         )
 
-    def test_error_read_only_file(self, inifile, tmp_path):
-        target = tmp_path / inifile.name
-        shutil.copy(inifile, target)
+    def test_error_read_only_file(self, inifile_root, tmp_path):
+        target = tmp_path / inifile_root.name
+        shutil.copy(inifile_root, target)
 
         data = target.read_text()
         if inifix.format_string(data) == data:
@@ -220,9 +220,9 @@ class TestFormat:
             f"Error: could not write to {target} (permission denied)\n",
         )
 
-    def test_diff_stdout(self, inifile, tmp_path):
-        target = tmp_path / inifile.name
-        shutil.copy(inifile, target)
+    def test_diff_stdout(self, inifile_root, tmp_path):
+        target = tmp_path / inifile_root.name
+        shutil.copy(inifile_root, target)
 
         result = runner.invoke(app, ["format", str(target), "--diff"])
         # we can't predict if formatting is needed
@@ -233,11 +233,11 @@ class TestFormat:
         else:
             assert result.stdout != ""
 
-    def test_report_noop(self, datadir, tmp_path):
-        inifile = datadir / "format-out.ini"
-        target = tmp_path / inifile.name
+    def test_report_noop(self, datadir_root, tmp_path):
+        inifile_root = datadir_root / "format-out.ini"
+        target = tmp_path / inifile_root.name
 
-        shutil.copyfile(inifile, target)
+        shutil.copyfile(inifile_root, target)
 
         result = runner.invoke(app, ["format", str(target), "--report-noop"])
         assert result.exit_code == 0
@@ -254,11 +254,11 @@ class TestFormat:
 
         assert target.read_text() == expected
 
-    def test_data_preservation(self, inifile, tmp_path):
+    def test_data_preservation(self, inifile_root, tmp_path):
         # check that perilous string manipulations do not destroy data
-        initial_mapping = inifix.load(inifile)
-        target = tmp_path / inifile.name
-        shutil.copyfile(inifile, target)
+        initial_mapping = inifix.load(inifile_root)
+        target = tmp_path / inifile_root.name
+        shutil.copyfile(inifile_root, target)
         runner.invoke(app, ["format", str(target)])
         round_mapping = inifix.load(target)
         assert round_mapping == initial_mapping
@@ -273,7 +273,7 @@ class TestFormat:
         monkeypatch.setattr(inifix_cli, "get_cpu_count", lambda: 1)
         runner.invoke(app, ["format", str(target)])
 
-    def test_concurrency(self, datadir, unformatted_files):
+    def test_concurrency(self, datadir_root, unformatted_files):
         result = runner.invoke(app, ["format", *(str(f) for f in unformatted_files)])
         assert result.exit_code != 0
 
@@ -281,7 +281,7 @@ class TestFormat:
         err_lines = result.stdout.splitlines()
         assert set(err_lines) == {f"Fixing {file}" for file in unformatted_files}
 
-        expected = (datadir / "format-out.ini").read_text()
+        expected = (datadir_root / "format-out.ini").read_text()
         for file in unformatted_files:
             body = file.read_text()
             assert body == expected

@@ -34,7 +34,7 @@ jobs:
     - uses: astral-sh/setup-uv@4db96194c378173c656ce18a155ffc14a9fc4355 # v5.2.2
     - name: Build distributions
       shell: bash -l {0}
-      run: uv build lib/inifix
+      run: uv build --package inifix
 
     - name: Publish package distributions to PyPI
       if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
