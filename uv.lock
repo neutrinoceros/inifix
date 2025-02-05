@@ -151,7 +151,7 @@ wheels = [
 
 [[package]]
 name = "inifix"
-version = "6.0.0"
+version = "6.0.1"
 source = { editable = "lib/inifix" }
 dependencies = [
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
