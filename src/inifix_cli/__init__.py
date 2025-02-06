@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Literal, NewType
+from typing import TYPE_CHECKING, Annotated, Literal, NewType, Callable
 
 import typer
 
@@ -43,26 +43,43 @@ def get_cpu_count() -> int:
     return base_cpu_count or 1
 
 
+def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None:
+    cpu_count = get_cpu_count()
+    with ThreadPoolExecutor(max_workers=max(1, int(cpu_count / 2))) as executor:
+        futures = [executor.submit(closure, file) for file in files]
+        results = [f.result() for f in futures]
+
+    for res in results:
+        for message in res.messages:
+            print(message)
+
+    if any(res.status for res in results):
+        raise typer.Exit(code=1)
+
+
 @app.command()
 def validate(files: list[str]) -> None:
     """
     Validate files as inifix format-compliant.
     """
-    retv = 0
-    for file in files:
-        if not os.path.isfile(file):
-            print(f"Error: could not find {file}")
-            retv = 1
-            continue
-        try:
-            _ = inifix.load(file)
-        except ValueError as exc:
-            print(f"Failed to validate {file}:\n  {exc}")
-            retv = 1
-        else:
-            print(f"Validated {file}")
+    run_as_pool(_validate_single_file, files)
 
-    raise typer.Exit(code=retv)
+
+def _validate_single_file(file: str) -> TaskResults:
+    status: Literal[0, 1] = 0
+    messages: list[Message] = []
+    if not os.path.isfile(file):
+        status = 1
+        messages.append(Message(f"Error: could not find {file}"))
+        return TaskResults(status, messages)
+    try:
+        _ = inifix.load(file)
+    except ValueError as exc:
+        status = 1
+        messages.append(Message(f"Failed to validate {file}:\n  {exc}"))
+    else:
+        messages.append(Message(f"Validated {file}"))
+    return TaskResults(status, messages)
 
 
 @app.command()
@@ -94,23 +111,15 @@ def format(
     """
     Format files.
     """
-    closure = partial(
-        _format_single_file,
-        diff=diff,
-        report_noop=report_noop,
-        skip_validation=skip_validation,
+    run_as_pool(
+        partial(
+            _format_single_file,
+            diff=diff,
+            report_noop=report_noop,
+            skip_validation=skip_validation,
+        ),
+        files,
     )
-    cpu_count = get_cpu_count()
-    with ThreadPoolExecutor(max_workers=max(1, int(cpu_count / 2))) as executor:
-        futures = [executor.submit(closure, file) for file in files]
-        results = [f.result() for f in futures]
-
-    for res in results:
-        for message in res.messages:
-            print(message)
-
-    if any(res.status for res in results):
-        raise typer.Exit(code=1)
 
 
 def _format_single_file(
