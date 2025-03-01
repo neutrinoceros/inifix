@@ -101,7 +101,7 @@ jobs:
     - uses: astral-sh/setup-uv@4db96194c378173c656ce18a155ffc14a9fc4355 # v5.2.2
     - run: uv sync --only-group covcheck
 
-    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+    - uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
       with:
         pattern: inifix_coverage_data-*
         merge-multiple: true
