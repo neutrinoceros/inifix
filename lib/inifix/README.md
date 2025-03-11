@@ -202,7 +202,7 @@ load/patch/dump routine.
 ```python
 >>> import inifix
 >>> with open("pluto.ini", "rb") as fr:
-...    inifix.load(fr)
+...    conf = inifix.load(fr)
 >>> conf["Time"]["CFL"] = 0.1
 >>> with open("pluto-mod.ini", "wb") as fw:
 ...    inifix.dump(conf, fw)
@@ -210,7 +210,7 @@ load/patch/dump routine.
 or, equivalently
 ```python
 >>> import inifix
->>> inifix.load("pluto.ini")
+>>> conf = inifix.load("pluto.ini")
 >>> conf["Time"]["CFL"] = 0.1
 >>> inifix.dump(conf, "pluto-mod.ini")
 ```
