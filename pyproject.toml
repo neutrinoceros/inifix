@@ -68,12 +68,13 @@ known-first-party = ["inifix"]
 [tool.coverage.run]
 branch = true
 source = [
-    "src/__init__.py",
+    "src/inifix_cli",
     "tests",
     "lib/inifix/src",
     "lib/inifix/tests",
 ]
 omit = [
+    "src/inifix_cli/__main__.py",
     "scripts/*",
 ]
 
