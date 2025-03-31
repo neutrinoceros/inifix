@@ -375,14 +375,13 @@ def test_pluto_compat(datadir):
     assert sections == expected
 
 
-@pytest.mark.skipif(
-    sys.version_info < (3, 14),
-    reason="annotationlib is new in Python 3.14",
-)
 @pytest.mark.parametrize("func", [load, loads, dump, dumps])
 @pytest.mark.parametrize("format", ["VALUE", "FORWARDREF", "STRING"])
-def test_runtime_annotations(func, format):  # pragma: no cover
-    from annotationlib import Format, get_annotations
+def test_runtime_annotations(func, format):
+    if sys.version_info >= (3, 14):  # pragma: no cover
+        from annotationlib import Format, get_annotations
+    else:
+        from typing_extensions import Format, get_annotations
 
     # check that no exception is raised
     # this test *may* be refined once Python 3.14 is out of beta
