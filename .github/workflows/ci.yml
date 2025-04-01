@@ -63,7 +63,7 @@ jobs:
       # only using reports from ubuntu because
       # combining reports from multiple platforms is tricky (or impossible ?)
       if: ${{ startswith( matrix.os, 'ubuntu' ) }}
-      uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}
         path: .coverage.*
@@ -113,7 +113,7 @@ jobs:
         uv run coverage report --fail-under=100
 
     - name: Upload HTML report if check failed.
-      uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: inifix_coverage_report
         path: htmlcov
