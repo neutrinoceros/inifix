@@ -20,12 +20,12 @@ repos:
     args: [--ignore-words-list, Nd]
 
 - repo: https://github.com/astral-sh/uv-pre-commit
-  rev: 0.5.14
+  rev: 0.6.12
   hooks:
   - id: uv-lock
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
-  rev: v0.8.6
+  rev: v0.11.4
   hooks:
   - id: ruff-format
   - id: ruff
@@ -38,6 +38,6 @@ repos:
     args: [--autofix, --indent, '2']
 
 - repo: https://github.com/pre-commit/pre-commit
-  rev: v4.0.1
+  rev: v4.2.0
   hooks:
   - id: validate_manifest
