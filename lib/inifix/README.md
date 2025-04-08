@@ -273,7 +273,7 @@ to be really useful in a type checking context. However, passing
 `parse_scalars_as_list=True`, `sections='forbid'` or `sections='require'` can
 narrow the return type, as seen by a typechecker (e.g. `mypy` or `pyright`).
 Note that this effect is intentionally not disabled with `skip_validation=True`,
-eventhough the `sections` argument's runtime effect *is* disabled; such a
+even though the `sections` argument's runtime effect *is* disabled; such a
 combination allows to get both optimal runtime performance and type-consistency.
 However, `skip_validation=True` may create situations where your code type-checks
 but fails at runtime, so this option is only meant to be used if validation is

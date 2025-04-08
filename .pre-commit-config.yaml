@@ -13,10 +13,11 @@ repos:
   - id: end-of-file-fixer
   - id: check-toml
 
-- repo: https://github.com/crate-ci/typos
-  rev: v1.29.4
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.4.1
   hooks:
-  - id: typos
+  - id: codespell
+    args: [--ignore-words-list, Nd]
 
 - repo: https://github.com/astral-sh/uv-pre-commit
   rev: 0.5.14
