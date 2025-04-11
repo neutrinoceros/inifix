@@ -1,8 +1,14 @@
+import re
+import sys
+
 import pytest
 
 from inifix import dump, dumps, load, loads, validate_inifile_schema
 
 from .utils import assert_dict_equal
+
+if sys.version_info < (3, 11):
+    from exceptiongroup import ExceptionGroup
 
 
 def test_validate_known_files(inifile):
@@ -112,8 +118,18 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
     ],
 )
 def test_dump_invalid_conf(invalid_conf, tmp_path):
-    with pytest.raises(ValueError, match=r"^(Invalid schema)"):
+    with pytest.raises(ExceptionGroup, match=r"^Invalid schema") as excinfo:
         dump(invalid_conf, tmp_path / "save.ini")
+
+    assert len(excinfo.value.exceptions) == 1
+    assert isinstance(excinfo.value.exceptions[0], ExceptionGroup)
+    nested_group = excinfo.value.exceptions[0]
+    assert len(nested_group.exceptions) == 1
+    nested_exc = nested_group.exceptions[0]
+    assert type(nested_exc) is ValueError
+    assert re.match(
+        "^$", str(nested_exc)
+    )  # TODO: adapt match to the actual error message
 
 
 def test_unknown_sections_value():
