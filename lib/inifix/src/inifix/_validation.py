@@ -8,6 +8,7 @@ from inifix._typing import AnyConfig
 if sys.version_info >= (3, 11):
     from typing import assert_never
 else:
+    from exceptiongroup import ExceptionGroup
     from typing_extensions import assert_never
 
 _PARAM_NAME_REGEXP = re.compile(r"[-\.\w]+")
@@ -25,36 +26,60 @@ def _uses_invalid_chars(s: str) -> bool:
     return ma is None
 
 
-def validate_elementary_item(key: object, value: object) -> None:
+def collect_exceptions_for_elementary_item(
+    key: object, value: object
+) -> list[ValueError]:
+    """
+    Collect exceptions for the given key/value pair.
+    """
+    exceptions: list[ValueError] = []
     if not isinstance(key, str):
-        raise ValueError(
-            f"Invalid schema: received key '{key}' with type '{type(key)}', "
-            "expected a str"
+        exceptions.append(
+            ValueError(
+                f"Found key {key} with type {type(key).__name__}. Expected a str"
+            )
         )
+        return exceptions
+
     if len(key) == 0:
-        raise ValueError("Invalid schema: received an empty str as key")
-    if _uses_invalid_chars(key):
-        raise ValueError(
-            f"Invalid schema: received key {key!r}, "
-            "expected only alphanumeric characters or special characters from {'-', '.'}"
+        exceptions.append(ValueError("Found an empty str as key"))
+    elif _uses_invalid_chars(key):
+        exceptions.append(
+            ValueError(
+                f"Found key {key!r}, "
+                "expected only alphanumeric characters or special characters from {'-', '.'}"
+            )
         )
-    if not key[0].isalpha():
-        raise ValueError(
-            f"Invalid schema: received key {key!r}, "
-            "keys are expected to start with a letter"
+    elif not key[0].isalpha():
+        exceptions.append(
+            ValueError(f"Found key {key!r}. Keys are expected to start with a letter")
         )
+
+    invalid_values: list[object] = []
     if isinstance(value, list):
         for ev in value:  # pyright: ignore[reportUnknownVariableType]
             if not isinstance(ev, SCALAR_TYPES):
-                raise ValueError(
-                    f"Invalid schema: received value '{ev}' with type '{type(ev)}', "  # pyright: ignore[reportUnknownArgumentType]
-                    "expected an int, float, bool or str"
-                )
+                invalid_values.append(ev)  # pyright: ignore[reportUnknownArgumentType]
     elif not isinstance(value, SCALAR_TYPES):
-        raise ValueError(
-            f"Invalid schema: received value with type '{type(value)}', "
-            "expected an int, float, bool, str, or list"
+        invalid_values.append(value)
+
+    if len(invalid_values) == 1:
+        exceptions.append(
+            ValueError(
+                f"Key {key!r} is associated to value {value} "
+                f"with type {type(value).__name__}. "  # pyright: ignore[reportUnknownArgumentType]
+                "Expected an int, float, bool, str, or list of these types"
+            )
         )
+    elif invalid_values:
+        exceptions.append(
+            ValueError(
+                f"Key {key!r} is associated to values {invalid_values} with types "
+                f"[{', '.join(type(v).__name__ for v in invalid_values)}], respectively. "
+                "Expected only int, float, bool and str values"
+            )
+        )
+    return exceptions
 
 
 def validate_inifile_schema(
@@ -97,22 +122,28 @@ def validate_inifile_schema(
                 f"Got {sections=!r}, expected 'allow', 'forbid' or 'require'"
             )
 
+    section_to_exceptions: dict[str, list[ValueError]] = {}
+
     for k, v in data.items():
         if not isinstance(k, str):
             raise ValueError(
-                f"Invalid schema: received key '{k}' "
-                f"with type '{type(k)}', expected a str"
+                f"Invalid schema: found key {k} with type {type(k).__name__}, expected a str"
             )
 
         if isinstance(v, dict):
             match sections_mode:
                 case SectionsMode.ALLOW | SectionsMode.REQUIRE:
+                    section_exceptions: list[ValueError] = []
                     for kk, vv in v.items():
-                        validate_elementary_item(kk, vv)
+                        section_exceptions.extend(
+                            collect_exceptions_for_elementary_item(kk, vv)
+                        )
+                    if section_exceptions:
+                        section_to_exceptions[k] = section_exceptions
                 case SectionsMode.FORBID:
                     raise ValueError(
                         "Invalid schema: sections were explicitly forbidden, "
-                        f"but one was found under key '{k}'"
+                        f"but one was found under key {k!r}"
                     )
                 case _:  # pragma: no cover
                     assert_never(sections_mode)
@@ -120,7 +151,9 @@ def validate_inifile_schema(
         else:
             match sections_mode:
                 case SectionsMode.ALLOW | SectionsMode.FORBID:
-                    validate_elementary_item(k, v)
+                    section_exceptions = collect_exceptions_for_elementary_item(k, v)
+                    if section_exceptions:
+                        section_to_exceptions[k] = section_exceptions
                 case SectionsMode.REQUIRE:
                     raise ValueError(
                         "Invalid schema: sections were explicitly required, "
@@ -129,3 +162,9 @@ def validate_inifile_schema(
                     )
                 case _:  # pragma: no cover
                     assert_never(sections_mode)
+
+    groups: list[ExceptionGroup[ValueError]] = []
+    for section, exceptions in section_to_exceptions.items():
+        groups.append(ExceptionGroup(f"Section '{section}' is invalid", exceptions))
+    if groups:
+        raise ExceptionGroup("Invalid schema", groups)

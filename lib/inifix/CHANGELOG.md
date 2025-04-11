@@ -6,9 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-BLD: use a minimal build backend (`flit-core`) for `inifix-cli`. This only
-affects installing the repo's pre-commit hooks, and should reduce the chance of
-it breaking without maintenance.
+- BLD: use a minimal build backend (`flit-core`) for `inifix-cli`. This only
+  affects installing the repo's pre-commit hooks, and should reduce the chance of
+  it breaking without maintenance.
+- ENH: validation now reports as many problems as possible instead of just the
+  first one it finds
 
 ## [6.0.1] - 2025-02-05
 

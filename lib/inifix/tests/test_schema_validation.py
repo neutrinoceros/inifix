@@ -1,8 +1,14 @@
+import re
+import sys
+
 import pytest
 
 from inifix import dump, dumps, load, loads, validate_inifile_schema
 
 from .utils import assert_dict_equal
+
+if sys.version_info < (3, 11):
+    from exceptiongroup import ExceptionGroup
 
 
 def test_validate_known_files(inifile):
@@ -95,25 +101,71 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
 
 
 @pytest.mark.parametrize(
-    "invalid_conf",
+    "invalid_conf, match",
     [
-        pytest.param({1: {"param": 1}}, id="section_no_str"),
-        pytest.param({"section": {"": 1}}, id="empty_param_name"),
-        pytest.param({"section": {"§": 1}}, id="invalid_param_name-1"),
-        pytest.param({"section": {"a§": 1}}, id="invalid_param_name-2"),
-        pytest.param({"section": {1: "one"}}, id="param_name_no_str"),
-        pytest.param({"section": [[1, 2], [3, 4]]}, id="non_flat_section"),
+        pytest.param({1: {"param": 1}}, r"^Invalid schema", id="section_no_str"),
         pytest.param(
-            {"section": {"param": [[1, 2], [3, 4]]}}, id="nested_non_flat_sequence"
+            {"section": {"": 1}}, r"^Found an empty str as key", id="empty_param_name"
         ),
         pytest.param(
-            {"section": {"subsection": {"subsubsection": 1}}}, id="too_deep_nesting"
+            {"section": {"§": 1}},
+            r"^Found key '§', expected only alphanumeric characters",
+            id="invalid_param_name-1",
+        ),
+        pytest.param(
+            {"section": {"a§": 1}},
+            r"^Found key 'a§', expected only alphanumeric characters",
+            id="invalid_param_name-2",
+        ),
+        pytest.param(
+            {"section": {1: "one"}},
+            r"^Found key 1 with type int\. Expected a str$",
+            id="param_name_no_str",
+        ),
+        pytest.param(
+            {"section": [[1, 2], [3, 4]]},
+            (
+                r"^Key 'section' is associated to values \[\[1, 2\], \[3, 4\]\] "
+                r"with types \[list, list\], respectively\. "
+                r"Expected only int, float, bool and str values$"
+            ),
+            id="non_flat_section",
+        ),
+        pytest.param(
+            {"section": {"param": [[1, 2], [3, 4]]}},
+            (
+                r"^Key 'param' is associated to values \[\[1, 2\], \[3, 4\]\] "
+                r"with types \[list, list\], respectively\. "
+                r"Expected only int, float, bool and str values$"
+            ),
+            id="nested_non_flat_sequence",
+        ),
+        pytest.param(
+            {"section": {"subsection": {"subsubsection": 1}}},
+            (
+                r"^Key 'subsection' is associated to value \{'subsubsection': 1\} "
+                r"with type dict\. "
+                r"Expected an int, float, bool, str, or list of these types$"
+            ),
+            id="too_deep_nesting",
         ),
     ],
 )
-def test_dump_invalid_conf(invalid_conf, tmp_path):
-    with pytest.raises(ValueError, match=r"^(Invalid schema)"):
+def test_dump_invalid_conf(invalid_conf, match, tmp_path):
+    with pytest.raises(Exception, match=r"^Invalid schema") as excinfo:
         dump(invalid_conf, tmp_path / "save.ini")
+
+    if excinfo.type is ExceptionGroup:
+        assert len(excinfo.value.exceptions) == 1
+        assert isinstance(excinfo.value.exceptions[0], ExceptionGroup)
+        nested_group = excinfo.value.exceptions[0]
+        assert len(nested_group.exceptions) == 1
+        nested_exc = nested_group.exceptions[0]
+        assert type(nested_exc) is ValueError
+        assert re.match(match, str(nested_exc))
+    else:
+        assert type(excinfo.value) is ValueError
+        assert re.match("^Invalid schema", str(excinfo.value))
 
 
 def test_unknown_sections_value():
