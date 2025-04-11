@@ -167,6 +167,7 @@ name = "inifix-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "exceptiongroup" },
     { name = "inifix" },
     { name = "typer-slim" },
 ]
@@ -198,6 +199,7 @@ typecheck = [
 
 [package.metadata]
 requires-dist = [
+    { name = "exceptiongroup", specifier = ">=1.0.0" },
     { name = "inifix", editable = "lib/inifix" },
     { name = "typer-slim", specifier = ">=0.15.1" },
 ]
