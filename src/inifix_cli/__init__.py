@@ -10,6 +10,9 @@ import typer
 
 import inifix
 
+# TODO: replace this with except* when support for Python 3.10 is dropped
+from exceptiongroup import catch, BaseExceptionGroup
+
 if TYPE_CHECKING:  # pragma: no cover
     from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
 
@@ -72,13 +75,17 @@ def _validate_single_file(file: str) -> TaskResults:
         status = 1
         messages.append(Message(f"Error: could not find {file}"))
         return TaskResults(status, messages)
-    try:
-        _ = inifix.load(file)
-    except ValueError as exc:
+
+    # TODO: rewrite this section with try/except*/else when support for Python 3.10 is dropped
+    def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
+        nonlocal status
         status = 1
         messages.append(Message(f"Failed to validate {file}:\n  {exc}"))
-    else:
+
+    with catch({ValueError: value_error_handler}):
+        _ = inifix.load(file)
         messages.append(Message(f"Validated {file}"))
+
     return TaskResults(status, messages)
 
 
@@ -135,11 +142,15 @@ def _format_single_file(
 
     validate_baseline: AnyConfig = {}
     if not skip_validation:
-        try:
-            validate_baseline = inifix.load(file)
-        except ValueError as exc:
+        # TODO: rewrite this section with try/except* when support for Python 3.10 is dropped
+        def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
+            nonlocal status
             status = 1
             messages.append(Message(f"Error: {exc}"))
+
+        with catch({ValueError: value_error_handler}):
+            validate_baseline = inifix.load(file)
+        if status != 0:
             return TaskResults(status, messages)
 
     with open(file, mode="rb") as fh:

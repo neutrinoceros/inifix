@@ -11,6 +11,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
+    "exceptiongroup>=1.0.0", # TDOO: remove when support for Python 3.10 is dropped
     "inifix==6.0.1",
     "typer-slim>=0.15.1",
 ]
