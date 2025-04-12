@@ -102,6 +102,13 @@ reportUnreachable = false
 reportUnnecessaryIsInstance = false
 reportUnnecessaryComparison = false
 
+# in some instances, pyright and basedpyright may conflict over a single line,
+# where e.g. pyright reports an error that I wish to ignore, but basedpyright
+# complains about an unused `# pyright: ignore[...]` comment
+# At the time of writing, it appears that this setting can be lifted once
+# Python 3.10 is unsupported
+reportUnnecessaryTypeIgnoreComment = false
+
 [tool.mypy]
 python_version = "3.10"
 strict = true
