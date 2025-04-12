@@ -151,15 +151,33 @@ jobs:
 
     - run: uv sync --frozen --no-editable --group typecheck
     - name: Typecheck source code (mypy)
+      id: mypy
       run: mypy src lib/inifix/src typechecks
+      continue-on-error: true
+
     - name: Typecheck source code (pyright)
+      id: pyright
       run: pyright src lib/inifix/src typechecks
+      continue-on-error: true
+
     - name: Typecheck source code (basedbpyright)
+      id: basedpyright
       run: basedpyright src lib/inifix/src typechecks
+      continue-on-error: true
+
     - name: Verify Types (pyright)
+      id: pyright-verifytypes
       run: pyright --verifytypes inifix
+      continue-on-error: true
+
     - name: Verify Types (basedpyright)
+      id: basedpyright-verifytypes
       run: basedpyright --verifytypes inifix
+      continue-on-error: true
+
+    - name: Check on failures
+      if: steps.mypy.outputs.status == 'failure' || steps.pyright.outputs.status == 'failure' || steps.basedpyright.outputs.status == 'failure' || steps.pyright-verifytypes.outputs.status == 'failure' || steps.basedpyright-verifytypes.outputs.status == 'failure' || steps.mypy.outputs.status == 'failure' || steps.pyright.outputs.status == 'failure' || steps.basedpyright.outputs.status == 'failure' || steps.pyright-verifytypes.outputs.status == 'failure' || steps.basedpyright-verifytypes.outputs.status == 'failure'
+      run: exit 1
 
   optimized_python:
     runs-on: ubuntu-latest
