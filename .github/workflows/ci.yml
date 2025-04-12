@@ -152,7 +152,7 @@ jobs:
     - run: uv sync --frozen --no-editable --group typecheck
     - name: Typecheck source code (mypy)
       id: mypy
-      run: mypy src lib/inifix/src typechecks
+      run: mypy src lib/inifix/sr typechecks
       continue-on-error: true
 
     - name: Typecheck source code (pyright)
