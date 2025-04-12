@@ -136,6 +136,10 @@ jobs:
         python-version:
         - '3.10'
         - '3.13'
+        typechecker:
+        - mypy
+        - pyright
+        - basedpyright
 
     runs-on: ubuntu-latest
     name: type check
@@ -150,16 +154,13 @@ jobs:
         cache-suffix: typecheck
 
     - run: uv sync --frozen --no-editable --group typecheck
-    - name: Typecheck source code (mypy)
-      run: mypy src lib/inifix/src typechecks
-    - name: Typecheck source code (pyright)
-      run: pyright src lib/inifix/src typechecks
-    - name: Typecheck source code (basedbpyright)
-      run: basedpyright src lib/inifix/src typechecks
-    - name: Verify Types (pyright)
-      run: pyright --verifytypes inifix
-    - name: Verify Types (basedpyright)
-      run: basedpyright --verifytypes inifix
+    - name: Typecheck source code (inifix-cli)
+      run: uv run --no-sync ${{ matrix.typechecker }} src
+    - name: Typecheck source code (inifix)
+      run: uv run --no-sync ${{ matrix.typechecker }} lib/inifix/src typechecks
+    - name: Verify Types (pyright only)
+      if: ${{ startsWith( matrix.typechecker , 'pyright' ) }}
+      run: uv run --no-sync ${{ matrix.typechecker }} --verifytypes inifix
 
   optimized_python:
     runs-on: ubuntu-latest
