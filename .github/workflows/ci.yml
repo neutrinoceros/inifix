@@ -176,7 +176,7 @@ jobs:
       continue-on-error: true
 
     - name: Check on failures
-      if: steps.mypy.outputs.status == 'failure' || steps.pyright.outputs.status == 'failure' || steps.basedpyright.outputs.status == 'failure' || steps.pyright-verifytypes.outputs.status == 'failure' || steps.basedpyright-verifytypes.outputs.status == 'failure' || steps.mypy.outputs.status == 'failure' || steps.pyright.outputs.status == 'failure' || steps.basedpyright.outputs.status == 'failure' || steps.pyright-verifytypes.outputs.status == 'failure' || steps.basedpyright-verifytypes.outputs.status == 'failure'
+      if: steps.mypy.outputs.status == 'failure' ||  steps.pyright.outputs.status == 'failure' || steps.basedpyright.outputs.status == 'failure' || steps.pyright-verifytypes.outputs.status == 'failure' || steps.basedpyright-verifytypes.outputs.status == 'failure'
       run: exit 1
 
   optimized_python:
