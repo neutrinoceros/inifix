@@ -43,6 +43,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
+        prune-cache: false
         cache-suffix: covcheck
 
     - if: ${{ matrix.label == 'oldestdeps' }}
@@ -89,6 +90,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
+        prune-cache: false
         cache-suffix: concurrency
     - run: uv sync --frozen --no-editable --group concurrency
     - run: |
@@ -106,6 +108,7 @@ jobs:
       with:
         python-version: '3.13'
         enable-cache: true
+        prune-cache: false
         cache-suffix: covcheck
     - run: uv sync --group covcheck
 
@@ -143,6 +146,7 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
         enable-cache: true
+        prune-cache: false
         cache-suffix: typecheck
 
     - run: uv sync --frozen --no-editable --group typecheck
@@ -174,6 +178,7 @@ jobs:
       with:
         python-version: '3.13'
         enable-cache: true
+        prune-cache: false
         cache-suffix: test
     - run: uv sync --frozen --no-editable --group test
     - name: Run pytest with PYTHONOPTIMIZE=2
@@ -191,6 +196,7 @@ jobs:
     - uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
       with:
         enable-cache: true
+        prune-cache: false
         cache-suffix: pre-publish-checks
 
     - run: uv run scripts/pre_publish_checks.py

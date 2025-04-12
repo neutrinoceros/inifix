@@ -51,6 +51,7 @@ jobs:
       with:
         python-version: '3.10'
         enable-cache: true
+        prune-cache: false
         cache-suffix: test-sdist
     - run: uv sync --only-group test
     - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
