@@ -11,7 +11,7 @@ import typer
 import inifix
 
 if TYPE_CHECKING:  # pragma: no cover
-    from inifix._typing import AnyConfig
+    from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
 
 
 __all__ = ["app"]
