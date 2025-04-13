@@ -8,11 +8,6 @@ on:
     - README.md
     - CHANGELOG.md
 
-concurrency:
-  # auto-cancel any in-progress job *on the same branch*
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   unit-tests:
     strategy:
@@ -165,10 +160,6 @@ jobs:
   optimized_python:
     runs-on: ubuntu-latest
     name: optimized Python
-
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-optimized
-      cancel-in-progress: true
 
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
