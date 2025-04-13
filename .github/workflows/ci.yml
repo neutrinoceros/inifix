@@ -148,7 +148,7 @@ jobs:
         prune-cache: false
         cache-suffix: typecheck
 
-    - run: uv sync --frozen --no-editable --group typecheck
+    - run: uv sync --frozen --group typecheck
     - name: Typecheck source code (inifix-cli)
       run: ${{ matrix.typechecker }} src
     - name: Typecheck source code (inifix)

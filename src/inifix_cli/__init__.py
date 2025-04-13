@@ -11,7 +11,7 @@ import typer
 import inifix
 
 if TYPE_CHECKING:  # pragma: no cover
-    from inifix._typing import AnyConfig
+    from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
 
 
 __all__ = ["app"]
@@ -36,7 +36,7 @@ def get_cpu_count() -> int:
         base_cpu_count = os.process_cpu_count()
     elif hasattr(os, "sched_getaffinity"):
         # this function isn't available on all platforms
-        base_cpu_count = len(os.sched_getaffinity(0))
+        base_cpu_count = len(os.sched_getaffinity(0))  # pyright: ignore[reportAttributeAccessIssue]
     else:  # pragma: no cover
         # this proxy is good enough in most situations
         base_cpu_count = os.cpu_count()
