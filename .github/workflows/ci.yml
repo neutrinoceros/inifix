@@ -150,12 +150,12 @@ jobs:
 
     - run: uv sync --frozen --no-editable --group typecheck
     - name: Typecheck source code (inifix-cli)
-      run: uv run --no-sync ${{ matrix.typechecker }} src
+      run: ${{ matrix.typechecker }} src
     - name: Typecheck source code (inifix)
-      run: uv run --no-sync ${{ matrix.typechecker }} lib/inifix/src typechecks
+      run: ${{ matrix.typechecker }} lib/inifix/src typechecks
     - name: Verify Types (pyright only)
       if: ${{ startsWith( matrix.typechecker , 'pyright' ) }}
-      run: uv run --no-sync ${{ matrix.typechecker }} --verifytypes inifix
+      run: ${{ matrix.typechecker }} --verifytypes inifix
 
   optimized_python:
     runs-on: ubuntu-latest
