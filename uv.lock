@@ -156,17 +156,22 @@ name = "inifix"
 version = "6.0.1"
 source = { editable = "lib/inifix" }
 dependencies = [
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
     { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.2.0" }]
+requires-dist = [
+    { name = "exceptiongroup", marker = "python_full_version < '3.11'", specifier = ">=1.0.0" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'", specifier = ">=4.2.0" },
+]
 
 [[package]]
 name = "inifix-cli"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "exceptiongroup" },
     { name = "inifix" },
     { name = "typer-slim" },
 ]
@@ -198,6 +203,7 @@ typecheck = [
 
 [package.metadata]
 requires-dist = [
+    { name = "exceptiongroup", specifier = ">=1.0.0" },
     { name = "inifix", editable = "lib/inifix" },
     { name = "typer-slim", specifier = ">=0.15.1" },
 ]
