@@ -172,7 +172,10 @@ def _format_single_file(
         def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
             nonlocal status
             status = 1
-            messages.append(Message(f"Error: {exc}"))
+            exc_repr = "\n".join(str(e) for e in exc.exceptions)
+            messages.append(
+                Message(f"Failed to format {file}:\n{indent(exc_repr, '  ')}")
+            )
 
         with catch({ValueError: value_error_handler}):
             validate_baseline = inifix.load(file, sections=sections.value)
