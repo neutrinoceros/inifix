@@ -5,9 +5,9 @@ from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
 from typing import TYPE_CHECKING, Annotated, Literal, NewType, Callable
-
+from enum import Enum
 import typer
-
+from textwrap import indent
 import inifix
 
 # TODO: replace this with except* when support for Python 3.10 is dropped
@@ -60,15 +60,21 @@ def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None
         raise typer.Exit(code=1)
 
 
+class SectionsArg(str, Enum):
+    allow = "allow"
+    forbid = "forbid"
+    require = "require"
+
+
 @app.command()
-def validate(files: list[str]) -> None:
+def validate(files: list[str], sections: SectionsArg = SectionsArg.allow) -> None:
     """
     Validate files as inifix format-compliant.
     """
-    run_as_pool(_validate_single_file, files)
+    run_as_pool(partial(_validate_single_file, sections=sections), files)
 
 
-def _validate_single_file(file: str) -> TaskResults:
+def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
     status: Literal[0, 1] = 0
     messages: list[Message] = []
     if not os.path.isfile(file):
@@ -80,10 +86,13 @@ def _validate_single_file(file: str) -> TaskResults:
     def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
         nonlocal status
         status = 1
-        messages.append(Message(f"Failed to validate {file}:\n  {exc}"))
+        exc_repr = "\n".join(str(e) for e in exc.exceptions)
+        messages.append(
+            Message(f"Failed to validate {file}:\n{indent(exc_repr, '  ')}")
+        )
 
     with catch({ValueError: value_error_handler}):
-        _ = inifix.load(file)
+        _ = inifix.load(file, sections=sections.value)
         messages.append(Message(f"Validated {file}"))
 
     return TaskResults(status, messages)
@@ -107,6 +116,17 @@ def format(
             help="Explicitly log noops for files that are already formatted",
         ),
     ] = False,
+    sections: Annotated[
+        SectionsArg,
+        typer.Option(
+            "--sections",
+            help=(
+                "'allow', 'forbid' or 'require' sections in the file "
+                "(default is 'allow' and has no effect). "
+                "This option's is without effect when combined with --skip-validataion"
+            ),
+        ),
+    ] = SectionsArg.allow,
     skip_validation: Annotated[
         bool,
         typer.Option(
@@ -123,6 +143,7 @@ def format(
             _format_single_file,
             diff=diff,
             report_noop=report_noop,
+            sections=sections,
             skip_validation=skip_validation,
         ),
         files,
@@ -130,7 +151,12 @@ def format(
 
 
 def _format_single_file(
-    file: str, *, diff: bool, report_noop: bool, skip_validation: bool
+    file: str,
+    *,
+    diff: bool,
+    report_noop: bool,
+    sections: SectionsArg,
+    skip_validation: bool,
 ) -> TaskResults:
     status: Literal[0, 1] = 0
     messages: list[Message] = []
@@ -149,7 +175,7 @@ def _format_single_file(
             messages.append(Message(f"Error: {exc}"))
 
         with catch({ValueError: value_error_handler}):
-            validate_baseline = inifix.load(file)
+            validate_baseline = inifix.load(file, sections=sections.value)
         if status != 0:
             return TaskResults(status, messages)
 

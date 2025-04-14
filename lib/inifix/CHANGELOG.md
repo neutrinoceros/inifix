@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   it breaking without maintenance.
 - ENH: validation now reports as many problems as possible instead of just the
   first one it finds
+- ENH: add a `--sections` argument to `inifix-cli` commands (pre-commit)
 
 ## [6.0.1] - 2025-02-05
 
