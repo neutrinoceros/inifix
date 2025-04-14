@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "inifix"
-version = "6.0.1"
+version = "6.1.0"
 description = "An I/O library for Pluto-style ini files."
 authors = [
     { name = "C.M.T. Robert" },
