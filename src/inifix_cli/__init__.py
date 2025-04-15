@@ -121,9 +121,9 @@ def format(
         typer.Option(
             "--sections",
             help=(
-                "'allow', 'forbid' or 'require' sections in the file "
-                "(default is 'allow' and has no effect). "
-                "This option's is without effect when combined with --skip-validataion"
+                "wether to 'allow' (default), 'forbid' or 'require' sections "
+                "during validation ('allow' and has no effect). "
+                "This option is without effect when combined with --skip-validataion"
             ),
         ),
     ] = SectionsArg.allow,
