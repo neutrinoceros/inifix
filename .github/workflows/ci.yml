@@ -102,6 +102,7 @@ jobs:
     - uses: astral-sh/setup-uv@c7f87aa956e4c323abf06d5dec078e358f6b4d04 # v6.0.0
       with:
         python-version: '3.13'
+        activate-environment: true
         enable-cache: true
         prune-cache: false
         cache-suffix: covcheck
@@ -144,6 +145,7 @@ jobs:
     - uses: astral-sh/setup-uv@c7f87aa956e4c323abf06d5dec078e358f6b4d04 # v6.0.0
       with:
         python-version: ${{ matrix.python-version }}
+        activate-environment: true
         enable-cache: true
         prune-cache: false
         cache-suffix: typecheck
@@ -174,7 +176,7 @@ jobs:
         cache-suffix: test
     - run: uv sync --frozen --no-editable --group test
     - name: Run pytest with PYTHONOPTIMIZE=2
-      run: pytest --color=yes
+      run: uv run --no-sync pytest --color=yes
       env:
         PYTHONOPTIMIZE: 2
 
