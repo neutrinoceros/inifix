@@ -7,6 +7,7 @@ on:
     paths-ignore:
     - README.md
     - CHANGELOG.md
+  workflow_dispatch:
 
 jobs:
   unit-tests:
