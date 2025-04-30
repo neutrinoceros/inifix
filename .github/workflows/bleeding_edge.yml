@@ -29,6 +29,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
         enable-cache: false
         version: '>=0.6,<0.7'
+
+    - name: Configure uv
+      run: |
+        echo "UV_PREVIEW=1" >> $GITHUB_ENV
+
     - name: Set PYTHON_GIL
       if: ${{ endswith( matrix.python-version , 't' ) }}
       run: |
