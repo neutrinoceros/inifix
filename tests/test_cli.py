@@ -12,7 +12,7 @@ import inifix
 import inifix_cli
 from inifix_cli import app
 
-runner = typer.testing.CliRunner(mix_stderr=False)
+runner = typer.testing.CliRunner()
 N_FILES = 257
 
 
