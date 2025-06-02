@@ -1,7 +1,7 @@
-import re
 import sys
 
 import pytest
+from pytest import RaisesExc, RaisesGroup
 
 from inifix import dump, dumps, load, loads, validate_inifile_schema
 
@@ -152,20 +152,17 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
     ],
 )
 def test_dump_invalid_conf(invalid_conf, match, tmp_path):
-    with pytest.raises(Exception, match=r"^Invalid schema") as excinfo:
+    with RaisesGroup(
+        RaisesExc(ValueError, match=match),
+        allow_unwrapped=True,
+        flatten_subgroups=True,
+    ) as excinfo:
         dump(invalid_conf, tmp_path / "save.ini")
-
-    if excinfo.type is ExceptionGroup:
-        assert len(excinfo.value.exceptions) == 1
-        assert isinstance(excinfo.value.exceptions[0], ExceptionGroup)
-        nested_group = excinfo.value.exceptions[0]
-        assert len(nested_group.exceptions) == 1
-        nested_exc = nested_group.exceptions[0]
-        assert type(nested_exc) is ValueError
-        assert re.match(match, str(nested_exc))
-    else:
-        assert type(excinfo.value) is ValueError
-        assert re.match("^Invalid schema", str(excinfo.value))
+    if isinstance(excinfo.value, ExceptionGroup):
+        assert RaisesGroup(
+            ExceptionGroup,
+            match=r"^Invalid schema",
+        ).matches(excinfo.value)
 
 
 def test_unknown_sections_value():
