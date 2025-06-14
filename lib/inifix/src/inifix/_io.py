@@ -366,7 +366,7 @@ def _write_to_file(data: AnyConfig, file: str | os.PathLike[str], /) -> None:
 # - since I'm overloading over two arguments at the same time, the above
 #   *implies* that I can only do it for keyword-only arguments
 
-# overloads are sorted from most to lease strict return type
+# overloads are sorted from most to least strict return type
 
 
 @overload
