@@ -16,19 +16,18 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - '3.11'
         - '3.12'
         - '3.13'
         include:
         - os: ubuntu-22.04
-          python-version: 3.10.0
+          python-version: '3.11'
           label: oldestdeps
         - os: macos-latest
-          python-version: 3.10.0
+          python-version: '3.11'
         - os: macos-latest
           python-version: '3.13'
         - os: windows-latest
-          python-version: 3.10.0
+          python-version: '3.11'
         - os: windows-latest
           python-version: '3.13'
 
@@ -75,7 +74,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.10.0
+        - '3.11'
         - '3.13'
         - 3.13t
 
@@ -131,7 +130,7 @@ jobs:
     strategy:
       matrix:
         python-version:
-        - '3.10'
+        - '3.11'
         - '3.13'
         typechecker:
         - mypy

@@ -1,14 +1,9 @@
-import sys
-
 import pytest
 from pytest import RaisesExc, RaisesGroup
 
 from inifix import dump, dumps, load, loads, validate_inifile_schema
 
 from .utils import assert_dict_equal
-
-if sys.version_info < (3, 11):
-    from exceptiongroup import ExceptionGroup
 
 
 def test_validate_known_files(inifile):
