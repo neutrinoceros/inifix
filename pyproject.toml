@@ -9,9 +9,8 @@ description = "A command line interface for inifix."
 authors = [
     { name = "C.M.T. Robert" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
-    "exceptiongroup>=1.0.0", # TDOO: remove when support for Python 3.10 is dropped
     "inifix==6.1.1",
     "typer-slim>=0.15.1",
 ]
@@ -35,8 +34,7 @@ concurrency = [
 ]
 covcheck = [
     {include-group = "test"},
-    "coverage[toml]>=6.5.0 ; python_version == '3.10'",
-    "coverage>=6.5.0 ; python_version >= '3.11'",
+    "coverage>=6.5.0",
 ]
 typecheck = [
     "basedpyright>=1.26.0",
@@ -104,15 +102,8 @@ reportUnreachable = false
 reportUnnecessaryIsInstance = false
 reportUnnecessaryComparison = false
 
-# in some instances, pyright and basedpyright may conflict over a single line,
-# where e.g. pyright reports an error that I wish to ignore, but basedpyright
-# complains about an unused `# pyright: ignore[...]` comment
-# At the time of writing, it appears that this setting can be lifted once
-# Python 3.10 is unsupported
-reportUnnecessaryTypeIgnoreComment = false
-
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 show_error_codes = true
 show_error_context = true

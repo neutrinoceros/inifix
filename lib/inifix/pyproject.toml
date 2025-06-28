@@ -14,11 +14,8 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10"
-dependencies = [
-    "exceptiongroup>=1.0.0 ; python_full_version < '3.11'",
-    "typing-extensions>=4.2.0 ; python_full_version < '3.11'",
-]
+requires-python = ">=3.11"
+dependencies = []
 
 [project.license]
 text = "GPL-3.0"

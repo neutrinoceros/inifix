@@ -31,7 +31,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.10.0
+        - '3.11'
         - '3.13'
         pre-commit-version:
         - 3.8.0 # minimal requirement for pre-commit-uv

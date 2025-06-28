@@ -10,11 +10,8 @@ import typer
 from textwrap import indent
 import inifix
 
-# TODO: replace this with except* when support for Python 3.10 is dropped
-from exceptiongroup import catch, BaseExceptionGroup
-
 if TYPE_CHECKING:  # pragma: no cover
-    from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
+    from inifix._typing import AnyConfig
 
 
 __all__ = ["app"]
@@ -39,7 +36,7 @@ def get_cpu_count() -> int:
         base_cpu_count = os.process_cpu_count()
     elif hasattr(os, "sched_getaffinity"):
         # this function isn't available on all platforms
-        base_cpu_count = len(os.sched_getaffinity(0))  # pyright: ignore[reportAttributeAccessIssue]
+        base_cpu_count = len(os.sched_getaffinity(0))
     else:  # pragma: no cover
         # this proxy is good enough in most situations
         base_cpu_count = os.cpu_count()
@@ -82,18 +79,15 @@ def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
         messages.append(Message(f"Error: could not find {file}"))
         return TaskResults(status, messages)
 
-    # TODO: rewrite this section with try/except*/else when support for Python 3.10 is dropped
-    def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
-        nonlocal status
+    try:
+        _ = inifix.load(file, sections=sections.value)
+        messages.append(Message(f"Validated {file}"))
+    except* ValueError as exc:
         status = 1
         exc_repr = "\n".join(str(e) for e in exc.exceptions)
         messages.append(
             Message(f"Failed to validate {file}:\n{indent(exc_repr, '  ')}")
         )
-
-    with catch({ValueError: value_error_handler}):
-        _ = inifix.load(file, sections=sections.value)
-        messages.append(Message(f"Validated {file}"))
 
     return TaskResults(status, messages)
 
@@ -168,17 +162,14 @@ def _format_single_file(
 
     validate_baseline: AnyConfig = {}
     if not skip_validation:
-        # TODO: rewrite this section with try/except* when support for Python 3.10 is dropped
-        def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
-            nonlocal status
+        try:
+            validate_baseline = inifix.load(file, sections=sections.value)
+        except* ValueError as exc:
             status = 1
             exc_repr = "\n".join(str(e) for e in exc.exceptions)
             messages.append(
                 Message(f"Failed to format {file}:\n{indent(exc_repr, '  ')}")
             )
-
-        with catch({ValueError: value_error_handler}):
-            validate_baseline = inifix.load(file, sections=sections.value)
         if status != 0:
             return TaskResults(status, messages)
 
