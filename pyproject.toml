@@ -49,6 +49,8 @@ members = ["lib/inifix"]
 
 [tool.uv.sources]
 inifix = { workspace = true }
+# https://github.com/pallets/click/pull/2991
+click = { git = "https://github.com/neutrinoceros/click", rev = "4679b1cbc35d05e1c250affaf8a3b7156bad6319" }
 
 [tool.ruff.lint]
 exclude = ["*__init__.py"]
