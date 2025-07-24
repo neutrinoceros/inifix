@@ -9,19 +9,29 @@ description = "An I/O library for Pluto-style ini files."
 authors = [
     { name = "C.M.T. Robert" },
 ]
+license = "GPL-3.0-only"
+license-files = ["LICENSE"]
 classifiers = [
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Typing :: Typed",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Free Threading :: 3 - Stable",
+    "Topic :: Scientific/Engineering",
 ]
 requires-python = ">=3.10"
 dependencies = [
     "exceptiongroup>=1.0.0 ; python_full_version < '3.11'",
     "typing-extensions>=4.2.0 ; python_full_version < '3.11'",
 ]
-
-[project.license]
-text = "GPL-3.0"
 
 [project.readme]
 file = "README.md"
