@@ -24,7 +24,7 @@ inifix = "inifix_cli:app"
 
 [dependency-groups]
 test = [
-    "click>=8.2.0", # required for typer.testing.CliRunner with separate stderr and stdout
+    "click>=8.2.2", # required for typer.testing.CliRunner with separate stderr and stdout
     "hypothesis>=6.110.0",
     "pytest>=8.4.0",
     "typing-extensions>=4.13.0 ; python_full_version < '3.14'",
@@ -49,8 +49,6 @@ members = ["lib/inifix"]
 
 [tool.uv.sources]
 inifix = { workspace = true }
-# https://github.com/pallets/click/pull/2991
-click = { git = "https://github.com/neutrinoceros/click", rev = "4679b1cbc35d05e1c250affaf8a3b7156bad6319" }
 
 [tool.ruff.lint]
 exclude = ["*__init__.py"]
