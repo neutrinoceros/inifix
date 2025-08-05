@@ -23,6 +23,11 @@ from inifix._io import (
 
 from .utils import assert_dict_equal
 
+if sys.version_info >= (3, 14):
+    from annotationlib import Format, get_annotations
+else:
+    from typing_extensions import Format, get_annotations
+
 
 @pytest.mark.parametrize(
     "invalid_data", ["", "SingleToken", "[InvalidSectionName", "InvalidSection]"]
@@ -378,12 +383,6 @@ def test_pluto_compat(datadir):
 @pytest.mark.parametrize("func", [load, loads, dump, dumps])
 @pytest.mark.parametrize("format", ["VALUE", "FORWARDREF", "STRING"])
 def test_runtime_annotations(func, format):
-    if sys.version_info >= (3, 14):  # pragma: no cover
-        from annotationlib import Format, get_annotations
-    else:
-        from typing_extensions import Format, get_annotations
-
     # check that no exception is raised
-    # this test *may* be refined once Python 3.14 is out of beta
     get_annotations(func, format=getattr(Format, format))
     get_annotations(func, eval_str=True)
