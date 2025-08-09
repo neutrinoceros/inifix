@@ -20,6 +20,7 @@ jobs:
         - '3.12'
         - '3.13'
         - '3.14'
+        python-jit: [null]
         include:
         - os: ubuntu-22.04
           python-version: 3.10.0
@@ -32,7 +33,13 @@ jobs:
           python-version: 3.10.0
         - os: windows-latest
           python-version: '3.14'
-
+        - os: ubuntu-latest
+          python-version: 3.14
+          python-jit: 1
+          label: JIT
+        - os: ubuntu-latest
+          python-version: 3.14t
+          label: free-threading
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -52,12 +59,16 @@ jobs:
       run: |
         uv run --frozen --no-editable --group test \
           pytest --color=yes
+      env:
+        PYTHON_JIT: ${{ matrix.python-jit }}
 
     - name: Run tests (with coverage)
       if: ${{ startswith( matrix.os, 'ubuntu' ) }}
       run: |
         uv run --group covcheck \
           coverage run --parallel-mode -m pytest --color=yes
+      env:
+        PYTHON_JIT: ${{ matrix.python-jit }}
 
     - name: Upload coverage data
       # only using reports from ubuntu because
@@ -65,7 +76,7 @@ jobs:
       if: ${{ startswith( matrix.os, 'ubuntu' ) }}
       uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
-        name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}
+        name: inifix_coverage_data-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.label }}
         path: .coverage.*
         if-no-files-found: ignore
         include-hidden-files: true
