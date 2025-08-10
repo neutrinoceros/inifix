@@ -27,6 +27,7 @@ test = [
     "click>=8.2.0", # required for typer.testing.CliRunner with separate stderr and stdout
     "hypothesis>=6.110.0",
     "pytest>=8.4.0",
+    "runtime-introspect>=0.1.0",
     "typing-extensions>=4.13.0 ; python_full_version < '3.14'",
 ]
 concurrency = [
