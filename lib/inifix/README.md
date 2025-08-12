@@ -36,7 +36,7 @@ Known differences are:
   version 5.0) will parse these as `float`s, allowing for 1-to-1 roundtrips.
   Idefix (as of version 2.1) is also resilient against integers written as decimal,
   so `inifix` will not break any working inifile by a load/patch/dump routine.
-  See [Reading Options](#reading-options) for more.
+  See [Parsing Options](#parsing-options) for more.
 
 ## File format specifications details
 <details><summary>Unroll !</summary>
