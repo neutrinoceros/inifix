@@ -210,6 +210,7 @@ concurrency = [
     { name = "hypothesis" },
     { name = "pytest" },
     { name = "pytest-repeat" },
+    { name = "runtime-introspect" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'" },
 ]
 covcheck = [
@@ -218,12 +219,14 @@ covcheck = [
     { name = "coverage", extra = ["toml"], marker = "python_full_version < '3.11'" },
     { name = "hypothesis" },
     { name = "pytest" },
+    { name = "runtime-introspect" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'" },
 ]
 test = [
     { name = "click" },
     { name = "hypothesis" },
     { name = "pytest" },
+    { name = "runtime-introspect" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'" },
 ]
 typecheck = [
@@ -245,6 +248,7 @@ concurrency = [
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=8.4.0" },
     { name = "pytest-repeat", specifier = ">=0.9.3" },
+    { name = "runtime-introspect", specifier = ">=0.1.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 covcheck = [
@@ -253,12 +257,14 @@ covcheck = [
     { name = "coverage", extras = ["toml"], marker = "python_full_version == '3.10.*'", specifier = ">=6.5.0" },
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=8.4.0" },
+    { name = "runtime-introspect", specifier = ">=0.1.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 test = [
     { name = "click", specifier = ">=8.2.0" },
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=8.4.0" },
+    { name = "runtime-introspect", specifier = ">=0.1.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 typecheck = [
@@ -421,6 +427,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/80/d4/69e9dbb9b8266df0b157c72be32083403c412990af15c7c15f7a3fd1b142/pytest_repeat-0.9.4.tar.gz", hash = "sha256:d92ac14dfaa6ffcfe6917e5d16f0c9bc82380c135b03c2a5f412d2637f224485", size = 6488, upload-time = "2025-04-07T14:59:53.077Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/73/d4/8b706b81b07b43081bd68a2c0359fe895b74bf664b20aca8005d2bb3be71/pytest_repeat-0.9.4-py3-none-any.whl", hash = "sha256:c1738b4e412a6f3b3b9e0b8b29fcd7a423e50f87381ad9307ef6f5a8601139f3", size = 4180, upload-time = "2025-04-07T14:59:51.492Z" },
+]
+
+[[package]]
+name = "runtime-introspect"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2b/eb/82028553f6393bbae702098b4b12cd03b358859702bd0d306ad9edd10479/runtime_introspect-0.1.0.tar.gz", hash = "sha256:3ed4120be72272bd050e473fa8940bf55eeffbbc74f8bd68fa50545278f6e331", size = 22916, upload-time = "2025-08-17T16:21:39.088Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c0/f2/95006bf215f840fdde18257113e54982d94a7491936ad10971fd2b465390/runtime_introspect-0.1.0-py3-none-any.whl", hash = "sha256:24924cfd896983535c2ba002c122ed6ceed2913ee66bdfb5560bab6e1b42cd86", size = 19692, upload-time = "2025-08-17T16:21:38.02Z" },
 ]
 
 [[package]]
