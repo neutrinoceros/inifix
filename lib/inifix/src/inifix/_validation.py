@@ -145,7 +145,7 @@ def validate_inifile_schema(
                         "Invalid schema: sections were explicitly forbidden, "
                         f"but one was found under key {k!r}"
                     )
-                case _:  # pragma: no cover
+                case _ as unreachable:
                     assert_never(sections_mode)
 
         else:
@@ -160,8 +160,8 @@ def validate_inifile_schema(
                         "but the following key/value pair was found outside of "
                         f"any section: '{k}', {v}"
                     )
-                case _:  # pragma: no cover
-                    assert_never(sections_mode)
+                case _ as unreachable:
+                    assert_never(unreachable)
 
     groups: list[ExceptionGroup[ValueError]] = []
     for section, exceptions in section_to_exceptions.items():

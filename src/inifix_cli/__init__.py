@@ -13,7 +13,7 @@ import inifix
 # TODO: replace this with except* when support for Python 3.10 is dropped
 from exceptiongroup import catch, BaseExceptionGroup
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
 
 

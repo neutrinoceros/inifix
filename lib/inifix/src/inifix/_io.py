@@ -212,7 +212,7 @@ def _config_from_string_with_sections(
     for line_begin, line_end in pairwise(section_limits):
         section_lines = lines[line_begin:line_end]
         if (match := SECTION_REGEXP.fullmatch(section_lines[0])) is None:
-            raise RuntimeError  # pragma: no cover
+            raise RuntimeError
         config[match["title"]] = _section_from_lines(
             section_lines[1:],
             caster=caster,
