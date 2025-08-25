@@ -42,5 +42,5 @@ class FloatEncoder(Enum):
                     FloatEncoder.ENOTATION.encode(r),
                     key=lambda x: len(x),
                 )
-            case _:  # pragma: no cover
-                assert_never(self)
+            case _ as unreachable:
+                assert_never(unreachable)

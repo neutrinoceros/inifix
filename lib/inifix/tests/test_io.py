@@ -137,7 +137,7 @@ def test_bool_strings(s):
         b = True
     elif s in FALSY_STRINGS:
         b = False
-    else:  # pragma: no cover
+    else:
         raise RuntimeError
     # test unsupported case
     S = s.title().swapcase()
