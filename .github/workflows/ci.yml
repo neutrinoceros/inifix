@@ -51,7 +51,7 @@ jobs:
         cache-suffix: covcheck
 
     - if: ${{ matrix.label == 'oldestdeps' }}
-      run: echo "UV_RESOLUTION=lowest-direct" >> $GITHUB_ENV
+      run: echo "UV_RESOLUTION=lowest-direct" >> "$GITHUB_ENV"
 
     - name: Run tests (without coverage)
       if: ${{ ! startswith( matrix.os, 'ubuntu' ) }}
@@ -130,7 +130,7 @@ jobs:
       run: |
         coverage combine
         coverage html --skip-covered --skip-empty
-        coverage report --skip-covered --format=markdown >> $GITHUB_STEP_SUMMARY
+        coverage report --skip-covered --format=markdown >> "$GITHUB_STEP_SUMMARY"
         coverage report --fail-under=100
 
     - name: Upload HTML report if check failed.
