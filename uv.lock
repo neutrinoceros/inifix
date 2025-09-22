@@ -253,7 +253,7 @@ typecheck = [
 requires-dist = [
     { name = "exceptiongroup", specifier = ">=1.0.0" },
     { name = "inifix", editable = "lib/inifix" },
-    { name = "typer-slim", specifier = ">=0.15.1" },
+    { name = "typer-slim", specifier = ">=0.19.0" },
 ]
 
 [package.metadata.requires-dev]
