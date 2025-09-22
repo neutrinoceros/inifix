@@ -4,8 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Literal, NewType, Callable
-from enum import Enum
+from typing import TYPE_CHECKING, Annotated, Literal, NewType, Callable, TypeAlias
 import typer
 from textwrap import indent
 import inifix
@@ -19,7 +18,7 @@ if TYPE_CHECKING:
 
 __all__ = ["app"]
 
-app: typer.Typer = typer.Typer()
+app = typer.Typer()
 
 
 Message = NewType("Message", str)
@@ -60,14 +59,11 @@ def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None
         raise typer.Exit(code=1)
 
 
-class SectionsArg(str, Enum):
-    allow = "allow"
-    forbid = "forbid"
-    require = "require"
+SectionsArg: TypeAlias = Literal["allow", "forbid", "require"]
 
 
 @app.command()
-def validate(files: list[str], sections: SectionsArg = SectionsArg.allow) -> None:
+def validate(files: list[str], sections: SectionsArg = "allow") -> None:
     """
     Validate files as inifix format-compliant.
     """
@@ -92,7 +88,7 @@ def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
         )
 
     with catch({ValueError: value_error_handler}):
-        _ = inifix.load(file, sections=sections.value)
+        _ = inifix.load(file, sections=sections)
         messages.append(Message(f"Validated {file}"))
 
     return TaskResults(status, messages)
@@ -126,7 +122,7 @@ def format(
                 "This option is without effect when combined with --skip-validataion"
             ),
         ),
-    ] = SectionsArg.allow,
+    ] = "allow",
     skip_validation: Annotated[
         bool,
         typer.Option(
@@ -178,7 +174,7 @@ def _format_single_file(
             )
 
         with catch({ValueError: value_error_handler}):
-            validate_baseline = inifix.load(file, sections=sections.value)
+            validate_baseline = inifix.load(file, sections=sections)
         if status != 0:
             return TaskResults(status, messages)
 
