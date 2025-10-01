@@ -9,6 +9,8 @@ on:
     - .github/workflows/bleeding_edge.yml
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   build:
     name: py${{ matrix.python-version }}

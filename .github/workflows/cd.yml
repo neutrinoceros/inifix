@@ -9,6 +9,8 @@ on:
     - ./**/pyproject.toml
     - ./**/conftest.py
 
+permissions: {}
+
 jobs:
   pre-publish-checks:
     runs-on: ubuntu-latest
