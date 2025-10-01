@@ -9,6 +9,8 @@ on:
     - CHANGELOG.md
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   unit-tests:
     strategy:
