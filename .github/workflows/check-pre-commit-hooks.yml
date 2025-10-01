@@ -23,6 +23,8 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   checks:
     name: py${{ matrix.python-version }} VS pre-commit ${{ matrix.pre-commit-version }} VS ${{ matrix.downstream }}
