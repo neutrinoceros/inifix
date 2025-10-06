@@ -55,7 +55,7 @@ jobs:
         cache-suffix: covcheck
 
     - if: ${{ matrix.label == 'oldestdeps' }}
-      run: echo "UV_RESOLUTION=lowest-direct" >> "$GITHUB_ENV"
+      run: echo "UV_RESOLUTION=lowest" >> "$GITHUB_ENV"
 
     - name: Run tests (without coverage)
       if: ${{ ! startswith( matrix.os, 'ubuntu' ) }}
