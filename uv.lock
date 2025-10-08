@@ -11,6 +11,10 @@ members = [
     "inifix",
     "inifix-cli",
 ]
+constraints = [
+    { name = "iniconfig", specifier = ">=1.0.1" },
+    { name = "packaging", specifier = ">=22.0" },
+]
 
 [[package]]
 name = "attrs"

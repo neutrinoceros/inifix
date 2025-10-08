@@ -45,6 +45,14 @@ typecheck = [
     "pyright>=1.1.390",
 ]
 
+[tool.uv]
+constraint-dependencies = [
+    # avoid transitive dependencies on six and pyparsing via pytest -> packaging -> { six , pyparsing }
+    "packaging>=22.0", # TODO: remove this line when bumping pytest >= 8.5.0
+    # avoid building 1.0.0 (no wheels), via pytest
+    "iniconfig>=1.0.1", # TODO: remove this line when bumping pytest >= 8.5.0
+]
+
 [tool.uv.workspace]
 members = ["lib/inifix"]
 
