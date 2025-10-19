@@ -9,6 +9,9 @@ on:
     - CHANGELOG.md
   workflow_dispatch:
 
+env:
+  PYTHONWARNDEFAULTENCODING: 1
+
 permissions: {}
 
 jobs:

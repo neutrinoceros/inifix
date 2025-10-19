@@ -34,7 +34,7 @@ def test_bool_cast_invalid(caster, s):
 
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)
 def test_bool_cast_integration(s, expected, tmp_path):
-    with open(tmp_path / "dummy.ini", "w") as fh:
+    with open(tmp_path / "dummy.ini", "w", encoding="utf-8") as fh:
         fh.write(f"dummy {s}")
     d = inifix.load(tmp_path / "dummy.ini")
     assert d == {"dummy": expected}

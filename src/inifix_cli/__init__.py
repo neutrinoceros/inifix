@@ -180,8 +180,9 @@ def _format_single_file(
 
     with open(file, mode="rb") as fh:
         data = fh.read().decode("utf-8")
-        # make sure newlines are always decoded as \n, even on windows
-        data = data.replace("\r\n", "\n")
+
+    # make sure newlines are always decoded as \n, even on windows
+    data = data.replace("\r\n", "\n")
 
     fmted_data = inifix.format_string(data)
 

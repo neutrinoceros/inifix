@@ -96,7 +96,7 @@ def check_requires_python(md: Metadata) -> int:
 
 
 def check_readme(md: Metadata) -> int:
-    text = README.read_text()
+    text = README.read_text(encoding="utf-8")
     if md.current_lib_static_version.is_devrelease:
         expected_tag = md.latest_git_tag
     else:

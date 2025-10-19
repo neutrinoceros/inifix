@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TST: add support for CPython's experimental JIT compiler
 - TST: add support for CPython 3.15 (alpha)
+- TST: ensure utf-8 encoding is explicitly used everywhere
 
 ## [6.1.1] - 2025-04-14
 
