@@ -55,8 +55,8 @@ def test_idempotent_io(inifile):
         data1 = load(save1)
         dump(data1, save2)
 
-        text1 = save1.read_text().split("\n")
-        text2 = save2.read_text().split("\n")
+        text1 = save1.read_text(encoding="utf-8").split("\n")
+        text2 = save2.read_text(encoding="utf-8").split("\n")
 
         diff = "".join(difflib.context_diff(text1, text2))
         assert not diff
@@ -165,16 +165,22 @@ def test_invalid_section_key():
         _validate_section_item(1, True)
 
 
-@pytest.mark.parametrize("mode", ("w", "wb"))
-def test_dump_to_file_descriptor(mode, inifile, tmp_path):
+@pytest.mark.parametrize(
+    "open_kwargs",
+    [
+        pytest.param({"mode": "w", "encoding": "utf-8"}, id="text write"),
+        pytest.param({"mode": "wb"}, id="bin write"),
+    ],
+)
+def test_dump_to_file_descriptor(inifile, open_kwargs, tmp_path):
     conf = load(inifile)
 
     file = tmp_path / "save.ini"
-    with open(file, mode=mode) as fh:
+    with open(file, **open_kwargs) as fh:
         dump(conf, fh)
 
     # a little weak but better than just testing that the file isn't empty
-    new_body = file.read_text()
+    new_body = file.read_text(encoding="utf-8")
     for key, val in conf.items():
         if isinstance(val, dict):
             assert f"[{key}]\n" in new_body
@@ -186,13 +192,13 @@ def test_dump_to_file_path(inifile, tmp_path):
     # pathlib.Path obj
     file1 = tmp_path / "save1.ini"
     dump(conf, file1, skip_validation=True)
-    body1 = file1.read_text()
+    body1 = file1.read_text(encoding="utf-8")
 
     # str
     file2 = tmp_path / "save2.ini"
     sfile2 = str(file2)
     dump(conf, sfile2, skip_validation=True)
-    body2 = file2.read_text()
+    body2 = file2.read_text(encoding="utf-8")
 
     assert body1 == body2
     for key, val in conf.items():
@@ -209,9 +215,15 @@ def test_load_empty_file(tmp_path):
         load(target)
 
 
-@pytest.mark.parametrize("mode", ("r", "rb"))
-def test_load_from_descriptor(inifile, mode):
-    with open(inifile, mode=mode) as fh:
+@pytest.mark.parametrize(
+    "open_kwargs",
+    [
+        pytest.param({"encoding": "utf-8"}, id="text read"),
+        pytest.param({"mode": "rb"}, id="bin read"),
+    ],
+)
+def test_load_from_descriptor(inifile, open_kwargs):
+    with open(inifile, **open_kwargs) as fh:
         load(fh)
 
 
@@ -226,7 +238,7 @@ def test_loads_invalid_str():
 
 
 def test_loads_dumps_roundtrip(inifile):
-    with open(inifile) as fh:
+    with open(inifile, encoding="utf-8") as fh:
         data = fh.read()
     d1 = loads(data)
     s1 = dumps(d1)
@@ -263,7 +275,7 @@ def test_parse_scalars_as_lists(inifile):
                 assert type(value) is list  # noqa: E721
 
     conf1 = load(inifile, parse_scalars_as_lists=True)
-    with open(inifile) as fh:
+    with open(inifile, encoding="utf-8") as fh:
         conf2 = load(fh, parse_scalars_as_lists=True)
 
     _validate(conf1)
@@ -287,7 +299,7 @@ def test_skip_validation(monkeypatch, tmp_path):
     with ctx:
         loads(data)
 
-    with open(tmp_path / "data.ini", "w") as fh:
+    with open(tmp_path / "data.ini", "w", encoding="utf-8") as fh:
         fh.write(data)
 
     with ctx:

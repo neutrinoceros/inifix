@@ -47,7 +47,7 @@ def unformatted_files(datadir_root, tmp_path):
 )
 def invalid_file(tmp_path, request):
     file = tmp_path / "myfile.ini"
-    file.write_text(request.param)
+    file.write_text(request.param, encoding="utf-8")
     return file
 
 
@@ -124,15 +124,15 @@ class TestFormat:
                 "\n".join(
                     line.removesuffix("\n")
                     for line in unified_diff(
-                        f1.read_text().splitlines(),
-                        f2.read_text().splitlines(),
+                        f1.read_text(encoding="utf-8").splitlines(),
+                        f2.read_text(encoding="utf-8").splitlines(),
                         fromfile=str(f1),
                     )
                 )
                 + "\n"
             )
 
-        body = (datadir_root / infile).read_text()
+        body = (datadir_root / infile).read_text(encoding="utf-8")
 
         result = runner.invoke(app, ["format", str(datadir_root / infile), "--diff"])
         if expect_diff:
@@ -145,7 +145,7 @@ class TestFormat:
             assert result.stdout == ""
             assert result.stderr == ""
 
-        assert (datadir_root / infile).read_text() == body
+        assert (datadir_root / infile).read_text(encoding="utf-8") == body
 
     def test_exact_format_inplace(self, datadir_root, tmp_path):
         target = tmp_path / "result.stdout.ini"
@@ -155,8 +155,8 @@ class TestFormat:
         assert result.exit_code != 0
         assert_text_equal(result.stdout, f"Fixing {target}")
 
-        expected = (datadir_root / "format-out.ini").read_text()
-        res = target.read_text()
+        expected = (datadir_root / "format-out.ini").read_text(encoding="utf-8")
+        res = target.read_text(encoding="utf-8")
         assert res == expected
 
     def test_no_parameters(self, tmp_path):
@@ -170,7 +170,8 @@ class TestFormat:
                     " # comment 3",
                     "[Section B]",
                 ]
-            )
+            ),
+            encoding="utf-8",
         )
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
@@ -186,7 +187,7 @@ class TestFormat:
                 "[Section B]\n",
             ]
         )
-        assert target.read_text() == expected
+        assert target.read_text(encoding="utf-8") == expected
 
     def test_missing_file(self, tmp_path):
         target = tmp_path / "not_a_file"
@@ -207,7 +208,7 @@ class TestFormat:
         target = tmp_path / inifile_root.name
         shutil.copy(inifile_root, target)
 
-        data = target.read_text()
+        data = target.read_text(encoding="utf-8")
         if inifix.format_string(data) == data:
             return
 
@@ -248,11 +249,11 @@ class TestFormat:
 
         inserted = '''Eggs 'Bacon Saussage'     "spam"'''
         expected = """Eggs    'Bacon Saussage'  "spam"\n"""
-        target.write_text(inserted)
+        target.write_text(inserted, encoding="utf-8")
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
 
-        assert target.read_text() == expected
+        assert target.read_text(encoding="utf-8") == expected
 
     def test_data_preservation(self, inifile_root, tmp_path):
         # check that perilous string manipulations do not destroy data
@@ -268,7 +269,7 @@ class TestFormat:
         target = tmp_path / "spaces.ini"
 
         inserted = '''Eggs 'Bacon Saussage'     "spam"'''
-        target.write_text(inserted)
+        target.write_text(inserted, encoding="utf-8")
 
         monkeypatch.setattr(inifix_cli, "get_cpu_count", lambda: 1)
         runner.invoke(app, ["format", str(target)])
@@ -281,7 +282,7 @@ class TestFormat:
         err_lines = result.stdout.splitlines()
         assert set(err_lines) == {f"Fixing {file}" for file in unformatted_files}
 
-        expected = (datadir_root / "format-out.ini").read_text()
+        expected = (datadir_root / "format-out.ini").read_text(encoding="utf-8")
         for file in unformatted_files:
-            body = file.read_text()
+            body = file.read_text(encoding="utf-8")
             assert body == expected
