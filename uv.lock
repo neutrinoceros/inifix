@@ -27,14 +27,14 @@ wheels = [
 
 [[package]]
 name = "basedpyright"
-version = "1.31.7"
+version = "1.32.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nodejs-wheel-binaries" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c6/ba/ed69e8df732a09c8ca469f592c8e08707fe29149735b834c276d94d4a3da/basedpyright-1.31.7.tar.gz", hash = "sha256:394f334c742a19bcc5905b2455c9f5858182866b7679a6f057a70b44b049bceb", size = 22710948, upload-time = "2025-10-11T05:12:48.3Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/a5/691d02a30bda15acb6a5727bb696dd7f3fcae1ad5b9f2708020c2645af8c/basedpyright-1.32.1.tar.gz", hash = "sha256:ce979891a3c4649e7c31d665acb06fd451f33fedfd500bc7796ee0950034aa54", size = 22757919, upload-time = "2025-10-23T12:53:28.169Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/90/ce01ad2d0afdc1b82b8b5aaba27e60d2e138e39d887e71c35c55d8f1bfcd/basedpyright-1.31.7-py3-none-any.whl", hash = "sha256:7c54beb7828c9ed0028630aaa6904f395c27e5a9f5a313aa9e91fc1d11170831", size = 11817571, upload-time = "2025-10-11T05:12:45.432Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/d5/17d24fd7ba9d899b82859ee04f4599a1e8a02a85c0753bc15eb3ca7ffff7/basedpyright-1.32.1-py3-none-any.whl", hash = "sha256:06b5cc56693e3690653955e19fbe5d2e38f2a343563b40ef95fd1b10fa556fb6", size = 11841548, upload-time = "2025-10-23T12:53:25.541Z" },
 ]
 
 [[package]]
@@ -176,16 +176,16 @@ wheels = [
 
 [[package]]
 name = "hypothesis"
-version = "6.142.1"
+version = "6.142.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
     { name = "sortedcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/de/13/a4f29624db4d88811d6c4b7708769180004b26f5a2ee6e8a2e8c605da5da/hypothesis-6.142.1.tar.gz", hash = "sha256:3179cb08756562c526aaf4a9871ebbff83d2d75c03896ed0bc9c1d14097a930c", size = 465849, upload-time = "2025-10-16T21:05:51.694Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/0b/76a062d1d6cd68342b460c2f5627e1ad1102a3dd781acd5c096c75aca0d6/hypothesis-6.142.4.tar.gz", hash = "sha256:b3e71a84708994aa910ea47f1483ad892a7c390839959d689b2a2b07ebfd160e", size = 466047, upload-time = "2025-10-25T16:19:03.838Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/16/2c8023ea706dd3ef155b1ffe531cd7672271cd9c70fbbbafba614b218679/hypothesis-6.142.1-py3-none-any.whl", hash = "sha256:95a7d38fcc58e697e3020665adcb951c630cdbc8065e4b4474949e486b06bd6d", size = 533271, upload-time = "2025-10-16T21:05:48.174Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/9f/8010f93e175ecd996f54df9019ee8c58025fc21ed47658b0a58dd25ebe8b/hypothesis-6.142.4-py3-none-any.whl", hash = "sha256:25eecc73fadecd8b491aed822204cfe4be9c98ff5c1e8e038d181136ffc54b5b", size = 533467, upload-time = "2025-10-25T16:19:00.443Z" },
 ]
 
 [[package]]
@@ -408,15 +408,15 @@ wheels = [
 
 [[package]]
 name = "pyright"
-version = "1.1.406"
+version = "1.1.407"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nodeenv" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f7/16/6b4fbdd1fef59a0292cbb99f790b44983e390321eccbc5921b4d161da5d1/pyright-1.1.406.tar.gz", hash = "sha256:c4872bc58c9643dac09e8a2e74d472c62036910b3bd37a32813989ef7576ea2c", size = 4113151, upload-time = "2025-10-02T01:04:45.488Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/1b/0aa08ee42948b61745ac5b5b5ccaec4669e8884b53d31c8ec20b2fcd6b6f/pyright-1.1.407.tar.gz", hash = "sha256:099674dba5c10489832d4a4b2d302636152a9a42d317986c38474c76fe562262", size = 4122872, upload-time = "2025-10-24T23:17:15.145Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f6/a2/e309afbb459f50507103793aaef85ca4348b66814c86bc73908bdeb66d12/pyright-1.1.406-py3-none-any.whl", hash = "sha256:1d81fb43c2407bf566e97e57abb01c811973fdb21b2df8df59f870f688bdca71", size = 5980982, upload-time = "2025-10-02T01:04:43.137Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/93/b69052907d032b00c40cb656d21438ec00b3a471733de137a3f65a49a0a0/pyright-1.1.407-py3-none-any.whl", hash = "sha256:6dd419f54fcc13f03b52285796d65e639786373f433e243f8b94cf93a7444d21", size = 5997008, upload-time = "2025-10-24T23:17:13.159Z" },
 ]
 
 [[package]]
@@ -518,15 +518,15 @@ wheels = [
 
 [[package]]
 name = "typer-slim"
-version = "0.19.2"
+version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/75/d6/489402eda270c00555213bdd53061b23a0ae2b5dccbfe428ebcc9562d883/typer_slim-0.19.2.tar.gz", hash = "sha256:6f601e28fb8249a7507f253e35fb22ccc701403ce99bea6a9923909ddbfcd133", size = 104788, upload-time = "2025-09-23T09:47:42.917Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/45/81b94a52caed434b94da65729c03ad0fb7665fab0f7db9ee54c94e541403/typer_slim-0.20.0.tar.gz", hash = "sha256:9fc6607b3c6c20f5c33ea9590cbeb17848667c51feee27d9e314a579ab07d1a3", size = 106561, upload-time = "2025-10-20T17:03:46.642Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/19/7aef771b3293e1b7c749eebb2948bb7ccd0e9b56aa222eb4d5e015087730/typer_slim-0.19.2-py3-none-any.whl", hash = "sha256:1c9cdbbcd5b8d30f4118d3cb7c52dc63438b751903fbd980a35df1dfe10c6c91", size = 46806, upload-time = "2025-09-23T09:47:41.385Z" },
+    { url = "https://files.pythonhosted.org/packages/5e/dd/5cbf31f402f1cc0ab087c94d4669cfa55bd1e818688b910631e131d74e75/typer_slim-0.20.0-py3-none-any.whl", hash = "sha256:f42a9b7571a12b97dddf364745d29f12221865acef7a2680065f9bb29c7dc89d", size = 47087, upload-time = "2025-10-20T17:03:44.546Z" },
 ]
 
 [[package]]
