@@ -1,9 +1,8 @@
-import sys
 import textwrap
 from pathlib import Path
 
 import pytest
-from runtime_introspect import CPythonFeatureSet
+from runtime_introspect import runtime_feature_set
 
 DATA_DIR = Path(__file__).parents[1] / "lib" / "inifix" / "tests" / "data"
 INIFILES_PATHS = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))
@@ -23,11 +22,8 @@ def inifile_root(request):
 
 
 def pytest_report_header(config, start_path) -> list[str]:
-    if sys.implementation.name == "cpython":
-        fs = CPythonFeatureSet()
-        return [
-            "CPython optional features state (snapshot):",
-            textwrap.indent("\n".join(fs.diagnostics()), "  "),
-        ]
-    else:
-        return []  # pragma: no cover
+    fs = runtime_feature_set()
+    return [
+        "Runtime optional features state (snapshot):",
+        textwrap.indent("\n".join(fs.diagnostics()), "  "),
+    ]
