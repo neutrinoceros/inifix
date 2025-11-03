@@ -176,16 +176,16 @@ wheels = [
 
 [[package]]
 name = "hypothesis"
-version = "6.142.4"
+version = "6.144.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "exceptiongroup", marker = "python_full_version < '3.11'" },
     { name = "sortedcontainers" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/47/0b/76a062d1d6cd68342b460c2f5627e1ad1102a3dd781acd5c096c75aca0d6/hypothesis-6.142.4.tar.gz", hash = "sha256:b3e71a84708994aa910ea47f1483ad892a7c390839959d689b2a2b07ebfd160e", size = 466047, upload-time = "2025-10-25T16:19:03.838Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d2/d5/622284cecf35fc1a702d415a0d6c988202a205a1ff2d9452855081d80411/hypothesis-6.144.0.tar.gz", hash = "sha256:38e81c34e5091ad6435efec85e82b956bb8c5bdfdaebd4930853dfc7a2783ae6", size = 466863, upload-time = "2025-11-02T22:10:16.318Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3e/9f/8010f93e175ecd996f54df9019ee8c58025fc21ed47658b0a58dd25ebe8b/hypothesis-6.142.4-py3-none-any.whl", hash = "sha256:25eecc73fadecd8b491aed822204cfe4be9c98ff5c1e8e038d181136ffc54b5b", size = 533467, upload-time = "2025-10-25T16:19:00.443Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/07/3fe99e5cd586dcb546f4eaac84a0a256c15a55cce392b42650c0261aa7e8/hypothesis-6.144.0-py3-none-any.whl", hash = "sha256:eea7ac8d8c906605781bd813715285088d5ab74eed1c4e7128b78043e6222213", size = 534244, upload-time = "2025-11-02T22:10:12.54Z" },
 ]
 
 [[package]]
@@ -451,11 +451,11 @@ wheels = [
 
 [[package]]
 name = "runtime-introspect"
-version = "0.1.0"
+version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2b/eb/82028553f6393bbae702098b4b12cd03b358859702bd0d306ad9edd10479/runtime_introspect-0.1.0.tar.gz", hash = "sha256:3ed4120be72272bd050e473fa8940bf55eeffbbc74f8bd68fa50545278f6e331", size = 22916, upload-time = "2025-08-17T16:21:39.088Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8b/fe/7474cd44547ff0bb551aa54edb718fe6fb00d3628f14b51c19b4d67674f5/runtime_introspect-0.2.0.tar.gz", hash = "sha256:56ae92dd7d85360270c3c8f03c341fe689139a92f5fd2fb962937ba016ecf283", size = 23557, upload-time = "2025-11-01T10:54:15.381Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c0/f2/95006bf215f840fdde18257113e54982d94a7491936ad10971fd2b465390/runtime_introspect-0.1.0-py3-none-any.whl", hash = "sha256:24924cfd896983535c2ba002c122ed6ceed2913ee66bdfb5560bab6e1b42cd86", size = 19692, upload-time = "2025-08-17T16:21:38.02Z" },
+    { url = "https://files.pythonhosted.org/packages/7c/40/4829f61368a8006327b281a2333ae3153e257280afdd658fef4ba0064da9/runtime_introspect-0.2.0-py3-none-any.whl", hash = "sha256:58b16c3d3a354bc91cab846f093e1732068a67f94b2a3c4144cc7d116f5ff4b1", size = 20214, upload-time = "2025-11-01T10:54:13.811Z" },
 ]
 
 [[package]]
