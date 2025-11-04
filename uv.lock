@@ -266,7 +266,7 @@ concurrency = [
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=8.4.0" },
     { name = "pytest-repeat", specifier = ">=0.9.3" },
-    { name = "runtime-introspect", specifier = ">=0.2.0" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 covcheck = [
@@ -275,14 +275,14 @@ covcheck = [
     { name = "coverage", extras = ["toml"], marker = "python_full_version == '3.10.*'" },
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=8.4.0" },
-    { name = "runtime-introspect", specifier = ">=0.2.0" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 test = [
     { name = "click", specifier = ">=8.2.0" },
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=8.4.0" },
-    { name = "runtime-introspect", specifier = ">=0.2.0" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 typecheck = [
@@ -451,11 +451,11 @@ wheels = [
 
 [[package]]
 name = "runtime-introspect"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8b/fe/7474cd44547ff0bb551aa54edb718fe6fb00d3628f14b51c19b4d67674f5/runtime_introspect-0.2.0.tar.gz", hash = "sha256:56ae92dd7d85360270c3c8f03c341fe689139a92f5fd2fb962937ba016ecf283", size = 23557, upload-time = "2025-11-01T10:54:15.381Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/92/b4/658b75ed32005cd687ea0d868cebf57b595f817d4f67494441c053da9002/runtime_introspect-0.3.0.tar.gz", hash = "sha256:86f8a222f9622a7f8476f1c8e8ea198f3ae25a1ee15aab6685cbdb99059561c5", size = 24759, upload-time = "2025-11-04T18:33:15.664Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7c/40/4829f61368a8006327b281a2333ae3153e257280afdd658fef4ba0064da9/runtime_introspect-0.2.0-py3-none-any.whl", hash = "sha256:58b16c3d3a354bc91cab846f093e1732068a67f94b2a3c4144cc7d116f5ff4b1", size = 20214, upload-time = "2025-11-01T10:54:13.811Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/f2/cac39d9077a0f4e11d12a7303c99a094b22b0ca5f8a426ac2a9f65aeaa9b/runtime_introspect-0.3.0-py3-none-any.whl", hash = "sha256:e38f53aab3a450499d09c9603689f2a2ca1827c1fc0fd6d136e4360353cbea63", size = 21004, upload-time = "2025-11-04T18:33:14.652Z" },
 ]
 
 [[package]]
