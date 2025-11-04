@@ -23,7 +23,8 @@ def inifile_root(request):
 
 def pytest_report_header(config, start_path) -> list[str]:
     fs = runtime_feature_set()
+    diagnostics = fs.diagnostics(features=["free-threading", "JIT"])
     return [
         "Runtime optional features state (snapshot):",
-        textwrap.indent("\n".join(fs.diagnostics()), "  "),
+        textwrap.indent("\n".join(diagnostics), "  "),
     ]
