@@ -208,7 +208,9 @@ jobs:
         cache-suffix: test
     - run: uv sync --frozen --no-editable --group test
     - name: Run pytest with PYTHONOPTIMIZE=2
-      run: uv run --no-sync pytest --color=yes
+      run: |
+        uv run --no-sync \
+          pytest --color=yes -Wdefault:'assertions not in test modules or plugins will be ignored'
       env:
         PYTHONOPTIMIZE: 2
 

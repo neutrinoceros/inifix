@@ -125,5 +125,4 @@ strict = true
 addopts = ["-ra"]
 filterwarnings = [
     "error",
-    "ignore:assertions not in test modules or plugins will be ignored:UserWarning",
 ]
