@@ -26,7 +26,7 @@ inifix = "inifix_cli:app"
 test = [
     "click>=8.2.0", # required for typer.testing.CliRunner with separate stderr and stdout
     "hypothesis>=6.110.0",
-    "pytest>=8.4.0",
+    "pytest>=9.0.0",
     "runtime-introspect>=0.3.0",
     "typing-extensions>=4.13.0 ; python_full_version < '3.14'",
 ]
@@ -43,14 +43,6 @@ typecheck = [
     "basedpyright>=1.26.0",
     "mypy>=1.11.2",
     "pyright>=1.1.390",
-]
-
-[tool.uv]
-constraint-dependencies = [
-    # avoid transitive dependencies on six and pyparsing via pytest -> packaging -> { six , pyparsing }
-    "packaging>=22.0", # TODO: remove this line when bumping pytest >= 8.5.0
-    # avoid building 1.0.0 (no wheels), via pytest
-    "iniconfig>=1.0.1", # TODO: remove this line when bumping pytest >= 8.5.0
 ]
 
 [tool.uv.workspace]
@@ -127,10 +119,10 @@ show_error_context = true
 module = "tests.*"
 ignore_errors = true
 
-[tool.pytest.ini_options]
-minversion = "6.0"
+[tool.pytest]
+minversion = "9.0"
+addopts = ["-ra"]
 filterwarnings = [
     "error",
     "ignore:assertions not in test modules or plugins will be ignored:UserWarning",
 ]
-addopts = "-ra"
