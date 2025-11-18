@@ -23,16 +23,20 @@ def datadir():
     return DATA_DIR
 
 
-@pytest.fixture(params=INIFILES.keys(), ids=INIFILES.values())
+@pytest.fixture(params=list(INIFILES.keys()), ids=list(INIFILES.values()))
 def inifile(request):
     return request.param
 
 
-@pytest.fixture(params=INIFILES_W_SECTIONS.keys(), ids=INIFILES_W_SECTIONS.values())
+@pytest.fixture(
+    params=list(INIFILES_W_SECTIONS.keys()), ids=list(INIFILES_W_SECTIONS.values())
+)
 def inifile_with_sections(request):
     return request.param
 
 
-@pytest.fixture(params=INIFILES_WO_SECTIONS.keys(), ids=INIFILES_WO_SECTIONS.values())
+@pytest.fixture(
+    params=list(INIFILES_WO_SECTIONS.keys()), ids=list(INIFILES_WO_SECTIONS.values())
+)
 def inifile_without_sections(request):
     return request.param

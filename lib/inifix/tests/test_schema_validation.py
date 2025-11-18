@@ -167,4 +167,7 @@ def test_dump_invalid_conf(invalid_conf, match, tmp_path):
 
 def test_unknown_sections_value():
     with pytest.raises(TypeError):
-        validate_inifile_schema({}, sections="unknown-value")
+        validate_inifile_schema(
+            {},
+            sections="unknown-value",  # type: ignore
+        )

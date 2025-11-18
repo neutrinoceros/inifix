@@ -162,7 +162,10 @@ def test_invalid_section_key():
         TypeError,
         match=re.escape("Expected str keys. Received invalid key: 1"),
     ):
-        _validate_section_item(1, True)
+        _validate_section_item(
+            1,  # type: ignore
+            True,
+        )
 
 
 @pytest.mark.parametrize(
@@ -290,7 +293,9 @@ def test_skip_validation(monkeypatch, tmp_path):
 
     # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
     monkeypatch.setattr(
-        inifix._io, "validate_inifile_schema", _mp_validate_inifile_schema
+        inifix._io,  # type: ignore
+        "validate_inifile_schema",
+        _mp_validate_inifile_schema,
     )
     ctx = pytest.raises(ValueError, match="gotcha")
 
@@ -363,7 +368,10 @@ def test_unknown_integer_casting():
         ValueError,
         match="Unknown integer_casting value 'unknown_strategy'.",
     ):
-        loads(input_data, integer_casting="unknown_strategy")
+        loads(
+            input_data,
+            integer_casting="unknown_strategy",  # type: ignore
+        )
 
 
 def test_fargo_compat(datadir):
