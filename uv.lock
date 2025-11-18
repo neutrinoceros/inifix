@@ -2,7 +2,8 @@ version = 1
 revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
-    "python_full_version < '3.11'",
+    "python_full_version >= '3.10.2' and python_full_version < '3.11'",
+    "python_full_version < '3.10.2'",
     "python_full_version >= '3.11'",
 ]
 
@@ -11,6 +12,7 @@ members = [
     "inifix",
     "inifix-cli",
 ]
+constraints = [{ name = "hypothesis", marker = "python_full_version < '3.10.2'", specifier = "<=6.144.1" }]
 
 [[package]]
 name = "attrs"
