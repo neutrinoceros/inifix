@@ -16,7 +16,7 @@ def datadir_root():
     return DATA_DIR
 
 
-@pytest.fixture(params=INIFILES.keys(), ids=INIFILES.values())
+@pytest.fixture(params=list(INIFILES.keys()), ids=list(INIFILES.values()))
 def inifile_root(request):
     return request.param
 
