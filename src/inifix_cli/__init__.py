@@ -193,10 +193,18 @@ def _format_single_file(
         return TaskResults(status, messages)
 
     if diff:
+        if sys.version_info >= (3, 15):
+            diff_kwargs = {"color": True}
+        else:
+            diff_kwargs = {}  # type: ignore[var-annotated]
+
         diff_ = "\n".join(
             line.removesuffix("\n")
             for line in unified_diff(
-                data.splitlines(), fmted_data.splitlines(), fromfile=file
+                data.splitlines(),
+                fmted_data.splitlines(),
+                fromfile=file,
+                **diff_kwargs,  # pyright: ignore[reportUnknownArgumentType]
             )
         )
         assert diff_

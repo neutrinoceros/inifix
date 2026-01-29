@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TST: add support for CPython 3.15 (alpha)
 - TST: ensure utf-8 encoding is explicitly used everywhere
 - TYP: add preliminary support for type-checking with `ty`
+- ENH: (pre-commit hook) in CPython 3.15 and newer, `inifix format --diff`'s
+  output will now use color by default (unless `NO_COLOR=1` is set)
 
 ## [6.1.1] - 2025-04-14
 
