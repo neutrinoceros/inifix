@@ -144,7 +144,7 @@ Files are assumed to be encoded as UTF-8.
 handling unknown data: all values can be safely treated as arrays, and iterated
 over, even in the presence of scalar strings. For illustration
 
-```python
+```pycon
 >>> import inifix
 >>> from pprint import pprint
 >>> pprint(inifix.load("example.ini"))
@@ -165,7 +165,7 @@ matching the behavior of `inifix` v4.5.0.
 
 The key difference is that the default strategy is roundtrip-stable on types,
 while the aggressive mode isn't:
-```python
+```pycon
 >>> import inifix
 >>> data = {'option_a': [0, 1., 2e3, 4.5]}
 >>> data
@@ -177,7 +177,7 @@ while the aggressive mode isn't:
 ```
 
 Aggressive casting may also lead to loss of precision beyond a certain range
-```python
+```pycon
 >>> import inifix
 >>> data = {'option_b': 9_007_199_254_740_993}
 >>> inifix.loads(inifix.dumps(data))
@@ -199,7 +199,7 @@ type checking.
 One typical use case is to combine `inifix.load` and `inifix.dump` to
 programmatically update an existing configuration file at runtime via a
 load/patch/dump routine.
-```python
+```pycon
 >>> import inifix
 >>> with open("pluto.ini", "rb") as fr:
 ...    conf = inifix.load(fr)
@@ -208,7 +208,7 @@ load/patch/dump routine.
 ...    inifix.dump(conf, fw)
 ```
 or, equivalently
-```python
+```pycon
 >>> import inifix
 >>> conf = inifix.load("pluto.ini")
 >>> conf["Time"]["CFL"] = 0.1
@@ -219,13 +219,12 @@ Files are always encoded as UTF-8.
 
 `inifix.dumps` is the same as `inifix.dump` except that it returns a string
 instead of writing to a file.
-```python
+```pycon
 >>> import inifix
 >>> data = {"option_a": 1, "option_b": True}
 >>> print(inifix.dumps(data))
 option_a 1
 option_b True
-
 ```
 
 By default, `inifix.dump` and `inifix.dumps` validate input data, see
