@@ -105,6 +105,13 @@ def format(
             help="Print the unified diff to stdout instead of editing files inplace",
         ),
     ] = False,
+    no_color: Annotated[
+        bool,
+        typer.Option(
+            "--no-color",
+            help="Disable colors in diff outputs (this has no effect if --diff is not passed or running on Python 3.14 or earlier)",
+        ),
+    ] = False,
     report_noop: Annotated[
         bool,
         typer.Option(
@@ -138,6 +145,7 @@ def format(
         partial(
             _format_single_file,
             diff=diff,
+            no_color=no_color,
             report_noop=report_noop,
             sections=sections,
             skip_validation=skip_validation,
@@ -150,6 +158,7 @@ def _format_single_file(
     file: str,
     *,
     diff: bool,
+    no_color: bool,
     report_noop: bool,
     sections: SectionsArg,
     skip_validation: bool,
@@ -193,7 +202,7 @@ def _format_single_file(
         return TaskResults(status, messages)
 
     if diff:
-        if sys.version_info >= (3, 15):
+        if sys.version_info >= (3, 15) and not no_color:
             diff_kwargs = {"color": True}
         else:
             diff_kwargs = {}  # type: ignore[var-annotated]

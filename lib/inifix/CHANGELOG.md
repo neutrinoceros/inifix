@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TYP: add preliminary support for type-checking with `ty`
 - ENH: (pre-commit hook) in CPython 3.15 and newer, `inifix format --diff`'s
   output will now use color by default (unless `NO_COLOR=1` is set)
+- ENH: (pre-commit hook) add a `--no-color` flag to `inifix format`
 - DOC: fix incorrect language spec for py-console code blocks
 
 ## [6.1.1] - 2025-04-14
