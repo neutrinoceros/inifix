@@ -25,7 +25,6 @@ inifix = "inifix_cli:app"
 
 [dependency-groups]
 test = [
-    "click>=8.2.0", # required for typer.testing.CliRunner with separate stderr and stdout
     "hypothesis>=6.110.0",
     "pytest>=9.0.0",
     "runtime-introspect>=0.3.0",
