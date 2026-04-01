@@ -1,24 +1,31 @@
+__all__ = ["app"]
+
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import unified_diff
 from functools import partial
-from typing import TYPE_CHECKING, Annotated, Literal, NewType, Callable, TypeAlias
-import typer
+from enum import Enum, auto
+from typing import TYPE_CHECKING, Literal, NewType, Callable, Any, IO, final, cast
+import click
 from textwrap import indent
 import inifix
 
 # TODO: replace this with except* when support for Python 3.10 is dropped
 from exceptiongroup import catch, BaseExceptionGroup
 
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
+
 if TYPE_CHECKING:
     from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
 
 
-__all__ = ["app"]
-
-app = typer.Typer()
+@click.group("inifix")
+def app() -> None: ...
 
 
 Message = NewType("Message", str)
@@ -45,6 +52,19 @@ def get_cpu_count() -> int:
     return base_cpu_count or 1
 
 
+@final
+class Exit(click.ClickException):
+    # silently exit with a non-zero exit code
+    exit_code = 1
+
+    @override
+    def __init__(self) -> None:
+        super().__init__("")
+
+    @override
+    def show(self, file: IO[Any] | None = None) -> None: ...  # pyright: ignore[reportExplicitAny]
+
+
 def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None:
     cpu_count = get_cpu_count()
     with ThreadPoolExecutor(max_workers=max(1, int(cpu_count / 2))) as executor:
@@ -56,14 +76,23 @@ def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None
             print(message)
 
     if any(res.status for res in results):
-        raise typer.Exit(code=1)
+        raise Exit()
 
 
-SectionsArg: TypeAlias = Literal["allow", "forbid", "require"]
+class SectionsArg(Enum):
+    allow = auto()
+    forbid = auto()
+    require = auto()
 
 
 @app.command()
-def validate(files: list[str], sections: SectionsArg = "allow") -> None:
+@click.argument("files", nargs=-1, type=click.Path())
+@click.option(
+    "--sections",
+    type=click.Choice(SectionsArg, case_sensitive=True),
+    default="allow",
+)
+def validate(files: list[str], sections: SectionsArg) -> None:
     """
     Validate files as inifix format-compliant.
     """
@@ -88,55 +117,48 @@ def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
         )
 
     with catch({ValueError: value_error_handler}):
-        _ = inifix.load(file, sections=sections)
+        # mypy struggles to infer sections.name
+        sections_name = cast("Literal['allow', 'forbid', 'require']", sections.name)  # pyright: ignore[reportUnnecessaryCast] # ty: ignore[redundant-cast]
+        _ = inifix.load(file, sections=sections_name)
         messages.append(Message(f"Validated {file}"))
 
     return TaskResults(status, messages)
 
 
 @app.command()
+@click.argument("files", nargs=-1, type=click.Path())
+@click.option(
+    "--sections",
+    type=click.Choice(SectionsArg, case_sensitive=True),
+    default="allow",
+)
+@click.option(
+    "--diff",
+    is_flag=True,
+    help="Print the unified diff to stdout instead of editing files inplace",
+)
+@click.option(
+    "--no-color",
+    is_flag=True,
+    help="Disable colors in diff outputs (this has no effect if --diff is not passed or running on Python 3.14 or earlier)",
+)
+@click.option(
+    "--report-noop",
+    is_flag=True,
+    help="Explicitly log noops for files that are already formatted",
+)
+@click.option(
+    "--skip-validation",
+    is_flag=True,
+    help="Skip validation step (formatting unvalidated data may lead to undefined behaviour)",
+)
 def format(
     files: list[str],
-    *,
-    diff: Annotated[
-        bool,
-        typer.Option(
-            "--diff",
-            help="Print the unified diff to stdout instead of editing files inplace",
-        ),
-    ] = False,
-    no_color: Annotated[
-        bool,
-        typer.Option(
-            "--no-color",
-            help="Disable colors in diff outputs (this has no effect if --diff is not passed or running on Python 3.14 or earlier)",
-        ),
-    ] = False,
-    report_noop: Annotated[
-        bool,
-        typer.Option(
-            "--report-noop",
-            help="Explicitly log noops for files that are already formatted",
-        ),
-    ] = False,
-    sections: Annotated[
-        SectionsArg,
-        typer.Option(
-            "--sections",
-            help=(
-                "whether to 'allow' (default), 'forbid' or 'require' sections "
-                "during validation ('allow' and has no effect). "
-                "This option is without effect when combined with --skip-validataion"
-            ),
-        ),
-    ] = "allow",
-    skip_validation: Annotated[
-        bool,
-        typer.Option(
-            "--skip-validation",
-            help="Skip validation step (formatting unvalidated data may lead to undefined behaviour)",
-        ),
-    ] = False,
+    sections: SectionsArg,
+    diff: bool,
+    no_color: bool,
+    report_noop: bool,
+    skip_validation: bool,
 ) -> None:
     """
     Format files.
@@ -144,10 +166,10 @@ def format(
     run_as_pool(
         partial(
             _format_single_file,
+            sections=sections,
             diff=diff,
             no_color=no_color,
             report_noop=report_noop,
-            sections=sections,
             skip_validation=skip_validation,
         ),
         files,
@@ -157,10 +179,10 @@ def format(
 def _format_single_file(
     file: str,
     *,
+    sections: SectionsArg,
     diff: bool,
     no_color: bool,
     report_noop: bool,
-    sections: SectionsArg,
     skip_validation: bool,
 ) -> TaskResults:
     status: Literal[0, 1] = 0
@@ -183,7 +205,9 @@ def _format_single_file(
             )
 
         with catch({ValueError: value_error_handler}):
-            validate_baseline = inifix.load(file, sections=sections)
+            # mypy struggles to infer sections.name
+            sections_name = cast("Literal['allow', 'forbid', 'require']", sections.name)  # pyright: ignore[reportUnnecessaryCast] # ty: ignore[redundant-cast]
+            validate_baseline = inifix.load(file, sections=sections_name)
         if status != 0:
             return TaskResults(status, messages)
 
