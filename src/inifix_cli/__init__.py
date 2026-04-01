@@ -12,16 +12,13 @@ import click
 from textwrap import indent
 import inifix
 
-# TODO: replace this with except* when support for Python 3.10 is dropped
-from exceptiongroup import catch, BaseExceptionGroup
-
 if sys.version_info >= (3, 12):
     from typing import override
 else:
     from typing_extensions import override
 
 if TYPE_CHECKING:
-    from inifix._typing import AnyConfig  # pyright: ignore[reportPrivateImportUsage]
+    from inifix._typing import AnyConfig
 
 
 @click.group("inifix")
@@ -45,7 +42,7 @@ def get_cpu_count() -> int:
         base_cpu_count = os.process_cpu_count()
     elif hasattr(os, "sched_getaffinity"):
         # this function isn't available on all platforms
-        base_cpu_count = len(os.sched_getaffinity(0))  # pyright: ignore[reportAttributeAccessIssue]
+        base_cpu_count = len(os.sched_getaffinity(0))
     else:  # pragma: no cover
         # this proxy is good enough in most situations
         base_cpu_count = os.cpu_count()
@@ -107,19 +104,17 @@ def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
         messages.append(Message(f"Error: could not find {file}"))
         return TaskResults(status, messages)
 
-    # TODO: rewrite this section with try/except*/else when support for Python 3.10 is dropped
-    def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
-        nonlocal status
+    # mypy struggles to infer sections.name
+    sections_name = cast("Literal['allow', 'forbid', 'require']", sections.name)  # pyright: ignore[reportUnnecessaryCast] # ty: ignore[redundant-cast]
+    try:
+        _ = inifix.load(file, sections=sections_name)
+    except* ValueError as excgroup:
         status = 1
-        exc_repr = "\n".join(str(e) for e in exc.exceptions)
+        exc_repr = "\n".join(str(e) for e in excgroup.exceptions)
         messages.append(
             Message(f"Failed to validate {file}:\n{indent(exc_repr, '  ')}")
         )
-
-    with catch({ValueError: value_error_handler}):
-        # mypy struggles to infer sections.name
-        sections_name = cast("Literal['allow', 'forbid', 'require']", sections.name)  # pyright: ignore[reportUnnecessaryCast] # ty: ignore[redundant-cast]
-        _ = inifix.load(file, sections=sections_name)
+    else:
         messages.append(Message(f"Validated {file}"))
 
     return TaskResults(status, messages)
@@ -195,19 +190,16 @@ def _format_single_file(
 
     validate_baseline: AnyConfig = {}
     if not skip_validation:
-        # TODO: rewrite this section with try/except* when support for Python 3.10 is dropped
-        def value_error_handler(exc: BaseExceptionGroup[Exception]) -> None:
-            nonlocal status
+        # mypy struggles to infer sections.name
+        sections_name = cast("Literal['allow', 'forbid', 'require']", sections.name)  # pyright: ignore[reportUnnecessaryCast] # ty: ignore[redundant-cast]
+        try:
+            validate_baseline = inifix.load(file, sections=sections_name)
+        except* ValueError as excgroup:
             status = 1
-            exc_repr = "\n".join(str(e) for e in exc.exceptions)
+            exc_repr = "\n".join(str(e) for e in excgroup.exceptions)
             messages.append(
                 Message(f"Failed to format {file}:\n{indent(exc_repr, '  ')}")
             )
-
-        with catch({ValueError: value_error_handler}):
-            # mypy struggles to infer sections.name
-            sections_name = cast("Literal['allow', 'forbid', 'require']", sections.name)  # pyright: ignore[reportUnnecessaryCast] # ty: ignore[redundant-cast]
-            validate_baseline = inifix.load(file, sections=sections_name)
         if status != 0:
             return TaskResults(status, messages)
 

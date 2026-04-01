@@ -1,15 +1,8 @@
 import re
-import sys
 from enum import Enum, auto
-from typing import Literal
+from typing import Literal, assert_never
 
 from inifix._typing import AnyConfig
-
-if sys.version_info >= (3, 11):
-    from typing import assert_never
-else:
-    from exceptiongroup import ExceptionGroup
-    from typing_extensions import assert_never
 
 _PARAM_NAME_REGEXP = re.compile(r"[-\.\w]+")
 SCALAR_TYPES = (int, float, bool, str)

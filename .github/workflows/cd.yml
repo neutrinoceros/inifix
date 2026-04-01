@@ -56,7 +56,7 @@ jobs:
         persist-credentials: false
     - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
       with:
-        python-version: '3.10'
+        python-version: '3.11'
         enable-cache: true
         prune-cache: false
         cache-suffix: test-sdist

@@ -33,8 +33,8 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.10.0
-        - '3.13'
+        - 3.11.0
+        - '3.14'
         pre-commit-version:
         - 3.8.0 # minimal requirement for pre-commit-uv
         - latest
@@ -54,9 +54,13 @@ jobs:
         path: downstream
         repository: ${{ matrix.downstream }}
         persist-credentials: false
-    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867   # v7.1.6
+    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      # 3.11.0 isn't available through setup-uv
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867   # v7.1.6
+      with:
+        enable-cache: false
     - name: Run pre-commit hooks
       # we use pre-commit-uv to ensure that the workspace configuration is read from
       # the root pyproject.toml, so that we run against the dev branch of inifix

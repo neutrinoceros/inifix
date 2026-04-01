@@ -9,10 +9,9 @@ description = "A command line interface for inifix."
 authors = [
     { name = "C.M.T. Robert" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "click>=8.3.1",
-    "exceptiongroup>=1.0.0", # TODO: remove when support for Python 3.10 is dropped
     "inifix==6.1.2",
     "typing-extensions>=4.4.0 ; python_full_version < '3.12'",
 ]
@@ -36,7 +35,6 @@ concurrency = [
 ]
 covcheck = [
     {include-group = "test"},
-    "coverage[toml] ; python_version == '3.10'",
     "coverage>=7.10.0",
 ]
 typecheck = [
@@ -50,12 +48,6 @@ members = ["lib/inifix"]
 
 [tool.uv.sources]
 inifix = { workspace = true }
-
-[tool.uv]
-constraint-dependencies = [
-    # https://github.com/HypothesisWorks/hypothesis/issues/4602
-    "hypothesis <= 6.144.1; python_full_version < '3.10.2'",
-]
 
 [tool.ruff.lint]
 exclude = ["*__init__.py"]
@@ -108,15 +100,8 @@ reportUnreachable = false
 reportUnnecessaryIsInstance = false
 reportUnnecessaryComparison = false
 
-# in some instances, pyright and basedpyright may conflict over a single line,
-# where e.g. pyright reports an error that I wish to ignore, but basedpyright
-# complains about an unused `# pyright: ignore[...]` comment
-# At the time of writing, it appears that this setting can be lifted once
-# Python 3.10 is unsupported
-reportUnnecessaryTypeIgnoreComment = false
-
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 strict = true
 show_error_codes = true
 show_error_context = true
