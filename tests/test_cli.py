@@ -5,14 +5,14 @@ from difflib import unified_diff
 from pathlib import Path
 from stat import S_IREAD
 
+import click.testing
 import pytest
-import typer.testing
 
 import inifix
 import inifix_cli
 from inifix_cli import app
 
-runner = typer.testing.CliRunner()
+runner = click.testing.CliRunner()
 N_FILES = 257
 
 
