@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ENH: (pre-commit hook) add a `--no-color` flag to `inifix format`
 - DEP: (pre-commit hook) drop dependency on `typer`, use `click` directly instead
 - DOC: fix incorrect language spec for py-console code blocks
+- DOC: add badge showing Python versions supported in the most recent release
 
 ## [6.1.1] - 2025-04-14
 
