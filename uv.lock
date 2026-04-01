@@ -257,7 +257,6 @@ dependencies = [
 
 [package.dev-dependencies]
 concurrency = [
-    { name = "click" },
     { name = "hypothesis", version = "6.144.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10.2'" },
     { name = "hypothesis", version = "6.148.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10.2'" },
     { name = "pytest" },
@@ -266,7 +265,6 @@ concurrency = [
     { name = "typing-extensions", marker = "python_full_version < '3.14'" },
 ]
 covcheck = [
-    { name = "click" },
     { name = "coverage" },
     { name = "coverage", extra = ["toml"], marker = "python_full_version < '3.11'" },
     { name = "hypothesis", version = "6.144.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10.2'" },
@@ -276,7 +274,6 @@ covcheck = [
     { name = "typing-extensions", marker = "python_full_version < '3.14'" },
 ]
 test = [
-    { name = "click" },
     { name = "hypothesis", version = "6.144.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10.2'" },
     { name = "hypothesis", version = "6.148.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.10.2'" },
     { name = "pytest" },
@@ -299,7 +296,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 concurrency = [
-    { name = "click", specifier = ">=8.2.0" },
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=9.0.0" },
     { name = "pytest-repeat", specifier = ">=0.9.3" },
@@ -307,7 +303,6 @@ concurrency = [
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 covcheck = [
-    { name = "click", specifier = ">=8.2.0" },
     { name = "coverage", specifier = ">=7.10.0" },
     { name = "coverage", extras = ["toml"], marker = "python_full_version == '3.10.*'" },
     { name = "hypothesis", specifier = ">=6.110.0" },
@@ -316,7 +311,6 @@ covcheck = [
     { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 test = [
-    { name = "click", specifier = ">=8.2.0" },
     { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "pytest", specifier = ">=9.0.0" },
     { name = "runtime-introspect", specifier = ">=0.3.0" },
