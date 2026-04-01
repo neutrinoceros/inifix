@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/inifix.svg?logo=pypi&logoColor=white&label=PyPI)](https://pypi.org/project/inifix/)
 [![Conda Version](https://img.shields.io/conda/vn/conda-forge/inifix.svg?logo=condaforge&logoColor=white)](https://anaconda.org/conda-forge/inifix)
-
+[![Supported Python Versions](https://img.shields.io/pypi/pyversions/inifix)](https://pypi.org/project/inifix/)
 
 `inifix` is a small Python library offering a `load/dump` interface similar to
 standard library modules `json` or `tomllib` (together with `tomli_w`) for ini
