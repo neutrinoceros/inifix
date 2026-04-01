@@ -13,7 +13,7 @@ requires-python = ">=3.10"
 dependencies = [
     "click>=8.3.1",
     "exceptiongroup>=1.0.0", # TODO: remove when support for Python 3.10 is dropped
-    "inifix==6.1.1",
+    "inifix==6.1.2",
     "typing-extensions>=4.4.0 ; python_full_version < '3.12'",
 ]
 

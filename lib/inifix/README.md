@@ -340,14 +340,14 @@ which can be configured by adding the following snippets to
 
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v6.1.1
+    rev: v6.1.2
     hooks:
       - id: inifix-validate
 ```
 or
 ```yaml
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v6.1.1
+    rev: v6.1.2
     hooks:
       - id: inifix-format
 ```
@@ -357,7 +357,7 @@ enable both hooks with no further configuration. Validation and formatting may
 nonetheless be decoupled as
 ```patch
   - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v6.1.1
+    rev: v6.1.2
     hooks:
     - id: inifix-validate
     - id: inifix-format
