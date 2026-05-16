@@ -371,3 +371,9 @@ It is possible to override this expression as, e.g.,
    - id: inifix-format
 +    files: (\.ini|\.par)$
 ```
+
+For convenience, in cases where the appropriate regular expression is hard to write,
+for instance if your project contains some files with a `.ini` extension that are not
+intended to be used with idefix, you may refine the selection via exclude patterns,
+using `--exclude` and/or `--extend-exclude`. By default, files named `pytest.ini` or
+`tox.ini` are excluded.

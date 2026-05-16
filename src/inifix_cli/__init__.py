@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Literal, NewType, Callable, Any, IO, final, ca
 import click
 from textwrap import indent
 import inifix
+import re
 
 if sys.version_info >= (3, 12):
     from typing import override
@@ -82,17 +83,48 @@ class SectionsArg(Enum):
     require = auto()
 
 
+BUILTIN_EXCLUDES = [
+    r"pytest\.ini$",
+    r"tox\.ini$",
+]
+
+
+def filter_files(files: list[str], /, *, exclude: list[str] | None = None) -> list[str]:
+    exclude = exclude or []
+    return sorted(filter(lambda f: not any(re.search(p, f) for p in exclude), files))
+
+
 @app.command()
 @click.argument("files", nargs=-1, type=click.Path())
+@click.option(
+    "--exclude",
+    multiple=True,
+    default=BUILTIN_EXCLUDES,
+    help=(
+        "Override the default list of file names to exclude (as regular expressions). Multi-allowed. "
+        f"Default: {BUILTIN_EXCLUDES}"
+    ),
+)
+@click.option(
+    "--extend-exclude",
+    multiple=True,
+    help="Extend the list of file names to exclude (as regular expressions). Multi-allowed.",
+)
 @click.option(
     "--sections",
     type=click.Choice(SectionsArg, case_sensitive=True),
     default="allow",
 )
-def validate(files: list[str], sections: SectionsArg) -> None:
+def validate(
+    files: list[str],
+    exclude: list[str],
+    extend_exclude: list[str],
+    sections: SectionsArg,
+) -> None:
     """
     Validate files as inifix format-compliant.
     """
+    files = filter_files(files, exclude=exclude + extend_exclude)
     run_as_pool(partial(_validate_single_file, sections=sections), files)
 
 
@@ -123,6 +155,20 @@ def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
 @app.command()
 @click.argument("files", nargs=-1, type=click.Path())
 @click.option(
+    "--exclude",
+    multiple=True,
+    default=BUILTIN_EXCLUDES,
+    help=(
+        "Override the default list of file names to exclude (as regular expressions). Multi-allowed. "
+        f"Default: {BUILTIN_EXCLUDES}"
+    ),
+)
+@click.option(
+    "--extend-exclude",
+    multiple=True,
+    help="Extend the list of file names to exclude (as regular expressions). Multi-allowed.",
+)
+@click.option(
     "--sections",
     type=click.Choice(SectionsArg, case_sensitive=True),
     default="allow",
@@ -149,6 +195,8 @@ def _validate_single_file(file: str, sections: SectionsArg) -> TaskResults:
 )
 def format(
     files: list[str],
+    exclude: list[str],
+    extend_exclude: list[str],
     sections: SectionsArg,
     diff: bool,
     no_color: bool,
@@ -158,6 +206,7 @@ def format(
     """
     Format files.
     """
+    files = filter_files(files, exclude=exclude + extend_exclude)
     run_as_pool(
         partial(
             _format_single_file,
