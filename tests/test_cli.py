@@ -4,13 +4,14 @@ import textwrap
 from difflib import unified_diff
 from pathlib import Path
 from stat import S_IREAD
+from uuid import uuid4
 
 import click.testing
 import pytest
 
 import inifix
 import inifix_cli
-from inifix_cli import app
+from inifix_cli import BUILTIN_EXCLUDES, app
 
 runner = click.testing.CliRunner()
 N_FILES = 257
@@ -61,6 +62,34 @@ def assert_text_equal(actual: str, desired: str):
 
 def assert_text_includes(actual, desired):
     assert wrap(desired) in wrap(desired)
+
+
+def test_filter_files_default(tmp_path):
+    target = tmp_path / str(uuid4())
+    target.touch()
+    assert inifix_cli.filter_files([str(target)]) == [str(target)]
+
+
+@pytest.mark.parametrize(
+    "names, exclude, expected_names",
+    [
+        pytest.param(["a.ini"], ["a.*"], [], id="exclude-only-files"),
+        pytest.param(["a.ini", "b.cfg"], [r"\.ini$"], ["b.cfg"], id="exclude-partial"),
+        pytest.param(
+            ["pytest.ini", "tox.ini"], BUILTIN_EXCLUDES, [], id="default-excludes"
+        ),
+    ],
+)
+def test_filter_files_exclude(names, exclude, expected_names, tmp_path):
+    targets = [tmp_path / name for name in names]
+    for t in targets:
+        t.touch()
+
+    expected = [str(t) for t in targets if t.name in expected_names]
+    assert len(expected) == len(expected_names)
+    assert (
+        inifix_cli.filter_files([str(t) for t in targets], exclude=exclude) == expected
+    )
 
 
 class TestValidate:
@@ -220,6 +249,16 @@ class TestFormat:
             result.stdout,
             f"Error: could not write to {target} (permission denied)\n",
         )
+
+    @pytest.mark.parametrize("name", ["pytest.ini", "tox.ini"])
+    @pytest.mark.parametrize("cmd", ["validate", "format"])
+    def test_exclude_defaults(self, name, cmd, tmp_path):
+        target = tmp_path / name
+        target.write_text("Invalid data, should be ignored", encoding="utf-8")
+        result = runner.invoke(app, [cmd, str(target)])
+        assert result.exit_code == 0
+        assert result.stderr == ""
+        assert result.stdout == ""
 
     def test_diff_stdout(self, inifile_root, tmp_path):
         target = tmp_path / inifile_root.name

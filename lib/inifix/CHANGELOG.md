@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - DEP: support for Python 3.10 has been dropped
+- ENH: (pre-commit hooks) add ability to exclude files by regular expressions after
+  pre-commit's own selection via the new `--exclude` and `--extend-exclude` options.
+  The default exclude list is `['pytest\\.ini$', 'tox\\.ini$']`
 
 ## [6.1.2] - 2026-04-01
 
@@ -14,10 +17,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TST: add support for CPython 3.15 (alpha)
 - TST: ensure utf-8 encoding is explicitly used everywhere
 - TYP: add preliminary support for type-checking with `ty`
-- ENH: (pre-commit hook) in CPython 3.15 and newer, `inifix format --diff`'s
+- ENH: (pre-commit hooks) in CPython 3.15 and newer, `inifix format --diff`'s
   output will now use color by default (unless `NO_COLOR=1` is set)
-- ENH: (pre-commit hook) add a `--no-color` flag to `inifix format`
-- DEP: (pre-commit hook) drop dependency on `typer`, use `click` directly instead
+- ENH: (pre-commit hooks) add a `--no-color` flag to `inifix format`
+- DEP: (pre-commit hooks) drop dependency on `typer`, use `click` directly instead
 - DOC: fix incorrect language spec for py-console code blocks
 - DOC: add badge showing Python versions supported in the most recent release
 
