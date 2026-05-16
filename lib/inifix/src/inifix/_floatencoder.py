@@ -1,11 +1,6 @@
 import re
-import sys
 from enum import Enum, auto
-
-if sys.version_info >= (3, 11):
-    from typing import assert_never
-else:
-    from typing_extensions import assert_never
+from typing import assert_never
 
 __all__ = ["FloatEncoder"]
 

@@ -1,5 +1,5 @@
-import sys
 from io import BytesIO
+from typing import assert_type
 
 from inifix import load, loads
 from inifix._typing import (
@@ -10,11 +10,6 @@ from inifix._typing import (
     Config_SectionsRequired_ScalarsAllowed,
     Config_SectionsRequired_ScalarsForbidden,
 )
-
-if sys.version_info >= (3, 11):
-    from typing import assert_type
-else:
-    from typing_extensions import assert_type
 
 bytes_wo_section = b"pi 3.14"
 bytes_w_section = b"[Title]\n" + bytes_wo_section

@@ -19,7 +19,6 @@ classifiers = [
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -29,11 +28,8 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10"
-dependencies = [
-    "exceptiongroup>=1.0.0 ; python_full_version < '3.11'",
-    "typing-extensions>=4.2.0 ; python_full_version < '3.11'",
-]
+requires-python = ">=3.11"
+dependencies = []
 
 [project.readme]
 file = "README.md"

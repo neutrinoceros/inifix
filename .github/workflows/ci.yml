@@ -29,14 +29,17 @@ jobs:
         python-jit: [null]
         include:
         - os: ubuntu-22.04
-          python-version: 3.10.0
+          python-version: 3.11.0
           label: oldestdeps
         - os: macos-latest
-          python-version: 3.10.0
+          python-version: 3.11.0
         - os: macos-latest
           python-version: '3.14'
         - os: windows-latest
-          python-version: 3.10.0
+          # 3.11.0 and 3.11.1 have a platform-specific self-triggered warning
+          # breaking pytest at collection time, and that I don't want to just
+          # ignore unconditionally
+          python-version: 3.11.2
         - os: windows-latest
           python-version: '3.14'
         - os: ubuntu-latest
@@ -54,9 +57,13 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
-    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      # 3.11.0 isn't available through setup-uv
       with:
         python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
+    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+      with:
         enable-cache: true
         prune-cache: false
         cache-suffix: covcheck
@@ -98,7 +105,7 @@ jobs:
         os:
         - ubuntu-latest
         python-version:
-        - 3.10.0
+        - 3.11.0
         - '3.14'
         - 3.14t
 
@@ -107,9 +114,12 @@ jobs:
     - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         persist-credentials: false
-    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+    - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+      # 3.11.0 isn't available through setup-uv
       with:
         python-version: ${{ matrix.python-version }}
+    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+      with:
         enable-cache: true
         prune-cache: false
         cache-suffix: concurrency
@@ -159,8 +169,8 @@ jobs:
     strategy:
       matrix:
         python-version:
-        - '3.10'
-        - '3.13'
+        - '3.11'
+        - '3.14'
         typechecker:
         - mypy
         - pyright
