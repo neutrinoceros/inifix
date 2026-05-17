@@ -164,12 +164,68 @@ wheels = [
 [[package]]
 name = "inifix"
 version = "6.1.2"
-source = { editable = "lib/inifix" }
+source = { editable = "." }
+
+[package.dev-dependencies]
+concurrency = [
+    { name = "hypothesis" },
+    { name = "pytest" },
+    { name = "pytest-repeat" },
+    { name = "runtime-introspect" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'" },
+]
+covcheck = [
+    { name = "coverage" },
+    { name = "hypothesis" },
+    { name = "pytest" },
+    { name = "runtime-introspect" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'" },
+]
+test = [
+    { name = "hypothesis" },
+    { name = "pytest" },
+    { name = "runtime-introspect" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'" },
+]
+typecheck = [
+    { name = "basedpyright" },
+    { name = "mypy" },
+    { name = "pyright" },
+]
+
+[package.metadata]
+
+[package.metadata.requires-dev]
+concurrency = [
+    { name = "hypothesis", specifier = ">=6.110.0" },
+    { name = "pytest", specifier = ">=9.0.0" },
+    { name = "pytest-repeat", specifier = ">=0.9.3" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
+]
+covcheck = [
+    { name = "coverage", specifier = ">=7.10.0" },
+    { name = "hypothesis", specifier = ">=6.110.0" },
+    { name = "pytest", specifier = ">=9.0.0" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
+]
+test = [
+    { name = "hypothesis", specifier = ">=6.110.0" },
+    { name = "pytest", specifier = ">=9.0.0" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
+]
+typecheck = [
+    { name = "basedpyright", specifier = ">=1.26.0" },
+    { name = "mypy", specifier = ">=1.11.2" },
+    { name = "pyright", specifier = ">=1.1.390" },
+]
 
 [[package]]
 name = "inifix-cli"
 version = "0.1.0"
-source = { editable = "." }
+source = { editable = "cli/inifix-cli" }
 dependencies = [
     { name = "click" },
     { name = "inifix" },
@@ -206,7 +262,7 @@ typecheck = [
 [package.metadata]
 requires-dist = [
     { name = "click", specifier = "==8.3.3" },
-    { name = "inifix", editable = "lib/inifix" },
+    { name = "inifix", editable = "." },
     { name = "typing-extensions", marker = "python_full_version < '3.12'", specifier = ">=4.4.0" },
 ]
 

@@ -25,10 +25,10 @@ REV_REGEXP = re.compile(r"rev:\s+v.*")
 STABLE_VER_REGEXP = re.compile(r"^\d+\.*\d+\.\d+$")
 STABLE_TAG_REGEXP = re.compile(r"^v\d+\.*\d+\.\d+$")
 ROOT = Path(__file__).parents[1]
-LIB_DIR = ROOT / "lib" / "inifix"
-README = LIB_DIR / "README.md"
-CLI_PYPROJECT_TOML = ROOT / "pyproject.toml"
-LIB_PYPROJECT_TOML = LIB_DIR / "pyproject.toml"
+CLI_DIR = ROOT / "cli" / "inifix-cli"
+README = ROOT / "README.md"
+LIB_PYPROJECT_TOML = ROOT / "pyproject.toml"
+CLI_PYPROJECT_TOML = CLI_DIR / "pyproject.toml"
 
 
 @dataclass(frozen=True)

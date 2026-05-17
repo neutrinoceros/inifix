@@ -1,0 +1,44 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "inifix-cli"
+version = "0.1.0"
+description = "A command line interface for inifix."
+authors = [
+    { name = "C.M.T. Robert" },
+]
+requires-python = ">=3.11"
+dependencies = [
+    "click==8.3.3",
+    "inifix==6.1.2",
+    "typing-extensions>=4.4.0 ; python_full_version < '3.12'",
+]
+
+[project.license]
+text = "GPL-3.0"
+
+[project.scripts]
+inifix = "inifix_cli:app"
+
+[dependency-groups]
+test = [
+    "hypothesis>=6.110.0",
+    "pytest>=9.0.0",
+    "runtime-introspect>=0.3.0",
+    "typing-extensions>=4.13.0 ; python_full_version < '3.14'",
+]
+concurrency = [
+    {include-group = "test"},
+    "pytest-repeat>=0.9.3",
+]
+covcheck = [
+    {include-group = "test"},
+    "coverage>=7.10.0",
+]
+typecheck = [
+    "basedpyright>=1.26.0",
+    "mypy>=1.11.2",
+    "pyright>=1.1.390",
+]

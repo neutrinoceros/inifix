@@ -71,11 +71,13 @@ jobs:
     - if: ${{ matrix.label == 'oldestdeps' }}
       run: echo "UV_RESOLUTION=lowest" >> "$GITHUB_ENV"
 
+
     - name: Run tests (without coverage)
       if: ${{ ! startswith( matrix.os, 'ubuntu' ) }}
       shell: bash  # for windows portability
       run: |
-        uv run --frozen --no-editable --group test \
+        uv sync --frozen --all-packages --group test --no-editable
+        uv run --no-sync \
           pytest --color=yes
       env:
         PYTHON_JIT: ${{ matrix.python-jit }}
@@ -83,8 +85,10 @@ jobs:
     - name: Run tests (with coverage)
       if: ${{ startswith( matrix.os, 'ubuntu' ) }}
       run: |
-        uv run --group covcheck \
-          coverage run --parallel-mode -m pytest --color=yes
+        uv sync --frozen --all-packages --group covcheck
+        uv run --no-sync \
+          coverage run --parallel-mode -m \
+          pytest --color=yes
       env:
         PYTHON_JIT: ${{ matrix.python-jit }}
 
@@ -123,7 +127,7 @@ jobs:
         enable-cache: true
         prune-cache: false
         cache-suffix: concurrency
-    - run: uv sync --frozen --no-editable --group concurrency
+    - run: uv sync --frozen --all-packages --no-editable --group concurrency
     - run: |
         uv run --no-sync \
           pytest --color=yes --count 100 -k concurrency
@@ -191,11 +195,11 @@ jobs:
         prune-cache: false
         cache-suffix: typecheck
 
-    - run: uv sync --frozen --group typecheck
-    - name: Typecheck source code (inifix-cli)
-      run: ${{ matrix.typechecker }} src
+    - run: uv sync --frozen --all-packages --group typecheck
     - name: Typecheck source code (inifix)
-      run: ${{ matrix.typechecker }} lib/inifix/src typechecks
+      run: ${{ matrix.typechecker }} src typechecks
+    - name: Typecheck source code (inifix-cli)
+      run: ${{ matrix.typechecker }} cli/inifix-cli/src
     - name: Verify Types (pyright only)
       if: ${{ startsWith( matrix.typechecker , 'pyright' ) }}
       run: ${{ matrix.typechecker }} --verifytypes inifix
@@ -216,7 +220,7 @@ jobs:
         enable-cache: true
         prune-cache: false
         cache-suffix: test
-    - run: uv sync --frozen --no-editable --group test
+    - run: uv sync --frozen --all-packages --no-editable --group test
     - name: Run pytest with PYTHONOPTIMIZE=2
       run: |
         uv run --no-sync \

@@ -38,13 +38,13 @@ jobs:
         echo "PYTHON_GIL=0" >> $GITHUB_ENV
 
     - run: uv lock --upgrade --prerelease=allow
-    - run: uv sync --frozen --no-editable --group test
+    - run: uv sync --frozen --all-packages --no-editable --group test
     - name: Run tests
       run: |
         uv run --no-sync \
           pytest --color=yes
 
-    - run: uv sync --frozen --no-editable --group concurrency
+    - run: uv sync --frozen --all-packages --no-editable --group concurrency
     - name: Run concurrency tests
       run: |
         uv run --no-sync \

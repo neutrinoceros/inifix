@@ -7,11 +7,11 @@ from stat import S_IREAD
 from uuid import uuid4
 
 import click.testing
+import inifix_cli
 import pytest
+from inifix_cli import BUILTIN_EXCLUDES, app
 
 import inifix
-import inifix_cli
-from inifix_cli import BUILTIN_EXCLUDES, app
 
 runner = click.testing.CliRunner()
 N_FILES = 257
