@@ -331,49 +331,7 @@ Note that we've used the catch-all `**kwargs` construct to capture optional
 parameters as well as any other parameters present (possibly none) that we do not
 care about.
 
-### pre-commit hooks
+### `inifix-pre-commit`
 
-The [source repository](https://github.com/neutrinoceros/inifix.git)
-provides two `pre-commit` hooks, `inifix-validate` and `inifix-format`,
-which can be configured by adding the following snippets to
-`.pre-commit-config.yaml`
-
-```yaml
-  - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v6.1.2
-    hooks:
-      - id: inifix-validate
-```
-or
-```yaml
-  - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v6.1.2
-    hooks:
-      - id: inifix-format
-```
-
-Note that `inifix-format` also validates data by default, so it is redundant to
-enable both hooks with no further configuration. Validation and formatting may
-nonetheless be decoupled as
-```patch
-  - repo: https://github.com/neutrinoceros/inifix.git
-    rev: v6.1.2
-    hooks:
-    - id: inifix-validate
-    - id: inifix-format
-+     args: [--skip-validation]
-```
-
-By default, both hooks target files matching the regular expression `(\.ini)$`.
-It is possible to override this expression as, e.g.,
-```patch
-   hooks:
-   - id: inifix-format
-+    files: (\.ini|\.par)$
-```
-
-For convenience, in cases where the appropriate regular expression is hard to write,
-for instance if your project contains some files with a `.ini` extension that are not
-intended to be used with idefix, you may refine the selection via exclude patterns,
-using `--exclude` and/or `--extend-exclude`. By default, files named `pytest.ini` or
-`tox.ini` are excluded.
+pre-commit hooks, previously offered directly from inifix's origin repository, are now served from
+https://github.com/la-niche/inifix-pre-commit
