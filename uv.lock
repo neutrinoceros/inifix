@@ -224,7 +224,7 @@ typecheck = [
 
 [[package]]
 name = "inifix-cli"
-version = "0.1.0"
+version = "1.0.0"
 source = { editable = "cli/inifix-cli" }
 dependencies = [
     { name = "click" },
