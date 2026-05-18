@@ -163,7 +163,7 @@ wheels = [
 
 [[package]]
 name = "inifix"
-version = "6.1.2"
+version = "7.0.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
