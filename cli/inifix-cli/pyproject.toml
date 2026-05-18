@@ -21,6 +21,10 @@ text = "GPL-3.0"
 [project.scripts]
 inifix = "inifix_cli:app"
 
+[project.urls]
+Homepage = "https://github.com/neutrinoceros/inifix"
+"Changelog (historical)" = "https://github.com/neutrinoceros/inifix/blob/main/CHANGELOG.md"
+
 [dependency-groups]
 test = [
     "hypothesis>=6.110.0",

@@ -7,9 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - DEP: support for Python 3.10 has been dropped
-- ENH: (pre-commit hooks) add ability to exclude files by regular expressions after
-  pre-commit's own selection via the new `--exclude` and `--extend-exclude` options.
-  The default exclude list is `['pytest\\.ini$', 'tox\\.ini$']`
+- RFC: the CLI backing up pre-commit hooks is now published to PyPI as a separate
+  package. Future developments in that package will not appear in this changelog.
+- Breaking: pre-commit hooks are now discontinued in the historical repository.
+  Users needs to migrate to `https://github.com/la-niche/inifix-pre-commit`
 
 ## [6.1.2] - 2026-04-01
 
