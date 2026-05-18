@@ -37,6 +37,19 @@ Known differences are:
   so `inifix` will not break any working inifile by a load/patch/dump routine.
   See [Parsing Options](#parsing-options) for more.
 
+## Development status
+**last updated: 2026-05-18 (~v7.0.0)**
+
+This library has:
+- 0 runtime dependencies
+- 100% test coverage (including branch coverage)
+- 100% type coverage (supported type checkers include `mypy`, `(based)pyright`, `pyrefly`, `ty`)
+
+it is:
+- feature-complete
+- 100% stable (no API change is anticipated)
+- still actively supported for security, compatibility, typing, logic bugs and performance issues
+
 ## File format specifications details
 <details><summary>Unroll !</summary>
 - parameter names are alphanumeric strings
