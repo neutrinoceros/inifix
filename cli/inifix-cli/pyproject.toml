@@ -42,3 +42,6 @@ typecheck = [
     "mypy>=1.11.2",
     "pyright>=1.1.390",
 ]
+
+[tool.flit.sdist]
+include = ["tests/"]
