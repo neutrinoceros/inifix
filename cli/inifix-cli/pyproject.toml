@@ -23,6 +23,7 @@ inifix = "inifix_cli:app"
 
 [project.urls]
 Homepage = "https://github.com/neutrinoceros/inifix"
+Changelog = "https://github.com/neutrinoceros/inifix/blob/main/cli/inifix-cli/CHANGELOG.md"
 "Changelog (historical)" = "https://github.com/neutrinoceros/inifix/blob/main/CHANGELOG.md"
 
 [dependency-groups]
