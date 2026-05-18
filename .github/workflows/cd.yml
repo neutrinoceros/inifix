@@ -94,6 +94,17 @@ jobs:
         uv run --no-project pytest --color=yes -ra
 
   test-sdist-cli:
+    strategy:
+      matrix:
+        python-version:
+        - '3.11'
+        - '3.12'
+        - '3.13'
+        - '3.14'
+        - '3.15'
+        resolution:
+        - highest
+        - lowest
     name: Test source distribution (cli)
     needs: [build-cli]
     runs-on: ubuntu-latest
@@ -104,7 +115,7 @@ jobs:
         persist-credentials: false
     - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
       with:
-        python-version: '3.11'
+        python-version: ${{ matrix.python-version }}
         enable-cache: false
     - run: uv sync --only-group test
 
@@ -117,7 +128,7 @@ jobs:
       run: |
         tar xzf dist/*.tar.gz
         cd inifix_cli-*
-        uv pip install .
+        uv pip install . --resolution ${{ matrix.resolution }}
         uv run --no-project pytest --color=yes -ra
 
   pypi-publish-lib:
