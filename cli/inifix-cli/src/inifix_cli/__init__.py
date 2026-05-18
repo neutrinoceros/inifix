@@ -13,10 +13,6 @@ from textwrap import indent
 import inifix
 import re
 
-if sys.version_info >= (3, 12):
-    from typing import override
-else:
-    from typing_extensions import override
 
 if TYPE_CHECKING:
     from inifix._typing import AnyConfig
@@ -55,12 +51,13 @@ class Exit(click.ClickException):
     # silently exit with a non-zero exit code
     exit_code = 1
 
-    @override
+    # TODO: from typing import override (requires Python 3.12)
+    # @override
     def __init__(self) -> None:
         super().__init__("")
 
-    @override
-    def show(self, file: IO[Any] | None = None) -> None: ...  # pyright: ignore[reportExplicitAny]
+    # @override
+    def show(self, file: IO[Any] | None = None) -> None: ...  # pyright: ignore[reportExplicitAny, reportImplicitOverride]
 
 
 def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None:
