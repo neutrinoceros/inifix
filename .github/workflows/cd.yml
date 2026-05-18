@@ -1,12 +1,15 @@
 name: CD
 on:
   push:
-    tags: v*
+    tags:
+    # use vMM.mm.pp to publish inifix (library) and cli-vMM.mm.pp to publish inifix-cli
+    - v*
+    - cli-v*
   pull_request:
     paths:
     - .github/workflows/cd.yml
-    - README.md
     - ./**/pyproject.toml
+    - ./**/README.md
     - ./**/conftest.py
 
 permissions: {}
@@ -25,8 +28,8 @@ jobs:
         enable-cache: false
     - run: uv run scripts/pre_publish_checks.py
 
-  build:
-    name: Build artifacts
+  build-lib:
+    name: Build artifacts (lib)
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Source
@@ -35,19 +38,37 @@ jobs:
         persist-credentials: false
     - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
       with:
-        enable-cache: true
-        cache-suffix: build
+        enable-cache: false
     - name: Build distributions
       shell: bash -l {0}
       run: uv build --package inifix
     - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
       with:
-        name: artifacts
+        name: artifacts-lib
         path: dist
 
-  test-sdist:
-    name: Test source distribution
-    needs: [build]
+  build-cli:
+    name: Build artifacts (cli)
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
+    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+      with:
+        enable-cache: false
+    - name: Build distributions
+      shell: bash -l {0}
+      run: uv build --package inifix-cli
+    - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      with:
+        name: artifacts-cli
+        path: dist
+
+  test-sdist-lib:
+    name: Test source distribution (lib)
+    needs: [build-lib]
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Source
@@ -57,14 +78,14 @@ jobs:
     - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
       with:
         python-version: '3.11'
-        enable-cache: true
-        prune-cache: false
-        cache-suffix: test-sdist
+        enable-cache: false
     - run: uv sync --only-group test
+
     - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
-        name: artifacts
+        name: artifacts-lib
         path: dist
+
     - name: test source distribution in isolation
       run: |
         tar xzf dist/*.tar.gz
@@ -72,10 +93,38 @@ jobs:
         uv pip install .
         uv run --no-project pytest --color=yes -ra
 
-  pypi-publish:
-    name: Publish
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: [pre-publish-checks, test-sdist]
+  test-sdist-cli:
+    name: Test source distribution (cli)
+    needs: [build-cli]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        persist-credentials: false
+    - uses: astral-sh/setup-uv@681c641aba71e4a1c380be3ab5e12ad51f415867 # v7.1.6
+      with:
+        python-version: '3.11'
+        enable-cache: false
+    - run: uv sync --only-group test
+
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: artifacts-cli
+        path: dist
+
+    - name: test source distribution in isolation
+      run: |
+        tar xzf dist/*.tar.gz
+        cd inifix_cli-*
+        uv pip install .
+        uv run --no-project pytest --color=yes -ra
+
+  pypi-publish-lib:
+    name: Publish (lib)
+    needs:
+    - pre-publish-checks
+    - test-sdist-lib
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -85,8 +134,30 @@ jobs:
     steps:
     - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
       with:
-        name: artifacts
+        name: artifacts-lib
         path: dist
 
-    - name: Publish package distributions to PyPI
+    - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
+
+  pypi-publish-cli:
+    name: Publish (cli)
+    needs:
+    - pre-publish-checks
+    - test-sdist-cli
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi-cli
+      url: https://pypi.org/p/inifix-cli
+    permissions:
+      id-token: write
+    steps:
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: artifacts-cli
+        path: dist
+
+    - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/cli-v')
+      name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0

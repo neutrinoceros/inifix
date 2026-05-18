@@ -11,6 +11,9 @@ INIFILES = dict(zip(INIFILES_PATHS, INIFILES_IDS, strict=True))
 
 @pytest.fixture()
 def datadir_root():
+    if not DATA_DIR.exists():  # pragma: no cover
+        pytest.skip("test data isn't available")
+
     return DATA_DIR
 
 
