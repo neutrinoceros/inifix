@@ -12,6 +12,7 @@ import tomllib
 from dataclasses import dataclass
 from difflib import unified_diff
 from pathlib import Path
+from typing import Literal
 
 from loguru import logger
 from packaging.requirements import Requirement
@@ -21,9 +22,9 @@ from packaging.version import Version
 logger.remove()
 logger.add(sys.stderr, colorize=True, format="<level>{level:<5} {message}</level>")
 
-REV_REGEXP = re.compile(r"rev:\s+v.*")
-STABLE_VER_REGEXP = re.compile(r"^\d+\.*\d+\.\d+$")
-STABLE_TAG_REGEXP = re.compile(r"^v\d+\.*\d+\.\d+$")
+REV_REGEXP = r"rev:\s+v.*"
+STABLE_VER_REGEXP = r"^\d+\.*\d+\.\d+$"
+STABLE_TAG_REGEXP = r"v\d+\.*\d+\.\d+$"
 ROOT = Path(__file__).parents[1]
 CLI_DIR = ROOT / "cli" / "inifix-cli"
 README = ROOT / "README.md"
@@ -34,34 +35,49 @@ CLI_PYPROJECT_TOML = CLI_DIR / "pyproject.toml"
 @dataclass(frozen=True)
 class Metadata:
     current_lib_static_version: Version
+    current_cli_static_version: Version
     current_cli_requirement: Requirement
     lib_requires_python: Specifier
     cli_requires_python: Specifier
-    latest_git_tag: str
+    latest_lib_git_tag: str
+    latest_cli_git_tag: str
 
     @property
-    def latest_git_version(self) -> Version:
-        if not STABLE_TAG_REGEXP.match(self.latest_git_tag):
-            logger.error(f"Failed to parse git tag (got {self.latest_git_tag})")
+    def latest_lib_git_version(self) -> Version:
+        if not re.fullmatch(STABLE_TAG_REGEXP, self.latest_lib_git_tag):
+            logger.error(f"Failed to parse git tag (got {self.latest_lib_git_tag})")
             raise SystemExit(1)
-        return Version(self.latest_git_tag)
+        return Version(self.latest_lib_git_tag)
+
+    @property
+    def latest_cli_git_version(self) -> Version:
+        if not re.fullmatch(f"^cli-{STABLE_TAG_REGEXP}", self.latest_cli_git_tag):
+            logger.error(f"Failed to parse git tag (got {self.latest_cli_git_tag})")
+            raise SystemExit(1)
+        return Version(self.latest_cli_git_tag.removeprefix("cli-"))
 
 
-def check_static_version(md: Metadata) -> int:
-    if not STABLE_VER_REGEXP.match(str(md.current_lib_static_version)):
+def check_static_versions(md: Metadata) -> int:
+    if not re.match(STABLE_VER_REGEXP, str(md.current_lib_static_version)):
         logger.error(
             f"Current static version {md.current_lib_static_version} doesn't "
             "conform to expected pattern for a stable sem-ver version.",
         )
         return 1
-    elif md.current_lib_static_version < md.latest_git_version:
+    elif md.current_lib_static_version < md.latest_lib_git_version:
         logger.error(
-            f"Current static version {md.current_lib_static_version} appears "
-            f"to be older than latest git tag {md.latest_git_tag}",
+            f"Current static lib version {md.current_lib_static_version} appears "
+            f"to be older than latest git tag {md.latest_lib_git_tag}",
+        )
+        return 1
+    elif md.current_cli_static_version < md.latest_cli_git_version:
+        logger.error(
+            f"Current static cli version {md.current_lib_static_version} appears "
+            f"to be older than latest git tag {md.latest_lib_git_tag}",
         )
         return 1
     else:
-        logger.info("Check static version: ok", file=sys.stderr)
+        logger.info("Check static versions: ok", file=sys.stderr)
         return 0
 
 
@@ -89,13 +105,33 @@ def check_requires_python(md: Metadata) -> int:
         return 0
 
 
+def get_latest_git_tag(type: Literal["lib", "cli"]) -> str:
+    match type:
+        case "lib":
+            pattern = "v*"
+        case "cli":
+            pattern = "cli-v*"
+        case _:
+            raise ValueError
+
+    cp = subprocess.run(
+        ["git", "describe", "--tags", "--abbrev=0", f"--match={pattern}"],
+        capture_output=True,
+    )
+    if cp.returncode != 0:
+        raise RuntimeError(f"subprocess failed with: {cp.stderr.decode()}")
+    tag = cp.stdout.decode().strip()
+    logger.debug(f"found latest {type} {tag = !r}")
+    return tag
+
+
 def check_readme(md: Metadata) -> int:
     text = README.read_text(encoding="utf-8")
     if md.current_lib_static_version.is_devrelease:
-        expected_tag = md.latest_git_tag
+        expected_tag = md.latest_lib_git_tag
     else:
         expected_tag = f"v{md.current_lib_static_version}"
-    if text != (expected := REV_REGEXP.sub(f"rev: {expected_tag}", text)):
+    if text != (expected := re.sub(REV_REGEXP, f"rev: {expected_tag}", text)):
         diff = "\n".join(
             line.removesuffix("\n")
             for line in unified_diff(
@@ -118,6 +154,7 @@ def main() -> int:
         current_lib_requires_python = Specifier(lib_table["project"]["requires-python"])
     with open(CLI_PYPROJECT_TOML, "rb") as fh:
         cli_table = tomllib.load(fh)
+        current_cli_static_version = Version(lib_table["project"]["version"])
         current_cli_requires_python = Specifier(cli_table["project"]["requires-python"])
         cli_requirements = [
             Requirement(_) for _ in cli_table["project"]["dependencies"]
@@ -129,23 +166,18 @@ def main() -> int:
     else:
         raise RuntimeError(f"failed to parse {CLI_PYPROJECT_TOML}")
 
-    cp = subprocess.run(
-        ["git", "describe", "--tags", "--abbrev=0"],
-        check=True,
-        capture_output=True,
-    )
-    cp_stdout = cp.stdout.decode().strip()
-
     md = Metadata(
         current_lib_static_version,
+        current_cli_static_version,
         current_cli_requirement,
         current_lib_requires_python,
         current_cli_requires_python,
-        cp_stdout,
+        get_latest_git_tag("lib"),
+        get_latest_git_tag("cli"),
     )
 
     return (
-        check_static_version(md)
+        check_static_versions(md)
         + check_inifix_cli_requirement(md)
         + check_requires_python(md)
         + check_readme(md)
