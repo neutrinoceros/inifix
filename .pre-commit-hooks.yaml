@@ -1,12 +1,12 @@
 - id: inifix-format
   name: Format .ini files
-  language: python
-  entry: inifix format
+  language: unsupported
+  always_run: true
+  entry: bash -c 'echo "This hook was moved to https://github.com/la-niche/inifix-pre-commit"; exit 1'
   description: Format configuration files with inifix format
-  files: (\.ini)$
 - id: inifix-validate
   name: Validate .ini files (no formatting)
-  language: python
-  entry: inifix validate
+  language: unsupported
+  entry: bash -c 'echo "This hook was moved to https://github.com/la-niche/inifix-pre-commit"; exit 1'
+  always_run: true
   description: Validate configuration files with inifix validate
-  files: (\.ini)$
