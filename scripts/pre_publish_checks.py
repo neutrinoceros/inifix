@@ -66,14 +66,14 @@ def check_static_version(md: Metadata) -> int:
 
 
 def check_inifix_cli_requirement(md: Metadata) -> int:
-    if md.current_cli_requirement.specifier != f"=={md.current_lib_static_version}":
+    if not md.current_cli_requirement.specifier.contains(md.current_lib_static_version):
         logger.error(
             f"inifix-cli is requiring inifix as {md.current_cli_requirement} "
-            f"which is out of sync with inifix's version (expected =={md.current_lib_static_version})",
+            f"which excludes inifix's current version ({md.current_lib_static_version})",
         )
         return 1
     else:
-        logger.info("Check pinned version: ok", file=sys.stderr)
+        logger.info("Check version ranges: ok", file=sys.stderr)
         return 0
 
 
