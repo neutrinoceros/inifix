@@ -189,8 +189,12 @@ test = [
 ]
 typecheck = [
     { name = "basedpyright" },
+    { name = "hypothesis" },
     { name = "mypy" },
     { name = "pyright" },
+    { name = "pytest" },
+    { name = "runtime-introspect" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'" },
 ]
 
 [package.metadata]
@@ -218,8 +222,12 @@ test = [
 ]
 typecheck = [
     { name = "basedpyright", specifier = ">=1.26.0" },
+    { name = "hypothesis", specifier = ">=6.110.0" },
     { name = "mypy", specifier = ">=1.11.2" },
     { name = "pyright", specifier = ">=1.1.390" },
+    { name = "pytest", specifier = ">=9.0.0" },
+    { name = "runtime-introspect", specifier = ">=0.3.0" },
+    { name = "typing-extensions", marker = "python_full_version < '3.14'", specifier = ">=4.13.0" },
 ]
 
 [[package]]
