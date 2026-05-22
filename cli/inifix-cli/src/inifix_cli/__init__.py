@@ -1,4 +1,13 @@
 __all__ = ["app"]
+__lazy_modules__ = [
+    "os",
+    "concurrent",
+    "difflib",
+    "functools",
+    "textwrap",
+    "inifix",
+    "re",
+]
 
 import os
 import sys
