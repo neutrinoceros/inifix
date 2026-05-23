@@ -69,3 +69,6 @@ typecheck = [
 
 [tool.flit.sdist]
 include = ["tests/"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["inifix"]
