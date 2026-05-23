@@ -98,7 +98,7 @@ def test_idempotent_io(inifile):
         ),
     ],
 )
-def test_string_casting(data, expected):
+def test_string_casting(data: str, expected):
     mapping = loads(data)
     assert mapping == expected
 
@@ -123,7 +123,7 @@ def test_string_casting(data, expected):
         ),
     ],
 )
-def test_idempotent_string_parsing(data, expected):
+def test_idempotent_string_parsing(data: str, expected):
     initial_mapping = loads(data)
     assert initial_mapping == expected
     round_str = dumps(initial_mapping)
@@ -132,7 +132,7 @@ def test_idempotent_string_parsing(data, expected):
 
 
 @pytest.mark.parametrize("s", ALL_BOOL_STRINGS)
-def test_bool_strings(s):
+def test_bool_strings(s: str):
     if s in TRUTHY_STRINGS:
         b = True
     elif s in FALSY_STRINGS:
@@ -154,7 +154,7 @@ def test_invalid_section_value():
             f"Received invalid values {val}"
         ),
     ):
-        _validate_section_item("key", val)
+        _validate_section_item("key", val)  # type: ignore
 
 
 def test_invalid_section_key():
@@ -293,7 +293,7 @@ def test_skip_validation(monkeypatch, tmp_path):
 
     # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
     monkeypatch.setattr(
-        inifix._io,  # type: ignore
+        inifix._io,
         "validate_inifile_schema",
         _mp_validate_inifile_schema,
     )
@@ -353,7 +353,7 @@ def test_roundtrip_stability_generated(kwargs, L):
 
 def test_aggressive_integer_casting():
     input_data = "opt 0 1. 2.0 3e0 4.5"
-    data = loads(input_data, integer_casting="aggressive")
+    data = loads(input_data, integer_casting="aggressive", parse_scalars_as_lists=True)
 
     expected = {"opt": [0, 1, 2, 3, 4.5]}
     assert list(data.keys()) == ["opt"]
