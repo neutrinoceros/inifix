@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "inifix-cli"
-version = "1.0.0"
+version = "1.1.0"
 description = "A command line interface for inifix."
 authors = [
     { name = "C.M.T. Robert" },
