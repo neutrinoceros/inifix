@@ -11,6 +11,7 @@ import sys
 import tomllib
 from dataclasses import dataclass
 from difflib import unified_diff
+from itertools import permutations
 from pathlib import Path
 
 from loguru import logger
@@ -136,34 +137,20 @@ def check_python_requires(*packages: PackageMeta) -> int:
         return 0
 
 
-def check_inifix_cli_requirement(*packages: PackageMeta) -> int:
-    for p in packages:
-        if p.name == "inifix":
-            lib = p
-            break
-    else:
-        raise AssertionError
-    for p in packages:
-        if p.name == "inifix-cli":
-            cli = p
-            break
-    else:
-        raise AssertionError
-    for req in cli.requirements:
-        if req.name == "inifix":
-            break
-    else:
-        raise AssertionError
-
-    if not req.specifier.contains(lib.version):
-        logger.error(
-            f"inifix-cli is requiring inifix as {req} "
-            f"which excludes inifix's current version ({lib.version})",
-        )
-        return 1
-    else:
-        logger.info("Check version ranges: ok", file=sys.stderr)
-        return 0
+def check_workspace_consistency(*packages: PackageMeta) -> int:
+    retv = 0
+    for p1, p2 in permutations(packages, 2):
+        for req in p1.requirements:
+            if p2.name != req.name or req.specifier.contains(p2.version):
+                continue
+            logger.error(
+                f"{p1.name} requires {p2.name} {req} "
+                f"which excludes {p2.name}'s current version ({p2.version})",
+            )
+            retv = 1
+    if retv == 0:
+        logger.info("Check workspace consistency: ok")
+    return retv
 
 
 def main() -> int:
@@ -175,7 +162,7 @@ def main() -> int:
     for p in packages:
         retv += p.check_static_versions() + p.check_readme()
     retv += check_python_requires(*packages)
-    retv += check_inifix_cli_requirement(*packages)
+    retv += check_workspace_consistency(*packages)
     return retv
 
 
