@@ -97,7 +97,7 @@ class PackageMeta:
             )
             return 1
         else:
-            logger.info(f"[{self.name}] Check static versions: ok", file=sys.stderr)
+            logger.info(f"[{self.name}] Check static versions: ok")
             return 0
 
     def check_readme(self) -> int:
