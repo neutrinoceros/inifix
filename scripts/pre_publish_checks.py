@@ -25,8 +25,6 @@ logger.add(sys.stderr, colorize=True, format="<level>{level:<5} {message}</level
 REV_REGEXP = r"rev:\s+v.*"
 STABLE_VER_REGEXP = r"^\d+\.*\d+\.\d+"
 STABLE_TAG_REGEXP = r"v\d+\.*\d+\.\d+"
-ROOT = Path(__file__).parents[1]
-CLI_DIR = ROOT / "cli" / "inifix-cli"
 
 
 @dataclass(slots=True, frozen=True, kw_only=True)
@@ -154,10 +152,11 @@ def check_workspace_consistency(*packages: PackageMeta) -> int:
 
 
 def main() -> int:
-    packages = [
-        PackageMeta.from_root(ROOT),
-        PackageMeta.from_root(CLI_DIR),
-    ]
+    packages: list[PackageMeta] = []
+    for dirpath, _dirnames, filenames in Path().walk():
+        if "pyproject.toml" in filenames:
+            packages.append(PackageMeta.from_root(dirpath))
+
     retv = 0
     for p in packages:
         retv += p.check_static_versions() + p.check_readme()
