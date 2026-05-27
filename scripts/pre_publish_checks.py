@@ -47,7 +47,7 @@ class PackageMeta:
             case "inifix-cli":
                 prefix = "cli-"
             case _:
-                raise AssertionError
+                raise AssertionError(f"{name=}")
 
         return PackageMeta(
             root=dir_,
@@ -154,7 +154,10 @@ def check_workspace_consistency(*packages: PackageMeta) -> int:
 def main() -> int:
     packages: list[PackageMeta] = []
     for dirpath, _dirnames, filenames in Path().walk():
+        if Path(".venv") in dirpath.parents:
+            continue
         if "pyproject.toml" in filenames:
+            logger.debug(f"found {dirpath / 'pyproject.toml'}")
             packages.append(PackageMeta.from_root(dirpath))
 
     retv = 0
