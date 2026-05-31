@@ -151,10 +151,14 @@ def check_workspace_consistency(*packages: PackageMeta) -> int:
     return retv
 
 
+ROOT = Path(__file__).parents[1]
+VENV_DIR = ROOT / ".venv"
+
+
 def main() -> int:
     packages: list[PackageMeta] = []
-    for dirpath, _dirnames, filenames in Path().walk():
-        if Path(".venv") in dirpath.parents:
+    for dirpath, _dirnames, filenames in ROOT.walk():
+        if dirpath.is_relative_to(VENV_DIR):
             continue
         if "pyproject.toml" in filenames:
             logger.debug(f"found {dirpath / 'pyproject.toml'}")
