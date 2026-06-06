@@ -2,8 +2,7 @@ import pytest
 from pytest import RaisesExc, RaisesGroup
 
 from inifix import dump, dumps, load, loads, validate_inifile_schema
-
-from .utils import assert_dict_equal
+from inifix._testing import assert_mapping_equal
 
 
 def test_validate_known_files(inifile):
@@ -32,7 +31,7 @@ def test_validate_known_files_without_sections(inifile_without_sections, tmp_pat
 
     # check that sections=... doesn't have any effect when combined with skip_validation=True
     conf2 = load(inifile_without_sections, sections="require", skip_validation=True)
-    assert_dict_equal(conf2, conf1)
+    assert_mapping_equal(conf2, conf1)
 
     save_file = tmp_path / "test"
     with pytest.raises(ValueError, match=expected_msg):
@@ -48,12 +47,12 @@ def test_validate_known_files_without_sections(inifile_without_sections, tmp_pat
     s = dumps(conf1, sections="require", skip_validation=True)
 
     conf3 = loads(s)
-    assert_dict_equal(conf3, conf1)
+    assert_mapping_equal(conf3, conf1)
     with pytest.raises(ValueError, match=expected_msg):
         loads(s, sections="require")
 
     conf4 = loads(s, sections="require", skip_validation=True)
-    assert_dict_equal(conf4, conf3)
+    assert_mapping_equal(conf4, conf3)
 
 
 def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
@@ -71,7 +70,7 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
 
     # check that sections=... doesn't have any effect when combined with skip_validation=True
     conf2 = load(inifile_with_sections, sections="forbid", skip_validation=True)
-    assert_dict_equal(conf2, conf1)
+    assert_mapping_equal(conf2, conf1)
 
     save_file = tmp_path / "test"
     with pytest.raises(ValueError, match=expected_msg):
@@ -87,12 +86,12 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
     s = dumps(conf1, sections="forbid", skip_validation=True)
 
     conf3 = loads(s)
-    assert_dict_equal(conf3, conf1)
+    assert_mapping_equal(conf3, conf1)
     with pytest.raises(ValueError, match=expected_msg):
         loads(s, sections="forbid")
 
     conf4 = loads(s, sections="forbid", skip_validation=True)
-    assert_dict_equal(conf4, conf3)
+    assert_mapping_equal(conf4, conf3)
 
 
 @pytest.mark.parametrize(
