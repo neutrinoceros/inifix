@@ -1,25 +1,26 @@
+from collections.abc import Mapping, Sequence
 from typing import TypeAlias
 
 # not quite typing.AnyStr : this is not a constrained type variable
 StrLike: TypeAlias = str | bytes
 Scalar: TypeAlias = int | float | bool | str
 
-Section_ScalarsAllowed: TypeAlias = dict[str, list[Scalar] | Scalar]
-Section_ScalarsForbidden: TypeAlias = dict[str, list[Scalar]]
+Section_ScalarsAllowed: TypeAlias = Mapping[str, Sequence[Scalar] | Scalar]
+Section_ScalarsForbidden: TypeAlias = Mapping[str, Sequence[Scalar]]
 
-AnySection = Section_ScalarsAllowed | Section_ScalarsForbidden
+AnyReadableSection = Section_ScalarsAllowed | Section_ScalarsForbidden
 
-Config_SectionsRequired_ScalarsForbidden: TypeAlias = dict[
+Config_SectionsRequired_ScalarsForbidden: TypeAlias = Mapping[
     str, Section_ScalarsForbidden
 ]
-Config_SectionsRequired_ScalarsAllowed: TypeAlias = dict[str, Section_ScalarsAllowed]
+Config_SectionsRequired_ScalarsAllowed: TypeAlias = Mapping[str, Section_ScalarsAllowed]
 Config_SectionsForbidden_ScalarsForbidden: TypeAlias = Section_ScalarsForbidden
 Config_SectionsForbidden_ScalarsAllowed: TypeAlias = Section_ScalarsAllowed
 Config_SectionsAllowed_ScalarsAllowed: TypeAlias = (
-    dict[str, Section_ScalarsAllowed] | Section_ScalarsAllowed
+    Mapping[str, Section_ScalarsAllowed] | Section_ScalarsAllowed
 )
 Config_SectionsAllowed_ScalarsForbidden: TypeAlias = (
-    dict[str, Section_ScalarsForbidden] | Section_ScalarsForbidden
+    Mapping[str, Section_ScalarsForbidden] | Section_ScalarsForbidden
 )
 
 AnyConfig: TypeAlias = (
@@ -29,4 +30,34 @@ AnyConfig: TypeAlias = (
     | Config_SectionsForbidden_ScalarsForbidden
     | Config_SectionsRequired_ScalarsAllowed
     | Config_SectionsRequired_ScalarsForbidden
+)
+
+# mutable variants
+MutSection_ScalarsAllowed: TypeAlias = dict[str, list[Scalar] | Scalar]
+MutSection_ScalarsForbidden: TypeAlias = dict[str, list[Scalar]]
+
+AnyMutSection = MutSection_ScalarsAllowed | MutSection_ScalarsForbidden
+
+MutConfig_SectionsRequired_ScalarsForbidden: TypeAlias = dict[
+    str, MutSection_ScalarsForbidden
+]
+MutConfig_SectionsRequired_ScalarsAllowed: TypeAlias = dict[
+    str, MutSection_ScalarsAllowed
+]
+MutConfig_SectionsForbidden_ScalarsForbidden: TypeAlias = MutSection_ScalarsForbidden
+MutConfig_SectionsForbidden_ScalarsAllowed: TypeAlias = MutSection_ScalarsAllowed
+MutConfig_SectionsAllowed_ScalarsAllowed: TypeAlias = (
+    dict[str, MutSection_ScalarsAllowed] | MutSection_ScalarsAllowed
+)
+MutConfig_SectionsAllowed_ScalarsForbidden: TypeAlias = (
+    dict[str, MutSection_ScalarsForbidden] | MutSection_ScalarsForbidden
+)
+
+AnyMutConfig: TypeAlias = (
+    MutConfig_SectionsAllowed_ScalarsAllowed
+    | MutConfig_SectionsAllowed_ScalarsForbidden
+    | MutConfig_SectionsForbidden_ScalarsAllowed
+    | MutConfig_SectionsForbidden_ScalarsForbidden
+    | MutConfig_SectionsRequired_ScalarsAllowed
+    | MutConfig_SectionsRequired_ScalarsForbidden
 )

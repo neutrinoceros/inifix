@@ -1,6 +1,6 @@
 import os
 import re
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from functools import partial
 from io import BufferedIOBase, IOBase
 from itertools import pairwise
@@ -9,13 +9,15 @@ from typing import Literal, Protocol, overload
 from inifix._floatencoder import FloatEncoder
 from inifix._typing import (
     AnyConfig,
-    Config_SectionsAllowed_ScalarsForbidden,
-    Config_SectionsForbidden_ScalarsAllowed,
-    Config_SectionsForbidden_ScalarsForbidden,
-    Config_SectionsRequired_ScalarsAllowed,
-    Config_SectionsRequired_ScalarsForbidden,
+    AnyMutConfig,
+    MutConfig_SectionsAllowed_ScalarsForbidden,
+    MutConfig_SectionsForbidden_ScalarsAllowed,
+    MutConfig_SectionsForbidden_ScalarsForbidden,
+    MutConfig_SectionsRequired_ScalarsAllowed,
+    MutConfig_SectionsRequired_ScalarsForbidden,
+    MutSection_ScalarsAllowed,
+    MutSection_ScalarsForbidden,
     Scalar,
-    Section_ScalarsAllowed,
     Section_ScalarsForbidden,
     StrLike,
 )
@@ -31,12 +33,12 @@ __all__ = [
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 
-def _always_iterable(obj: Scalar | list[Scalar], /) -> Iterator[Scalar]:
+def _always_iterable(obj: Scalar | Sequence[Scalar], /) -> Iterator[Scalar]:
     # adapted from more_iterools 10.1.0 (MIT)
     if isinstance(obj, str):
         return iter((obj,))
 
-    if isinstance(obj, list):
+    if isinstance(obj, Sequence):
         return iter(obj)
     else:
         return iter((obj,))
@@ -166,13 +168,13 @@ def _tokenize_line(
     return key, [caster(v) for v in raw_values]
 
 
-def _unwrap_section(section: Section_ScalarsForbidden) -> Section_ScalarsAllowed:
-    section_unwrapped: Section_ScalarsAllowed = {}
+def _unwrap_section(section: Section_ScalarsForbidden) -> MutSection_ScalarsAllowed:
+    section_unwrapped: MutSection_ScalarsAllowed = {}
     for key, values in section.items():
         if len(values) == 1:
             section_unwrapped[key] = values[0]
         else:
-            section_unwrapped[key] = values
+            section_unwrapped[key] = list(values)
 
     return section_unwrapped
 
@@ -182,8 +184,8 @@ def _section_from_lines(
     *,
     caster: CasterFunction,
     filename: str | None,
-) -> Section_ScalarsForbidden:
-    section: Section_ScalarsForbidden = {}
+) -> MutSection_ScalarsForbidden:
+    section: MutSection_ScalarsForbidden = {}
     for line_number, line in enumerate(lines, start=1):
         if not line:
             continue
@@ -206,8 +208,11 @@ def _config_from_string_with_sections(
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
     filename: str | None = None,
-) -> Config_SectionsRequired_ScalarsAllowed | Config_SectionsRequired_ScalarsForbidden:
-    config: Config_SectionsRequired_ScalarsForbidden = {}
+) -> (
+    MutConfig_SectionsRequired_ScalarsAllowed
+    | MutConfig_SectionsRequired_ScalarsForbidden
+):
+    config: MutConfig_SectionsRequired_ScalarsForbidden = {}
     section_limits = [*section_linenos, len(lines)]
     for line_begin, line_end in pairwise(section_limits):
         section_lines = lines[line_begin:line_end]
@@ -221,7 +226,7 @@ def _config_from_string_with_sections(
     if parse_scalars_as_lists:
         return config
 
-    config_unwrapped: Config_SectionsRequired_ScalarsAllowed = {}
+    config_unwrapped: MutConfig_SectionsRequired_ScalarsAllowed = {}
     for section_name, section_dict in config.items():
         config_unwrapped[section_name] = _unwrap_section(section_dict)
 
@@ -234,7 +239,7 @@ def _from_string(
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
     filename: str | None = None,
-) -> AnyConfig:
+) -> AnyMutConfig:
     lines = _normalize_data(data)
     section_linenos: list[int] = []
     for i, line in enumerate(lines):
@@ -270,7 +275,7 @@ def _from_file_descriptor(
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
-) -> AnyConfig:
+) -> AnyMutConfig:
     filename = str(getattr(file, "name", repr(file)))
     data = file.read()
     lines = _normalize_data(data)
@@ -289,7 +294,7 @@ def _from_path(
     *,
     parse_scalars_as_lists: bool,
     caster: CasterFunction,
-) -> AnyConfig:
+) -> AnyMutConfig:
     file = os.fspath(file)
     with open(file, "rb") as fh:
         return _from_file_descriptor(
@@ -323,7 +328,7 @@ def _write(content: str, buffer: IOBase) -> None:
         buffer.write(content)
 
 
-def _write_line(key: str, values: Scalar | list[Scalar], buffer: IOBase) -> None:
+def _write_line(key: str, values: Scalar | Sequence[Scalar], buffer: IOBase) -> None:
     val_repr = [_encode(v) for v in _always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
@@ -331,7 +336,7 @@ def _write_line(key: str, values: Scalar | list[Scalar], buffer: IOBase) -> None
 def _write_to_buffer(data: AnyConfig, buffer: IOBase) -> None:
     last = len(data) - 1
     for i, (key, val) in enumerate(data.items()):
-        if not isinstance(val, dict):
+        if not isinstance(val, Mapping):
             _write_line(key, val, buffer)
             continue
         _write(f"[{key}]\n", buffer)
@@ -378,7 +383,7 @@ def load(
     parse_scalars_as_lists: Literal[True],
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsForbidden_ScalarsForbidden: ...
+) -> MutConfig_SectionsForbidden_ScalarsForbidden: ...
 @overload
 def load(
     source: str | os.PathLike[str] | IOBase,
@@ -388,7 +393,7 @@ def load(
     parse_scalars_as_lists: Literal[True],
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsRequired_ScalarsForbidden: ...
+) -> MutConfig_SectionsRequired_ScalarsForbidden: ...
 @overload
 def load(
     source: str | os.PathLike[str] | IOBase,
@@ -398,7 +403,7 @@ def load(
     parse_scalars_as_lists: Literal[False] = False,
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsForbidden_ScalarsAllowed: ...
+) -> MutConfig_SectionsForbidden_ScalarsAllowed: ...
 @overload
 def load(
     source: str | os.PathLike[str] | IOBase,
@@ -408,7 +413,7 @@ def load(
     parse_scalars_as_lists: Literal[False] = False,
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsRequired_ScalarsAllowed: ...
+) -> MutConfig_SectionsRequired_ScalarsAllowed: ...
 @overload
 def load(
     source: str | os.PathLike[str] | IOBase,
@@ -418,7 +423,7 @@ def load(
     sections: Literal["allow"] = "allow",
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsAllowed_ScalarsForbidden: ...
+) -> MutConfig_SectionsAllowed_ScalarsForbidden: ...
 @overload
 def load(
     source: str | os.PathLike[str] | IOBase,
@@ -428,7 +433,7 @@ def load(
     sections: Literal["allow"] = "allow",
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> AnyConfig: ...
+) -> AnyMutConfig: ...
 
 
 def load(
@@ -441,7 +446,7 @@ def load(
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
     skip_validation: bool = False,
-) -> AnyConfig:
+) -> AnyMutConfig:
     """
     Parse data from a file.
 
@@ -522,7 +527,7 @@ def loads(
     parse_scalars_as_lists: Literal[True],
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsForbidden_ScalarsForbidden: ...
+) -> MutConfig_SectionsForbidden_ScalarsForbidden: ...
 @overload
 def loads(
     source: str,
@@ -532,7 +537,7 @@ def loads(
     parse_scalars_as_lists: Literal[True],
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsRequired_ScalarsForbidden: ...
+) -> MutConfig_SectionsRequired_ScalarsForbidden: ...
 @overload
 def loads(
     source: str,
@@ -542,7 +547,7 @@ def loads(
     parse_scalars_as_lists: Literal[False] = False,
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsForbidden_ScalarsAllowed: ...
+) -> MutConfig_SectionsForbidden_ScalarsAllowed: ...
 @overload
 def loads(
     source: str,
@@ -552,7 +557,7 @@ def loads(
     parse_scalars_as_lists: Literal[False] = False,
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsRequired_ScalarsAllowed: ...
+) -> MutConfig_SectionsRequired_ScalarsAllowed: ...
 @overload
 def loads(
     source: str,
@@ -562,7 +567,7 @@ def loads(
     sections: Literal["allow"] = "allow",
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> Config_SectionsAllowed_ScalarsForbidden: ...
+) -> MutConfig_SectionsAllowed_ScalarsForbidden: ...
 @overload
 def loads(
     source: str,
@@ -572,7 +577,7 @@ def loads(
     sections: Literal["allow"] = "allow",
     integer_casting: Literal["stable", "aggressive"] = "stable",
     skip_validation: bool = False,
-) -> AnyConfig: ...
+) -> AnyMutConfig: ...
 
 
 def loads(
@@ -585,7 +590,7 @@ def loads(
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
     skip_validation: bool = False,
-) -> AnyConfig:
+) -> AnyMutConfig:
     """
     Parse data from a string.
 
