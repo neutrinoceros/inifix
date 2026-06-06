@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 - TYP: add missing type annotations to test functions
+- TYP: run type checkers on test suite
 
 ## [1.1.0] 2026-05-23
 
