@@ -8,7 +8,7 @@ Scalar: TypeAlias = int | float | bool | str
 Section_ScalarsAllowed: TypeAlias = Mapping[str, Sequence[Scalar] | Scalar]
 Section_ScalarsForbidden: TypeAlias = Mapping[str, Sequence[Scalar]]
 
-AnyReadableSection = Section_ScalarsAllowed | Section_ScalarsForbidden
+AnySection = Section_ScalarsAllowed | Section_ScalarsForbidden
 
 Config_SectionsRequired_ScalarsForbidden: TypeAlias = Mapping[
     str, Section_ScalarsForbidden
