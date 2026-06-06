@@ -20,8 +20,7 @@ from inifix._io import (
     _tokenize_line,
     _validate_section_item,
 )
-
-from .utils import assert_dict_equal
+from inifix._testing import assert_mapping_equal
 
 if sys.version_info >= (3, 14):
     from annotationlib import Format, get_annotations
@@ -344,11 +343,11 @@ def test_roundtrip_stability_generated(kwargs, L):
         kwargs.setdefault("parse_scalars_as_lists", True)
     data1 = {"a": L}
     data1_rt = loads(dumps(data1), **kwargs)
-    assert_dict_equal(data1_rt, data1)
+    assert_mapping_equal(data1_rt, data1)
 
     data2 = {"Section 1": data1, "Section 2": data1}
     data2_rt = loads(dumps(data2), **kwargs)
-    assert_dict_equal(data2_rt, data2)
+    assert_mapping_equal(data2_rt, data2)
 
 
 def test_aggressive_integer_casting():
