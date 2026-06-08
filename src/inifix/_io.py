@@ -38,10 +38,10 @@ def _always_iterable(obj: Scalar | Sequence[Scalar], /) -> Iterator[Scalar]:
     if isinstance(obj, str):
         return iter((obj,))
 
-    if isinstance(obj, Sequence):
-        return iter(obj)
-    else:
+    if isinstance(obj, Scalar):
         return iter((obj,))
+    else:
+        return iter(obj)
 
 
 def _is_numeric(s: str) -> bool:
