@@ -3,9 +3,11 @@ import os
 import re
 import sys
 import tempfile
+from collections.abc import Sequence
 from io import BytesIO
 from pathlib import Path
 from stat import S_IREAD
+from typing import Any, Literal, NotRequired, TypedDict
 
 import pytest
 from hypothesis import example, given
@@ -21,6 +23,7 @@ from inifix._io import (
     _validate_section_item,
 )
 from inifix._testing import assert_mapping_equal
+from inifix._typing import AnyConfig, Scalar
 
 if sys.version_info >= (3, 14):
     from annotationlib import Format, get_annotations
@@ -31,7 +34,7 @@ else:
 @pytest.mark.parametrize(
     "invalid_data", ["", "SingleToken", "[InvalidSectionName", "InvalidSection]"]
 )
-def test_tokenizer(invalid_data):
+def test_tokenizer(invalid_data: str) -> None:
     with pytest.raises(ValueError):
         _tokenize_line(
             invalid_data,
@@ -41,11 +44,11 @@ def test_tokenizer(invalid_data):
         )
 
 
-def test_unit_read(inifile):
+def test_unit_read(inifile: Path) -> None:
     load(inifile)
 
 
-def test_idempotent_io(inifile):
+def test_idempotent_io(inifile: Path) -> None:
     data0 = load(inifile)
     with tempfile.TemporaryDirectory() as tmpdir:
         save1 = Path(tmpdir) / "save1"
@@ -97,7 +100,7 @@ def test_idempotent_io(inifile):
         ),
     ],
 )
-def test_string_casting(data: str, expected):
+def test_string_casting(data: str, expected: AnyConfig) -> None:
     mapping = loads(data)
     assert mapping == expected
 
@@ -122,7 +125,7 @@ def test_string_casting(data: str, expected):
         ),
     ],
 )
-def test_idempotent_string_parsing(data: str, expected):
+def test_idempotent_string_parsing(data: str, expected: AnyConfig) -> None:
     initial_mapping = loads(data)
     assert initial_mapping == expected
     round_str = dumps(initial_mapping)
@@ -131,7 +134,7 @@ def test_idempotent_string_parsing(data: str, expected):
 
 
 @pytest.mark.parametrize("s", ALL_BOOL_STRINGS)
-def test_bool_strings(s: str):
+def test_bool_strings(s: str) -> None:
     if s in TRUTHY_STRINGS:
         b = True
     elif s in FALSY_STRINGS:
@@ -144,7 +147,7 @@ def test_bool_strings(s: str):
     assert data == {"a": [b, s, S]}
 
 
-def test_invalid_section_value():
+def test_invalid_section_value() -> None:
     val = frozenset((1, 2, 3))
     with pytest.raises(
         TypeError,
@@ -156,7 +159,7 @@ def test_invalid_section_value():
         _validate_section_item("key", val)  # type: ignore
 
 
-def test_invalid_section_key():
+def test_invalid_section_key() -> None:
     with pytest.raises(
         TypeError,
         match=re.escape("Expected str keys. Received invalid key: 1"),
@@ -167,6 +170,11 @@ def test_invalid_section_key():
         )
 
 
+class OpenKwargs(TypedDict):
+    mode: Literal["w", "wb"]
+    encoding: NotRequired[str]
+
+
 @pytest.mark.parametrize(
     "open_kwargs",
     [
@@ -174,7 +182,9 @@ def test_invalid_section_key():
         pytest.param({"mode": "wb"}, id="bin write"),
     ],
 )
-def test_dump_to_file_descriptor(inifile, open_kwargs, tmp_path):
+def test_dump_to_file_descriptor(
+    inifile: Path, open_kwargs: OpenKwargs, tmp_path: Path
+) -> None:
     conf = load(inifile)
 
     file = tmp_path / "save.ini"
@@ -188,7 +198,7 @@ def test_dump_to_file_descriptor(inifile, open_kwargs, tmp_path):
             assert f"[{key}]\n" in new_body
 
 
-def test_dump_to_file_path(inifile, tmp_path):
+def test_dump_to_file_path(inifile: Path, tmp_path: Path) -> None:
     conf = load(inifile)
 
     # pathlib.Path obj
@@ -208,7 +218,7 @@ def test_dump_to_file_path(inifile, tmp_path):
             assert f"[{key}]\n" in body2
 
 
-def test_load_empty_file(tmp_path):
+def test_load_empty_file(tmp_path: Path) -> None:
     target = tmp_path / "empty_file"
     target.touch()
     with pytest.raises(
@@ -224,22 +234,22 @@ def test_load_empty_file(tmp_path):
         pytest.param({"mode": "rb"}, id="bin read"),
     ],
 )
-def test_load_from_descriptor(inifile, open_kwargs):
+def test_load_from_descriptor(inifile: Path, open_kwargs: OpenKwargs) -> None:
     with open(inifile, **open_kwargs) as fh:
         load(fh)
 
 
-def test_loads_empty_str():
+def test_loads_empty_str() -> None:
     ret = loads("")
     assert ret == {}
 
 
-def test_loads_invalid_str():
+def test_loads_invalid_str() -> None:
     with pytest.raises(ValueError, match="Failed to parse line 1: 'invalid'"):
         loads("invalid")
 
 
-def test_loads_dumps_roundtrip(inifile):
+def test_loads_dumps_roundtrip(inifile: Path) -> None:
     with open(inifile, encoding="utf-8") as fh:
         data = fh.read()
     d1 = loads(data)
@@ -248,7 +258,7 @@ def test_loads_dumps_roundtrip(inifile):
     assert d1 == d2
 
 
-def test_error_read_only_file(tmp_path):
+def test_error_read_only_file(tmp_path: Path) -> None:
     target = tmp_path / "ini"
     target.touch()
     os.chmod(target, S_IREAD)
@@ -262,14 +272,14 @@ def test_error_read_only_file(tmp_path):
         dump(data, target)
 
 
-def test_read_from_binary_io():
+def test_read_from_binary_io() -> None:
     b = BytesIO(b"var 1 2 a b 'hello world'")
     data = load(b)
     assert data == {"var": [1, 2, "a", "b", "hello world"]}
 
 
-def test_parse_scalars_as_lists(inifile):
-    def _validate(conf):
+def test_parse_scalars_as_lists(inifile: Path) -> None:
+    def _validate(conf: AnyConfig) -> None:
         for value in conf.values():
             if isinstance(value, dict):
                 _validate(value)
@@ -284,10 +294,10 @@ def test_parse_scalars_as_lists(inifile):
     _validate(conf2)
 
 
-def test_skip_validation(monkeypatch, tmp_path):
+def test_skip_validation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     import inifix
 
-    def _mp_validate_inifile_schema(d, /, **kwargs):
+    def _mp_validate_inifile_schema(d: AnyConfig, /, **kwargs: object) -> None:
         raise ValueError("gotcha")
 
     # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
@@ -338,7 +348,9 @@ def test_skip_validation(monkeypatch, tmp_path):
     ).filter(lambda L: len(L) > 0)
 )
 @example([1, ""])  # regression test for gh-243
-def test_roundtrip_stability_generated(kwargs, L):
+def test_roundtrip_stability_generated(
+    kwargs: dict[str, Any], L: Sequence[Scalar]
+) -> None:
     if len(L) == 1:
         kwargs.setdefault("parse_scalars_as_lists", True)
     data1 = {"a": L}
@@ -350,7 +362,7 @@ def test_roundtrip_stability_generated(kwargs, L):
     assert_mapping_equal(data2_rt, data2)
 
 
-def test_aggressive_integer_casting():
+def test_aggressive_integer_casting() -> None:
     input_data = "opt 0 1. 2.0 3e0 4.5"
     data = loads(input_data, integer_casting="aggressive", parse_scalars_as_lists=True)
 
@@ -361,7 +373,7 @@ def test_aggressive_integer_casting():
         assert type(item) is type(expected_item)
 
 
-def test_unknown_integer_casting():
+def test_unknown_integer_casting() -> None:
     input_data = "opt 0 1. 2.0 3e0 4.5"
     with pytest.raises(
         ValueError,
@@ -373,7 +385,7 @@ def test_unknown_integer_casting():
         )
 
 
-def test_fargo_compat(datadir):
+def test_fargo_compat(datadir: Path) -> None:
     conf = load(datadir / "fargo-dummy.ini")
     expected = {
         "x": 1,
@@ -383,7 +395,7 @@ def test_fargo_compat(datadir):
     assert conf == expected
 
 
-def test_pluto_compat(datadir):
+def test_pluto_compat(datadir: Path) -> None:
     conf = load(datadir / "pluto-DiskPlanet.ini")
     expected = [
         "Grid",
@@ -401,7 +413,7 @@ def test_pluto_compat(datadir):
 
 @pytest.mark.parametrize("func", [load, loads, dump, dumps])
 @pytest.mark.parametrize("format", ["VALUE", "FORWARDREF", "STRING"])
-def test_runtime_annotations(func, format):
+def test_runtime_annotations(func: object, format: str) -> None:
     # check that no exception is raised
     get_annotations(func, format=getattr(Format, format))
     get_annotations(func, eval_str=True)

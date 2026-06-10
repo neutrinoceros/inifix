@@ -1,3 +1,5 @@
+from _pytest.fixtures import SubRequest
+from collections.abc import Iterable
 import os
 import shutil
 import textwrap
@@ -46,7 +48,7 @@ def unformatted_files(datadir_root, tmp_path):
         pytest.param("[{}]", id="invalid section chars (brackets)"),
     ]
 )
-def invalid_file(tmp_path, request):
+def invalid_file(tmp_path: Path, request: SubRequest):
     file = tmp_path / "myfile.ini"
     file.write_text(request.param, encoding="utf-8")
     return file
@@ -303,7 +305,7 @@ class TestFormat:
         round_mapping = inifix.load(target)
         assert round_mapping == initial_mapping
 
-    def test_single_core(self, monkeypatch, tmp_path):
+    def test_single_core(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         # regression test for gh-251
         target = tmp_path / "spaces.ini"
 
@@ -313,7 +315,9 @@ class TestFormat:
         monkeypatch.setattr(inifix_cli, "get_cpu_count", lambda: 1)
         runner.invoke(app, ["format", str(target)])
 
-    def test_concurrency(self, datadir_root, unformatted_files):
+    def test_concurrency(
+        self, datadir_root: Path, unformatted_files: Iterable[Path]
+    ) -> None:
         result = runner.invoke(app, ["format", *(str(f) for f in unformatted_files)])
         assert result.exit_code != 0
 

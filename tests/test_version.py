@@ -3,11 +3,11 @@ from importlib.metadata import version
 import inifix
 
 
-def test_dunder_version():
+def test_dunder_version() -> None:
     assert inifix.__version__ == version("inifix")
 
 
-def test_dunder_version_tuple():
+def test_dunder_version_tuple() -> None:
     vt = inifix.__version_tuple__
     assert isinstance(vt, tuple)
     assert len(vt) == 3

@@ -1,3 +1,4 @@
+from _pytest.fixtures import SubRequest
 from pathlib import Path
 
 import pytest
@@ -18,5 +19,5 @@ def datadir_root():
 
 
 @pytest.fixture(params=list(INIFILES.keys()), ids=list(INIFILES.values()))
-def inifile_root(request):
-    return request.param
+def inifile_root(request: SubRequest):
+    return Path(request.param)

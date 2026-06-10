@@ -1,3 +1,7 @@
+from collections.abc import Mapping
+from pathlib import Path
+from typing import Any
+
 import pytest
 from pytest import RaisesExc, RaisesGroup
 
@@ -5,7 +9,7 @@ from inifix import dump, dumps, load, loads, validate_inifile_schema
 from inifix._testing import assert_mapping_equal
 
 
-def test_validate_known_files(inifile):
+def test_validate_known_files(inifile: Path) -> None:
     conf = load(inifile)
     # implicit form
     validate_inifile_schema(conf)
@@ -14,7 +18,10 @@ def test_validate_known_files(inifile):
     validate_inifile_schema(conf, sections="allow")
 
 
-def test_validate_known_files_without_sections(inifile_without_sections, tmp_path):
+def test_validate_known_files_without_sections(
+    inifile_without_sections: Path,
+    tmp_path: Path,
+) -> None:
     conf1 = load(inifile_without_sections)
     validate_inifile_schema(conf1, sections="forbid")
 
@@ -55,7 +62,9 @@ def test_validate_known_files_without_sections(inifile_without_sections, tmp_pat
     assert_mapping_equal(conf4, conf3)
 
 
-def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
+def test_validate_known_files_with_sections(
+    inifile_with_sections: Path, tmp_path: Path
+) -> None:
     conf1 = load(inifile_with_sections)
     validate_inifile_schema(conf1, sections="require")
     expected_msg = (
@@ -145,7 +154,9 @@ def test_validate_known_files_with_sections(inifile_with_sections, tmp_path):
         ),
     ],
 )
-def test_dump_invalid_conf(invalid_conf, match, tmp_path):
+def test_dump_invalid_conf(
+    invalid_conf: Mapping[Any, Any], match: str, tmp_path: Path
+) -> None:
     with RaisesGroup(
         RaisesExc(ValueError, match=match),
         allow_unwrapped=True,
@@ -159,7 +170,7 @@ def test_dump_invalid_conf(invalid_conf, match, tmp_path):
         ).matches(excinfo.value)
 
 
-def test_unknown_sections_value():
+def test_unknown_sections_value() -> None:
     with pytest.raises(TypeError):
         validate_inifile_schema(
             {},

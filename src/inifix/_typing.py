@@ -1,4 +1,4 @@
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from typing import TypeAlias
 
 # not quite typing.AnyStr : this is not a constrained type variable
@@ -61,3 +61,6 @@ AnyMutConfig: TypeAlias = (
     | MutConfig_SectionsRequired_ScalarsAllowed
     | MutConfig_SectionsRequired_ScalarsForbidden
 )
+
+
+CasterFunction = Callable[[str], Scalar]

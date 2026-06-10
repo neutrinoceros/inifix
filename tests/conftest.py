@@ -2,6 +2,7 @@ import textwrap
 from pathlib import Path
 
 import pytest
+from _pytest.fixtures import SubRequest
 from runtime_introspect import runtime_feature_set
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -21,30 +22,35 @@ INIFILES_WO_SECTIONS = {
 
 
 @pytest.fixture()
-def datadir():
+def datadir() -> Path:
     return DATA_DIR
 
 
-@pytest.fixture(params=list(INIFILES.keys()), ids=list(INIFILES.values()))
-def inifile(request):
-    return request.param
+@pytest.fixture(
+    params=list(INIFILES.keys()),
+    ids=list(INIFILES.values()),
+)
+def inifile(request: SubRequest) -> Path:
+    return Path(request.param)
 
 
 @pytest.fixture(
-    params=list(INIFILES_W_SECTIONS.keys()), ids=list(INIFILES_W_SECTIONS.values())
+    params=list(INIFILES_W_SECTIONS.keys()),
+    ids=list(INIFILES_W_SECTIONS.values()),
 )
-def inifile_with_sections(request):
-    return request.param
+def inifile_with_sections(request: SubRequest) -> Path:
+    return Path(request.param)
 
 
 @pytest.fixture(
-    params=list(INIFILES_WO_SECTIONS.keys()), ids=list(INIFILES_WO_SECTIONS.values())
+    params=list(INIFILES_WO_SECTIONS.keys()),
+    ids=list(INIFILES_WO_SECTIONS.values()),
 )
-def inifile_without_sections(request):
-    return request.param
+def inifile_without_sections(request: SubRequest) -> Path:
+    return Path(request.param)
 
 
-def pytest_report_header(config, start_path) -> list[str]:
+def pytest_report_header(config: pytest.Config, start_path: Path) -> list[str]:
     fs = runtime_feature_set()
     diagnostics = fs.diagnostics(features=["free-threading", "JIT"])
     return [

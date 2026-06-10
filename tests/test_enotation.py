@@ -18,7 +18,7 @@ from inifix._floatencoder import FloatEncoder
         ("1.100e+00", "1.1e0"),
     ],
 )
-def test_simplify(input, expected):
+def test_simplify(input: str, expected: str) -> None:
     assert FloatEncoder._simplify(input) == expected
 
 
@@ -39,7 +39,7 @@ def test_simplify(input, expected):
         (0, ("0.0", "0e0", "0.0")),
     ],
 )
-def test_encoders(input, expected):
+def test_encoders(input: float, expected: tuple[str, str, str]) -> None:
     assert FloatEncoder.SIMPLE.encode(input) == expected[0]
     assert FloatEncoder.ENOTATION.encode(input) == expected[1]
     assert FloatEncoder.ENOTATION_IFF_SHORTER.encode(input) == expected[2]
@@ -52,7 +52,7 @@ def test_encoders(input, expected):
 @example(0.5)  # len('5e-1') > len('0.5')
 @example(float("nan"))
 @given(st.floats())
-def test_strategies_comparison(r):
+def test_strategies_comparison(r: float) -> None:
     s0 = FloatEncoder.SIMPLE.encode(r)
     s1 = FloatEncoder.ENOTATION.encode(r)
     s2 = FloatEncoder.ENOTATION_IFF_SHORTER.encode(r)
