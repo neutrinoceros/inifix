@@ -66,7 +66,7 @@ class Exit(click.ClickException):
         super().__init__(message)
 
     # @override
-    def show(self, file: IO[Any] | None = None) -> None: ...  # pyright: ignore[reportExplicitAny, reportImplicitOverride] # pyrefly: ignore[missing-override-decorator]
+    def show(self, file: IO[Any] | None = None) -> None: ...  # pyright: ignore[reportImplicitOverride] # pyrefly: ignore[missing-override-decorator]
 
 
 def run_as_pool(closure: Callable[[str], TaskResults], files: list[str]) -> None:
@@ -284,7 +284,7 @@ def _format_single_file(
                 data.splitlines(),
                 fmted_data.splitlines(),
                 fromfile=file,
-                **diff_kwargs,  # pyright: ignore[reportUnknownArgumentType] # pyrefly: ignore[bad-argument-type]
+                **diff_kwargs,  # pyright: ignore[reportArgumentType] # pyrefly: ignore[bad-argument-type]
             )
         )
         assert diff_

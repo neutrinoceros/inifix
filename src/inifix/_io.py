@@ -54,7 +54,7 @@ def _is_numeric(s: str) -> bool:
         return True
 
 
-def _validate_section_item(key: str, value: Scalar | list[Scalar]) -> None:
+def validate_section_item(key: str, value: Scalar | list[Scalar]) -> None:
     if not isinstance(key, str):
         raise TypeError(f"Expected str keys. Received invalid key: {key}")
 
@@ -101,7 +101,7 @@ _RE_CASTERS: list[tuple[re.Pattern[str], Callable[[str], Scalar]]] = [
 ]
 
 
-def _auto_cast_aggressive(s: str) -> Scalar:
+def auto_cast_aggressive(s: str) -> Scalar:
     try:
         f = float(s)
     except ValueError:
@@ -119,7 +119,7 @@ def _auto_cast_aggressive(s: str) -> Scalar:
     return s
 
 
-def _auto_cast_stable(s: str) -> Scalar:
+def auto_cast_stable(s: str) -> Scalar:
     try:
         return int(s)
     except ValueError:
@@ -140,9 +140,9 @@ def _auto_cast_stable(s: str) -> Scalar:
 def _get_caster(integer_casting: Literal["stable", "aggressive"]) -> CasterFunction:
     match integer_casting:
         case "stable":
-            return _auto_cast_stable
+            return auto_cast_stable
         case "aggressive":
-            return _auto_cast_aggressive
+            return auto_cast_aggressive
         case _:
             raise ValueError(
                 f"Unknown integer_casting value {integer_casting!r}. "
@@ -150,7 +150,7 @@ def _get_caster(integer_casting: Literal["stable", "aggressive"]) -> CasterFunct
             )
 
 
-def _tokenize_line(
+def tokenize_line(
     line: str,
     line_number: int,
     filename: str | None,
@@ -188,13 +188,13 @@ def _section_from_lines(
         if not line:
             continue
         values: Scalar | list[Scalar]
-        key, values = _tokenize_line(
+        key, values = tokenize_line(
             line,
             filename=filename,
             line_number=line_number,
             caster=caster,
         )
-        _validate_section_item(key, values)
+        validate_section_item(key, values)
         section[key] = values
     return section
 

@@ -50,9 +50,9 @@ def collect_exceptions_for_elementary_item(
 
     invalid_values: list[object] = []
     if isinstance(value, list):
-        for ev in value:  # pyright: ignore[reportUnknownVariableType]
+        for ev in value:
             if not isinstance(ev, SCALAR_TYPES):
-                invalid_values.append(ev)  # pyright: ignore[reportUnknownArgumentType]
+                invalid_values.append(ev)
     elif not isinstance(value, SCALAR_TYPES):
         invalid_values.append(value)
 
@@ -60,7 +60,7 @@ def collect_exceptions_for_elementary_item(
         exceptions.append(
             ValueError(
                 f"Key {key!r} is associated to value {value} "
-                f"with type {type(value).__name__}. "  # pyright: ignore[reportUnknownArgumentType]
+                f"with type {type(value).__name__}. "
                 "Expected an int, float, bool, str, or list of these types"
             )
         )
