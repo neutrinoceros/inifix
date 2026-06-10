@@ -4,7 +4,7 @@ from collections.abc import Callable, Iterator, Mapping, Sequence
 from functools import partial
 from io import BufferedIOBase, IOBase
 from itertools import pairwise
-from typing import Literal, Protocol, overload
+from typing import IO, AnyStr, Literal, Protocol, cast, overload
 
 from inifix._floatencoder import FloatEncoder
 from inifix._typing import (
@@ -376,7 +376,7 @@ def _write_to_file(data: AnyConfig, file: str | os.PathLike[str], /) -> None:
 
 @overload
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     sections: Literal["forbid"],
@@ -386,7 +386,7 @@ def load(
 ) -> MutConfig_SectionsForbidden_ScalarsForbidden: ...
 @overload
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     sections: Literal["require"],
@@ -396,7 +396,7 @@ def load(
 ) -> MutConfig_SectionsRequired_ScalarsForbidden: ...
 @overload
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     sections: Literal["forbid"],
@@ -406,7 +406,7 @@ def load(
 ) -> MutConfig_SectionsForbidden_ScalarsAllowed: ...
 @overload
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     sections: Literal["require"],
@@ -416,7 +416,7 @@ def load(
 ) -> MutConfig_SectionsRequired_ScalarsAllowed: ...
 @overload
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     parse_scalars_as_lists: Literal[True],
@@ -426,7 +426,7 @@ def load(
 ) -> MutConfig_SectionsAllowed_ScalarsForbidden: ...
 @overload
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     parse_scalars_as_lists: Literal[False] = False,
@@ -437,7 +437,7 @@ def load(
 
 
 def load(
-    source: str | os.PathLike[str] | IOBase,
+    source: str | os.PathLike[str] | IO[AnyStr],
     /,
     *,
     # parsing options
@@ -651,7 +651,7 @@ def loads(
 def dump(
     data: AnyConfig,
     /,
-    file: str | os.PathLike[str] | IOBase,
+    file: str | os.PathLike[str] | IO[AnyStr],
     *,
     # validation options
     sections: Literal["allow", "forbid", "require"] = "allow",
@@ -700,6 +700,11 @@ def dump(
     if isinstance(file, IOBase):
         _write_to_buffer(data, file)
     else:
+        # to the best of my knowledge, the return type of `open` is:
+        # - `IO[AnyStr]` at typecheck-time
+        # - `IOBase` at runtime
+        # however typecheckers won't recognize our runtime checking as narrowing
+        file = cast("str | os.PathLike[str]", file)
         _write_to_file(data, file)
 
 
