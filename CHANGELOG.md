@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TYP: distinguish read-only input and mutable output types in public
   interface
+- TYP: fix type annotations to inifix.load and inifix.dump's first argument
 
 ## [7.0.0] - 2026-05-18
 
