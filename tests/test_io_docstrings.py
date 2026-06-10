@@ -140,5 +140,5 @@ LOADS_DOCSTRING = cleandoc(
         (inifix.dumps, DUMPS_DOCSTRING),
     ],
 )
-def test_docstrings(func, expected_docstring):
+def test_docstrings(func: object, expected_docstring: str) -> None:
     assert getdoc(func) == dedent(expected_docstring)

@@ -10,6 +10,7 @@ from inifix._floatencoder import FloatEncoder
 from inifix._typing import (
     AnyConfig,
     AnyMutConfig,
+    CasterFunction,
     MutConfig_SectionsAllowed_ScalarsForbidden,
     MutConfig_SectionsForbidden_ScalarsAllowed,
     MutConfig_SectionsForbidden_ScalarsForbidden,
@@ -134,9 +135,6 @@ def _auto_cast_stable(s: str) -> Scalar:
             return caster(s)
 
     return s
-
-
-CasterFunction = Callable[[str], Scalar]
 
 
 def _get_caster(integer_casting: Literal["stable", "aggressive"]) -> CasterFunction:
