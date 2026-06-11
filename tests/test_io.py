@@ -171,7 +171,7 @@ def test_invalid_section_key() -> None:
 
 
 class OpenKwargs(TypedDict):
-    mode: Literal["w", "wb"]
+    mode: NotRequired[Literal["w", "wb"]]
     encoding: NotRequired[str]
 
 
@@ -197,6 +197,8 @@ def test_dump_to_file_descriptor(
         if isinstance(val, dict):
             assert f"[{key}]\n" in new_body
 
+    assert_mapping_equal(loads(new_body), conf)
+
 
 def test_dump_to_file_path(inifile: Path, tmp_path: Path) -> None:
     conf = load(inifile)
@@ -216,6 +218,9 @@ def test_dump_to_file_path(inifile: Path, tmp_path: Path) -> None:
     for key, val in conf.items():
         if isinstance(val, dict):
             assert f"[{key}]\n" in body2
+
+    assert_mapping_equal(loads(body1), conf)
+    assert_mapping_equal(loads(body2), conf)
 
 
 def test_load_empty_file(tmp_path: Path) -> None:
@@ -255,7 +260,7 @@ def test_loads_dumps_roundtrip(inifile: Path) -> None:
     d1 = loads(data)
     s1 = dumps(d1)
     d2 = loads(s1)
-    assert d1 == d2
+    assert_mapping_equal(d2, d2)
 
 
 def test_error_read_only_file(tmp_path: Path) -> None:
@@ -297,7 +302,7 @@ def test_parse_scalars_as_lists(inifile: Path) -> None:
 def test_skip_validation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     import inifix
 
-    def _mp_validate_inifile_schema(_d: AnyConfig, /, **_kwargskwargs: object) -> None:
+    def _mp_validate_inifile_schema(_d: AnyConfig, /, **_kwargs: object) -> None:
         raise ValueError("gotcha")
 
     # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
@@ -321,7 +326,7 @@ def test_skip_validation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> Non
 
     conf1 = loads(data, skip_validation=True)
     conf2 = load(tmp_path / "data.ini", skip_validation=True)
-    assert conf1 == conf2
+    assert_mapping_equal(conf2, conf1)
 
 
 @pytest.mark.parametrize(
@@ -392,7 +397,7 @@ def test_fargo_compat(datadir: Path) -> None:
         "y": 2,
         "z": 3,
     }
-    assert conf == expected
+    assert_mapping_equal(conf, expected)
 
 
 def test_pluto_compat(datadir: Path) -> None:
