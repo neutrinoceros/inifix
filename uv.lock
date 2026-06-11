@@ -151,7 +151,7 @@ wheels = [
 
 [[package]]
 name = "inifix"
-version = "7.0.0"
+version = "7.0.1"
 source = { editable = "." }
 
 [package.dev-dependencies]
