@@ -1,3 +1,4 @@
+from typing import Generator
 from _pytest.fixtures import SubRequest
 from collections.abc import Iterable
 import os
@@ -20,7 +21,9 @@ N_FILES = 257
 
 
 @pytest.fixture
-def unformatted_files(datadir_root, tmp_path):
+def unformatted_files(
+    datadir_root: Path, tmp_path: Path
+) -> Generator[list[Path], None, None]:
     in_file = datadir_root / "format-in.ini"
     files = []
     for file_no in range(N_FILES):
@@ -48,7 +51,7 @@ def unformatted_files(datadir_root, tmp_path):
         pytest.param("[{}]", id="invalid section chars (brackets)"),
     ]
 )
-def invalid_file(tmp_path: Path, request: SubRequest):
+def invalid_file(tmp_path: Path, request: SubRequest) -> Path:
     file = tmp_path / "myfile.ini"
     file.write_text(request.param, encoding="utf-8")
     return file
@@ -58,15 +61,15 @@ def wrap(t: str) -> str:
     return "\n".join(textwrap.wrap(t))
 
 
-def assert_text_equal(actual: str, desired: str):
+def assert_text_equal(actual: str, desired: str) -> None:
     assert wrap(actual) == wrap(desired)
 
 
-def assert_text_includes(actual, desired):
+def assert_text_includes(actual: str, desired: str) -> None:
     assert wrap(desired) in wrap(desired)
 
 
-def test_filter_files_default(tmp_path):
+def test_filter_files_default(tmp_path: Path) -> None:
     target = tmp_path / str(uuid4())
     target.touch()
     assert inifix_cli.filter_files([str(target)]) == [str(target)]
@@ -82,7 +85,12 @@ def test_filter_files_default(tmp_path):
         ),
     ],
 )
-def test_filter_files_exclude(names, exclude, expected_names, tmp_path):
+def test_filter_files_exclude(
+    names: list[str],
+    exclude: list[str],
+    expected_names: list[str],
+    tmp_path: Path,
+) -> None:
     targets = [tmp_path / name for name in names]
     for t in targets:
         t.touch()
@@ -95,7 +103,7 @@ def test_filter_files_exclude(names, exclude, expected_names, tmp_path):
 
 
 class TestValidate:
-    def test_empty_file(self, tmp_path):
+    def test_empty_file(self, tmp_path: Path) -> None:
         target = tmp_path / "invalid_file"
         target.touch()
         result = runner.invoke(app, ["validate", str(target)])
@@ -103,25 +111,25 @@ class TestValidate:
         assert_text_includes(result.stdout, f"Failed to validate {target}:")
         assert_text_includes(result.stdout, "appears to be empty.\n")
 
-    def test_missing_file(self, tmp_path):
+    def test_missing_file(self, tmp_path: Path) -> None:
         target = tmp_path / "not_a_file"
         result = runner.invoke(app, ["validate", str(target)])
         assert result.exit_code != 0
         assert_text_includes(result.stdout, f"Error: could not find {target}")
 
-    def test_invalid_files(self, invalid_file):
+    def test_invalid_files(self, invalid_file: Path) -> None:
         result = runner.invoke(app, ["validate", str(invalid_file)])
         assert result.stdout.startswith("Failed to validate")
         assert result.exit_code != 0
 
-    def test_valid_files(self, inifile_root):
+    def test_valid_files(self, inifile_root: Path) -> None:
         result = runner.invoke(app, ["validate", str(inifile_root)])
 
         assert result.stdout == f"Validated {inifile_root}\n"
         assert result.stderr == ""
         assert result.exit_code == 0
 
-    def test_concurrency(self, unformatted_files, capsys):
+    def test_concurrency(self, unformatted_files: Iterable[Path]) -> None:
         result = runner.invoke(app, ["validate", *(str(f) for f in unformatted_files)])
         assert result.exit_code == 0
         assert result.stderr == ""
@@ -133,7 +141,12 @@ class TestValidate:
 
 class TestFormat:
     @pytest.mark.parametrize("args", [(), ("--skip-validation",)])
-    def test_format_keep_data(self, args, datadir_root, inifile_root, tmp_path):
+    def test_format_keep_data(
+        self,
+        args: tuple[str, ...],
+        inifile_root: Path,
+        tmp_path: Path,
+    ) -> None:
         target = tmp_path / inifile_root.name
 
         ref_data = inifix.load(inifile_root)
@@ -149,7 +162,12 @@ class TestFormat:
         "infile, expect_diff",
         [("format-in.ini", True), ("format-out.ini", False)],
     )
-    def test_exact_format_diff(self, datadir_root, infile, expect_diff):
+    def test_exact_format_diff(
+        self,
+        datadir_root: Path,
+        infile: Path,
+        expect_diff: bool,
+    ) -> None:
         def diff_file(f1: Path, f2: Path) -> str:
             return (
                 "\n".join(
@@ -178,7 +196,7 @@ class TestFormat:
 
         assert (datadir_root / infile).read_text(encoding="utf-8") == body
 
-    def test_exact_format_inplace(self, datadir_root, tmp_path):
+    def test_exact_format_inplace(self, datadir_root: Path, tmp_path: Path) -> None:
         target = tmp_path / "result.stdout.ini"
         shutil.copyfile(datadir_root / "format-in.ini", target)
 
@@ -190,7 +208,7 @@ class TestFormat:
         res = target.read_text(encoding="utf-8")
         assert res == expected
 
-    def test_no_parameters(self, tmp_path):
+    def test_no_parameters(self, tmp_path: Path) -> None:
         target = tmp_path / "no_params.ini"
         target.write_text(
             "\n".join(
@@ -220,13 +238,13 @@ class TestFormat:
         )
         assert target.read_text(encoding="utf-8") == expected
 
-    def test_missing_file(self, tmp_path):
+    def test_missing_file(self, tmp_path: Path) -> None:
         target = tmp_path / "not_a_file"
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
         assert_text_equal(result.stdout, f"Error: could not find {target}")
 
-    def test_empty_file(self, tmp_path):
+    def test_empty_file(self, tmp_path: Path) -> None:
         target = tmp_path / "invalid_file"
         target.touch()
         result = runner.invoke(app, ["format", str(target)])
@@ -235,7 +253,7 @@ class TestFormat:
             result.stdout, f"Error: {str(target)!r} appears to be empty.\n"
         )
 
-    def test_error_read_only_file(self, inifile_root, tmp_path):
+    def test_error_read_only_file(self, inifile_root: Path, tmp_path: Path) -> None:
         target = tmp_path / inifile_root.name
         shutil.copy(inifile_root, target)
 
@@ -254,7 +272,7 @@ class TestFormat:
 
     @pytest.mark.parametrize("name", ["pytest.ini", "tox.ini"])
     @pytest.mark.parametrize("cmd", ["validate", "format"])
-    def test_exclude_defaults(self, name, cmd, tmp_path):
+    def test_exclude_defaults(self, name: str, cmd: str, tmp_path: Path) -> None:
         target = tmp_path / name
         target.write_text("Invalid data, should be ignored", encoding="utf-8")
         result = runner.invoke(app, [cmd, str(target)])
@@ -262,7 +280,7 @@ class TestFormat:
         assert result.stderr == ""
         assert result.stdout == ""
 
-    def test_diff_stdout(self, inifile_root, tmp_path):
+    def test_diff_stdout(self, inifile_root: Path, tmp_path: Path) -> None:
         target = tmp_path / inifile_root.name
         shutil.copy(inifile_root, target)
 
@@ -275,7 +293,7 @@ class TestFormat:
         else:
             assert result.stdout != ""
 
-    def test_report_noop(self, datadir_root, tmp_path):
+    def test_report_noop(self, datadir_root: Path, tmp_path: Path) -> None:
         inifile_root = datadir_root / "format-out.ini"
         target = tmp_path / inifile_root.name
 
@@ -285,7 +303,7 @@ class TestFormat:
         assert result.exit_code == 0
         assert result.stdout == f"{target} is already formatted\n"
 
-    def test_format_quoted_strings_with_whitespaces(self, tmp_path):
+    def test_format_quoted_strings_with_whitespaces(self, tmp_path: Path) -> None:
         target = tmp_path / "spaces.ini"
 
         inserted = '''Eggs 'Bacon Saussage'     "spam"'''
@@ -296,7 +314,7 @@ class TestFormat:
 
         assert target.read_text(encoding="utf-8") == expected
 
-    def test_data_preservation(self, inifile_root, tmp_path):
+    def test_data_preservation(self, inifile_root: Path, tmp_path: Path) -> None:
         # check that perilous string manipulations do not destroy data
         initial_mapping = inifix.load(inifile_root)
         target = tmp_path / inifile_root.name
@@ -316,7 +334,9 @@ class TestFormat:
         runner.invoke(app, ["format", str(target)])
 
     def test_concurrency(
-        self, datadir_root: Path, unformatted_files: Iterable[Path]
+        self,
+        datadir_root: Path,
+        unformatted_files: Iterable[Path],
     ) -> None:
         result = runner.invoke(app, ["format", *(str(f) for f in unformatted_files)])
         assert result.exit_code != 0
