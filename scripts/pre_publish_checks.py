@@ -120,6 +120,31 @@ class PackageMeta:
             logger.info(f"[{self.name}] Check README.md: ok")
             return 0
 
+    def check_changelog(self) -> int:
+        sections_lines = [
+            L
+            for L in self.root.joinpath("CHANGELOG.md")
+            .read_text(encoding="utf-8")
+            .splitlines()
+            if L.startswith("## ")
+        ]
+        if self.version.is_devrelease:
+            expected_ver = str(self.latest_git_version)
+        else:
+            expected_ver = str(self.version)
+
+        sec0 = sections_lines[0]
+        sec1 = sections_lines[1]
+
+        if expected_ver in sec0 or (sec0 == "## Unreleased" and expected_ver in sec1):
+            logger.info(f"[{self.name}] Check CHANGELOG.md: ok")
+            return 0
+        else:
+            logger.error(
+                f"[{self.name}] CHANGELOG.md's first section is {sections_lines[0]!r}, expected '## {expected_ver} [<DATE>]'"
+            )
+            return 1
+
 
 def check_python_requires(*packages: PackageMeta) -> int:
     p0 = packages[0]
@@ -166,7 +191,7 @@ def main() -> int:
 
     retv = 0
     for p in packages:
-        retv += p.check_static_versions() + p.check_readme()
+        retv += p.check_static_versions() + p.check_readme() + p.check_changelog()
     retv += check_python_requires(*packages)
     retv += check_workspace_consistency(*packages)
     return retv
