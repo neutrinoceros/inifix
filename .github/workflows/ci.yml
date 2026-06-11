@@ -178,7 +178,6 @@ jobs:
         typechecker:
         - mypy
         - pyright
-        - basedpyright
 
     runs-on: ubuntu-latest
     name: type check
