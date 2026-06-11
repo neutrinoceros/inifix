@@ -1,10 +1,16 @@
+__all__ = [
+    "dump",
+    "dumps",
+    "load",
+    "loads",
+]
 import os
 import re
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from functools import partial
-from io import BufferedIOBase, IOBase
+from io import BufferedIOBase, IOBase, TextIOBase
 from itertools import pairwise
-from typing import IO, AnyStr, Literal, Protocol, cast, overload
+from typing import IO, TYPE_CHECKING, Any, AnyStr, Literal, Protocol, overload
 
 from inifix._floatencoder import FloatEncoder
 from inifix._typing import (
@@ -24,12 +30,13 @@ from inifix._typing import (
 )
 from inifix._validation import SCALAR_TYPES, validate_inifile_schema
 
-__all__ = [
-    "dump",
-    "dumps",
-    "load",
-    "loads",
-]
+if TYPE_CHECKING:
+    import sys
+
+    if sys.version_info >= (3, 13):
+        from typing import TypeIs
+    else:
+        from typing_extensions import TypeIs
 
 SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
@@ -319,19 +326,39 @@ def _encode(v: Scalar) -> str:
         return str(v)
 
 
-def _write(content: str, buffer: IOBase) -> None:
-    if isinstance(buffer, BufferedIOBase):
+def _is_io(obj: Any) -> "TypeIs[IO[AnyStr]]":
+    # to the best of my knowledge, the return type of `open` is:
+    # - `IO[AnyStr]` at typecheck-time
+    # - `IOBase` at runtime
+    # however typecheckers won't recognize our runtime checking as narrowing
+    return isinstance(obj, IOBase)
+
+
+def _is_text_io(obj: Any) -> "TypeIs[IO[str]]":
+    return isinstance(obj, TextIOBase)
+
+
+def _is_bytes_io(obj: Any) -> "TypeIs[IO[bytes]]":
+    return isinstance(obj, BufferedIOBase)
+
+
+def _write(content: str, buffer: IO[AnyStr]) -> None:
+    if _is_text_io(buffer):
+        buffer.write(content)
+    elif _is_bytes_io(buffer):
         _ = buffer.write(content.encode("utf-8"))
     else:
-        buffer.write(content)
+        raise AssertionError
 
 
-def _write_line(key: str, values: Scalar | Sequence[Scalar], buffer: IOBase) -> None:
+def _write_line(
+    key: str, values: Scalar | Sequence[Scalar], buffer: IO[AnyStr]
+) -> None:
     val_repr = [_encode(v) for v in _always_iterable(values)]
     _write(f"{key} {'  '.join(list(val_repr))}\n", buffer)
 
 
-def _write_to_buffer(data: AnyConfig, buffer: IOBase) -> None:
+def _write_to_buffer(data: AnyConfig, buffer: IO[AnyStr]) -> None:
     last = len(data) - 1
     for i, (key, val) in enumerate(data.items()):
         if not isinstance(val, Mapping):
@@ -497,18 +524,13 @@ def load(
     """
     caster = _get_caster(integer_casting)
 
-    if isinstance(source, IOBase):
+    if _is_io(source):
         config = _from_file_descriptor(
             source,
             parse_scalars_as_lists=parse_scalars_as_lists,
             caster=caster,
         )
     else:
-        # to the best of my knowledge, the return type of `open` is:
-        # - `IO[AnyStr]` at typecheck-time
-        # - `IOBase` at runtime
-        # however typecheckers won't recognize our runtime checking as narrowing
-        source = cast("str | os.PathLike[str]", source)
         config = _from_path(
             source,
             parse_scalars_as_lists=parse_scalars_as_lists,
@@ -699,14 +721,9 @@ def dump(
     if not skip_validation:
         validate_inifile_schema(data, sections=sections)
 
-    if isinstance(file, IOBase):
+    if _is_io(file):
         _write_to_buffer(data, file)
     else:
-        # to the best of my knowledge, the return type of `open` is:
-        # - `IO[AnyStr]` at typecheck-time
-        # - `IOBase` at runtime
-        # however typecheckers won't recognize our runtime checking as narrowing
-        file = cast("str | os.PathLike[str]", file)
         _write_to_file(data, file)
 
 
