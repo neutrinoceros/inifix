@@ -43,7 +43,7 @@ Known differences are:
 This library has:
 - 0 runtime dependencies
 - 100% test coverage (including branch coverage)
-- 100% type coverage (supported type checkers include `mypy`, `(based)pyright`, `pyrefly`, `ty`)
+- 100% type coverage (supported type checkers include `mypy`, `pyright`, `pyrefly`, `ty`)
 
 it is:
 - feature-complete
