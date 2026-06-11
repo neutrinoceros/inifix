@@ -80,7 +80,6 @@ covcheck = [
 ]
 typecheck = [
     {include-group = "test"},
-    "basedpyright>=1.26.0",
     "mypy>=1.11.2",
     "pyright>=1.1.390",
 ]

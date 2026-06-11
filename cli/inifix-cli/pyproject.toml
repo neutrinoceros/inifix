@@ -62,7 +62,6 @@ covcheck = [
     "coverage>=7.10.0",
 ]
 typecheck = [
-    "basedpyright>=1.26.0",
     "mypy>=1.11.2",
     "pyright>=1.1.390",
 ]
