@@ -504,7 +504,11 @@ def load(
             caster=caster,
         )
     else:
-        assert isinstance(source, str | bytes | os.PathLike)
+        # to the best of my knowledge, the return type of `open` is:
+        # - `IO[AnyStr]` at typecheck-time
+        # - `IOBase` at runtime
+        # however typecheckers won't recognize our runtime checking as narrowing
+        source = cast("str | os.PathLike[str]", source)
         config = _from_path(
             source,
             parse_scalars_as_lists=parse_scalars_as_lists,
