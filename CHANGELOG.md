@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   interface
 - TYP: fix type annotations to inifix.load and inifix.dump's first argument
 - TYP: stop running basedpyright in CI as unsustainable
+- TYP: run type checkers on test suite
 
 ## [7.0.0] - 2026-05-18
 
