@@ -27,7 +27,7 @@ def assert_mapping_equal(m1: Mapping[K, V], m2: Mapping[K, V], /) -> None:
     for v1, v2 in zip(m1.values(), m2.values(), strict=True):
         match v1, v2:
             case Mapping(), Mapping():
-                assert_mapping_equal(v1, v2)  # pyright: ignore[reportUnknownArgumentType]
+                assert_mapping_equal(v1, v2)
             case Sequence(), Sequence():
                 for s1, s2 in zip(v1, v2, strict=True):
                     assert_scalar_equal(s1, s2)

@@ -19,7 +19,7 @@ from inifix._floatencoder import FloatEncoder
     ],
 )
 def test_simplify(input: str, expected: str) -> None:
-    assert FloatEncoder._simplify(input) == expected
+    assert FloatEncoder.simplify(input) == expected
 
 
 @pytest.mark.parametrize(

@@ -18,9 +18,9 @@ from inifix._io import (
     ALL_BOOL_STRINGS,
     FALSY_STRINGS,
     TRUTHY_STRINGS,
-    _auto_cast_stable,
-    _tokenize_line,
-    _validate_section_item,
+    auto_cast_stable,
+    tokenize_line,
+    validate_section_item,
 )
 from inifix._testing import assert_mapping_equal
 from inifix._typing import AnyConfig, Scalar
@@ -36,11 +36,11 @@ else:
 )
 def test_tokenizer(invalid_data: str) -> None:
     with pytest.raises(ValueError):
-        _tokenize_line(
+        tokenize_line(
             invalid_data,
             filename="fake_filename",
             line_number=-1,
-            caster=_auto_cast_stable,
+            caster=auto_cast_stable,
         )
 
 
@@ -156,7 +156,7 @@ def test_invalid_section_value() -> None:
             f"Received invalid values {val}"
         ),
     ):
-        _validate_section_item("key", val)  # type: ignore
+        validate_section_item("key", val)  # type: ignore
 
 
 def test_invalid_section_key() -> None:
@@ -164,7 +164,7 @@ def test_invalid_section_key() -> None:
         TypeError,
         match=re.escape("Expected str keys. Received invalid key: 1"),
     ):
-        _validate_section_item(
+        validate_section_item(
             1,  # type: ignore
             True,
         )
@@ -297,12 +297,12 @@ def test_parse_scalars_as_lists(inifile: Path) -> None:
 def test_skip_validation(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     import inifix
 
-    def _mp_validate_inifile_schema(d: AnyConfig, /, **kwargs: object) -> None:
+    def _mp_validate_inifile_schema(_d: AnyConfig, /, **_kwargskwargs: object) -> None:
         raise ValueError("gotcha")
 
     # cannot monkeypatch inifix.validation.validate_inifile_schema directly ...
     monkeypatch.setattr(
-        inifix._io,
+        inifix._io,  # pyright: ignore[reportPrivateUsage]
         "validate_inifile_schema",
         _mp_validate_inifile_schema,
     )

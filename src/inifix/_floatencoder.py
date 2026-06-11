@@ -11,7 +11,7 @@ class FloatEncoder(Enum):
     ENOTATION_IFF_SHORTER = auto()
 
     @staticmethod
-    def _simplify(s: str, /) -> str:
+    def simplify(s: str, /) -> str:
         """
         Simplify exponents and trailing zeros in decimals.
         """
@@ -26,11 +26,11 @@ class FloatEncoder(Enum):
             case FloatEncoder.ENOTATION:
                 base = str(r)
                 if "e" in base:
-                    return self._simplify(base)
+                    return self.simplify(base)
                 if not base.strip(".0"):
                     return "0e0"
                 max_ndigit = len(base.replace(".", "")) - 1
-                return self._simplify(f"{r:.{max_ndigit}e}")
+                return self.simplify(f"{r:.{max_ndigit}e}")
             case FloatEncoder.ENOTATION_IFF_SHORTER:
                 return min(
                     FloatEncoder.SIMPLE.encode(r),
