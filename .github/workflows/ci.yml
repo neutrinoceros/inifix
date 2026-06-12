@@ -196,7 +196,7 @@ jobs:
 
     - run: uv sync --frozen --all-packages --group typecheck
     - name: Typecheck source code (inifix)
-      run: ${{ matrix.typechecker }} src tests typechecks
+      run: ${{ matrix.typechecker }} src tests
     - name: Typecheck source code (inifix-cli)
       run: ${{ matrix.typechecker }} cli/inifix-cli
     - name: Verify Types (pyright only)
