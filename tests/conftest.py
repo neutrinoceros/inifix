@@ -9,7 +9,7 @@ DATA_DIR = Path(__file__).parent / "data"
 INIFILES_PATHS = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))
 INIFILES_IDS = [inifile.name[:-4] for inifile in INIFILES_PATHS]
 
-INIFILES = dict(zip(INIFILES_PATHS, INIFILES_IDS, strict=True))
+INIFILES: dict[Path, str] = dict(zip(INIFILES_PATHS, INIFILES_IDS, strict=True))
 
 INIFILES_W_SECTIONS = {
     path: id

@@ -50,7 +50,7 @@ VALIDATION_OPTIONS = """
 
         .. versionadded: 4.1.0"""
 
-DUMP_DOCSTRING = cleandoc(
+DUMP_DOCSTRING: str = cleandoc(
     f"""
     Write data to a file.
 
@@ -72,7 +72,7 @@ DUMP_DOCSTRING = cleandoc(
     """
 )
 
-DUMPS_DOCSTRING = cleandoc(
+DUMPS_DOCSTRING: str = cleandoc(
     f"""
     Convert data to a string.
 
@@ -93,7 +93,7 @@ DUMPS_DOCSTRING = cleandoc(
 )
 
 
-LOAD_DOCSTRING = cleandoc(
+LOAD_DOCSTRING: str = cleandoc(
     f"""
     Parse data from a file.
 
@@ -113,7 +113,7 @@ LOAD_DOCSTRING = cleandoc(
     """
 )
 
-LOADS_DOCSTRING = cleandoc(
+LOADS_DOCSTRING: str = cleandoc(
     f"""
     Parse data from a string.
 

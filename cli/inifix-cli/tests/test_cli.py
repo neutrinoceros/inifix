@@ -16,7 +16,7 @@ import inifix
 import inifix_cli
 from inifix_cli import BUILTIN_EXCLUDES, app
 
-runner = click.testing.CliRunner()
+runner: click.testing.CliRunner = click.testing.CliRunner()
 N_FILES = 257
 
 

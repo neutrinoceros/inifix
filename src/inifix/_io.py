@@ -31,7 +31,7 @@ __all__ = [
     "loads",
 ]
 
-SECTION_REGEXP = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
+SECTION_REGEXP: re.Pattern[str] = re.compile(r"\[(?P<title>[^(){}\[\]]+)\]\s*")
 
 
 def _always_iterable(obj: Scalar | Sequence[Scalar], /) -> Iterator[Scalar]:
@@ -89,9 +89,11 @@ def split_tokens(data: str) -> list[str]:
     return _TOKEN.findall(data)
 
 
-TRUTHY_STRINGS = frozenset({"true", "TRUE", "True", "yes", "YES", "Yes"})
-FALSY_STRINGS = frozenset({"false", "FALSE", "False", "no", "NO", "No"})
-ALL_BOOL_STRINGS = frozenset({*TRUTHY_STRINGS, *FALSY_STRINGS})
+TRUTHY_STRINGS: frozenset[str] = frozenset(
+    {"true", "TRUE", "True", "yes", "YES", "Yes"}
+)
+FALSY_STRINGS: frozenset[str] = frozenset({"false", "FALSE", "False", "no", "NO", "No"})
+ALL_BOOL_STRINGS: frozenset[str] = frozenset({*TRUTHY_STRINGS, *FALSY_STRINGS})
 
 _RE_CASTERS: list[tuple[re.Pattern[str], Callable[[str], Scalar]]] = [
     (re.compile("(" + "|".join(TRUTHY_STRINGS) + ")"), lambda _: True),
