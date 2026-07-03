@@ -482,11 +482,11 @@ wheels = [
 
 [[package]]
 name = "runtime-introspect"
-version = "0.3.0"
+version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/92/b4/658b75ed32005cd687ea0d868cebf57b595f817d4f67494441c053da9002/runtime_introspect-0.3.0.tar.gz", hash = "sha256:86f8a222f9622a7f8476f1c8e8ea198f3ae25a1ee15aab6685cbdb99059561c5", size = 24759, upload-time = "2025-11-04T18:33:15.664Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/b9/d4feffda2f30e904b44d00cfc186227923108c7c74b51d7cc74dca746022/runtime_introspect-0.4.1.tar.gz", hash = "sha256:e1c6932c4021d432c81ed577424af20e4cb1e20eed93d45b2950cf8be2da9b45", size = 24458, upload-time = "2026-05-19T07:37:37.018Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d1/f2/cac39d9077a0f4e11d12a7303c99a094b22b0ca5f8a426ac2a9f65aeaa9b/runtime_introspect-0.3.0-py3-none-any.whl", hash = "sha256:e38f53aab3a450499d09c9603689f2a2ca1827c1fc0fd6d136e4360353cbea63", size = 21004, upload-time = "2025-11-04T18:33:14.652Z" },
+    { url = "https://files.pythonhosted.org/packages/e4/8d/eae181160558368a946f185a7d422f448433617d90af74cf899f5d0be2f5/runtime_introspect-0.4.1-py3-none-any.whl", hash = "sha256:22b3703ef9f0f3e5207339b549b2d785505cb6511d7f090eb2fa268589c7f0f0", size = 20762, upload-time = "2026-05-19T07:37:35.605Z" },
 ]
 
 [[package]]
