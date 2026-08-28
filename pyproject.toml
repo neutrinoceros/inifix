@@ -91,6 +91,9 @@ members = ["cli/inifix-cli"]
 inifix = { workspace = true }
 inifix-cli = { workspace = true }
 
+[tool.pyrefly]
+preset = "strict"
+
 [tool.pyright]
 reportImplicitStringConcatenation = false
 
