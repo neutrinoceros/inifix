@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TYP: add missing type annotations to test functions
 - TYP: run type checkers on test suite
 - BLD: adjust build time requirement on `flit-core`
+- DEP: allow installation against click 8.5.x
 
 ## [1.1.0] 2026-05-23
 
