@@ -124,6 +124,13 @@ filterwarnings = [
     "error",
 ]
 
+[tool.coverage.paths]
+source = [
+    "/home/runner/work/inifix", # Ubuntu
+    "/Users/runner/work/inifix", # macOS
+    "d:\\a\\inifix", # Windows
+]
+
 [tool.coverage.run]
 branch = true
 source = [
