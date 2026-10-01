@@ -84,6 +84,13 @@ typecheck = [
     "pyright>=1.1.390",
 ]
 
+[tool.uv]
+no-build-package = [
+    "ast-serialize",
+    "librt",
+    "mypy",
+]
+
 [tool.uv.workspace]
 members = ["cli/inifix-cli"]
 
