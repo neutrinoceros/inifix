@@ -14,8 +14,9 @@ V = TypeVar("V")
 def assert_scalar_equal(s1: V, s2: V, /) -> None:
     __tracebackhide__ = True
     assert type(s1) is type(s2)
-    if type(s1) is float and type(s2) is float and isnan(s2):
+    if isinstance(s1, float) and isinstance(s2, float) and isnan(s2):
         assert isnan(s1)
+        assert type(s1) is float
     else:
         assert s1 == s2
 
