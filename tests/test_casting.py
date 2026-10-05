@@ -31,7 +31,7 @@ def test_bool_cast(caster: CasterFunction, s: str, expected: bool) -> None:
 @pytest.mark.parametrize("caster", [auto_cast_stable, auto_cast_aggressive])
 @pytest.mark.parametrize("s", ["tdsk", "1213", "Treu", "Flsae", "flkj"])
 def test_bool_cast_invalid(caster: CasterFunction, s: str) -> None:
-    assert type(caster(s)) is not bool  # noqa: E721
+    assert type(caster(s)) is not bool
 
 
 @pytest.mark.parametrize("s, expected", BASE_BOOLS)

@@ -1,9 +1,7 @@
-from typing import Generator
-from _pytest.fixtures import SubRequest
-from collections.abc import Iterable
 import os
 import shutil
 import textwrap
+from collections.abc import Generator, Iterable
 from difflib import unified_diff
 from pathlib import Path
 from stat import S_IREAD
@@ -11,6 +9,7 @@ from uuid import uuid4
 
 import click.testing
 import pytest
+from _pytest.fixtures import SubRequest
 
 import inifix
 import inifix_cli

@@ -1,7 +1,7 @@
-from _pytest.fixtures import SubRequest
 from pathlib import Path
 
 import pytest
+from _pytest.fixtures import SubRequest
 
 DATA_DIR = Path(__file__).parents[3] / "tests" / "data"
 INIFILES_PATHS = list(DATA_DIR.glob("*.ini")) + list(DATA_DIR.glob("*.cfg"))

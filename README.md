@@ -179,22 +179,22 @@ The key difference is that the default strategy is roundtrip-stable on types,
 while the aggressive mode isn't:
 ```pycon
 >>> import inifix
->>> data = {'option_a': [0, 1., 2e3, 4.5]}
+>>> data = {"option_a": [0, 1.0, 2e3, 4.5]}
 >>> data
 {'option_a': [0, 1.0, 2000.0, 4.5]}
 >>> inifix.loads(inifix.dumps(data))
 {'option_a': [0, 1.0, 2000.0, 4.5]}
->>> inifix.loads(inifix.dumps(data), integer_casting='aggressive')
+>>> inifix.loads(inifix.dumps(data), integer_casting="aggressive")
 {'option_a': [0, 1, 2000, 4.5]}
 ```
 
 Aggressive casting may also lead to loss of precision beyond a certain range
 ```pycon
 >>> import inifix
->>> data = {'option_b': 9_007_199_254_740_993}
+>>> data = {"option_b": 9_007_199_254_740_993}
 >>> inifix.loads(inifix.dumps(data))
 {'option_b': 9007199254740993}
->>> inifix.loads(inifix.dumps(data), integer_casting='aggressive')
+>>> inifix.loads(inifix.dumps(data), integer_casting="aggressive")
 {'option_b': 9007199254740992}
 ```
 
@@ -214,10 +214,10 @@ load/patch/dump routine.
 ```pycon
 >>> import inifix
 >>> with open("pluto.ini", "rb") as fr:
-...    conf = inifix.load(fr)
+...     conf = inifix.load(fr)
 >>> conf["Time"]["CFL"] = 0.1
 >>> with open("pluto-mod.ini", "wb") as fw:
-...    inifix.dump(conf, fw)
+...     inifix.dump(conf, fw)
 ```
 or, equivalently
 ```pycon
@@ -317,6 +317,7 @@ class IdefixIni:
         self.hydro = IdefixIniHydro(**Hydro)
         self.output = IdefixIniOutput(**Output)
 
+
 class IdefixIniHydro:
     def __init__(self, **kwargs):
         if "rotation" in kwargs:
@@ -326,12 +327,15 @@ class IdefixIniHydro:
             self.frame = "UNSET"
             self.rotation = 0.0
 
+
 class IdefixIniOutput:
     def __init__(self, *, vtk, **kwargs):
         self.vtk = float(vtk)
 
+
 def read_parameter_file(file) -> IdefixIni:
     return IdefixIni(**inifix.load(file))
+
 
 ini = read_parameter_file("idefix.ini")
 ```
