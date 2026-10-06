@@ -210,7 +210,7 @@ class TestFormat:
     def test_no_parameters(self, tmp_path: Path) -> None:
         target = tmp_path / "no_params.ini"
         target.write_text(
-            "\n".join(
+            "\n".join(  # noqa: FLY002
                 [
                     "    # comment 1",
                     "[Section A]",
@@ -224,7 +224,7 @@ class TestFormat:
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
 
-        expected = "\n".join(
+        expected = "\n".join(  # noqa: FLY002
             [
                 "# comment 1",
                 "",

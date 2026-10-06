@@ -115,6 +115,6 @@ def format_string(s: str, /) -> str:
     """
     fh = StringIO(s)
     content: list[str] = []
-    for s in _iter_sections(fh):
-        content.append(_format_section(s))
+    for sec in _iter_sections(fh):
+        content.append(_format_section(sec))
     return _finalize("\n".join(content))
