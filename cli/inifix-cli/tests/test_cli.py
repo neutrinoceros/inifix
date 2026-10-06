@@ -1,9 +1,7 @@
-from typing import Generator
-from _pytest.fixtures import SubRequest
-from collections.abc import Iterable
 import os
 import shutil
 import textwrap
+from collections.abc import Generator, Iterable
 from difflib import unified_diff
 from pathlib import Path
 from stat import S_IREAD
@@ -11,6 +9,7 @@ from uuid import uuid4
 
 import click.testing
 import pytest
+from _pytest.fixtures import SubRequest
 
 import inifix
 import inifix_cli
@@ -211,7 +210,7 @@ class TestFormat:
     def test_no_parameters(self, tmp_path: Path) -> None:
         target = tmp_path / "no_params.ini"
         target.write_text(
-            "\n".join(
+            "\n".join(  # noqa: FLY002
                 [
                     "    # comment 1",
                     "[Section A]",
@@ -225,7 +224,7 @@ class TestFormat:
         result = runner.invoke(app, ["format", str(target)])
         assert result.exit_code != 0
 
-        expected = "\n".join(
+        expected = "\n".join(  # noqa: FLY002
             [
                 "# comment 1",
                 "",

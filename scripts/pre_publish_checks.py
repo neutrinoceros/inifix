@@ -72,6 +72,7 @@ class PackageMeta:
         cp = subprocess.run(
             ["git", "describe", "--tags", "--abbrev=0", f"--match={self.tag_pattern}"],
             capture_output=True,
+            check=False,
         )
         if cp.returncode != 0:
             raise RuntimeError(f"subprocess failed with: {cp.stderr.decode()}")

@@ -119,7 +119,7 @@ def validate_inifile_schema(
 
     for k, v in data.items():
         if not isinstance(k, str):
-            raise ValueError(
+            raise ValueError(  # noqa: TRY004
                 f"Invalid schema: found key {k} with type {type(k).__name__}, expected a str"
             )
 

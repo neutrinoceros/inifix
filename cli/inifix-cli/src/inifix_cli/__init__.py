@@ -10,18 +10,20 @@ __lazy_modules__ = [
 ]
 
 import os
+import re
 import sys
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from difflib import unified_diff
-from functools import partial
 from enum import Enum, auto
-from typing import TYPE_CHECKING, Literal, NewType, Callable, Any, IO, final, cast
-import click
+from functools import partial
 from textwrap import indent
-import inifix
-import re
+from typing import IO, TYPE_CHECKING, Any, Literal, NewType, cast, final
 
+import click
+
+import inifix
 
 if TYPE_CHECKING:
     from inifix._typing import AnyConfig
