@@ -26,6 +26,7 @@ jobs:
         - '3.13'
         - '3.14'
         - '3.15'
+        - '3.16'
         python-jit: [null]
         include:
         - os: ubuntu-22.04
@@ -34,14 +35,14 @@ jobs:
         - os: macos-latest
           python-version: 3.11.0
         - os: macos-latest
-          python-version: '3.14'
+          python-version: '3.15'
         - os: windows-latest
           # 3.11.0 and 3.11.1 have a platform-specific self-triggered warning
           # breaking pytest at collection time, and that I don't want to just
           # ignore unconditionally
           python-version: 3.11.2
         - os: windows-latest
-          python-version: '3.14'
+          python-version: '3.15'
         - os: ubuntu-latest
           python-version: '3.15'
           python-jit: 1
@@ -59,11 +60,18 @@ jobs:
         persist-credentials: false
     - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
       # 3.11.0 isn't available through setup-uv
+      if: ${{ startsWith( matrix.python-version , '3.11' ) }}
       with:
         python-version: ${{ matrix.python-version }}
-        allow-prereleases: true
     - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      if: ${{ startsWith( matrix.python-version , '3.11' ) }}
       with:
+        enable-cache: true
+        cache-suffix: covcheck
+    - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+      if: ${{ !startsWith( matrix.python-version , '3.11' ) }}
+      with:
+        python-version: ${{ matrix.python-version }}
         enable-cache: true
         cache-suffix: covcheck
 
@@ -95,8 +103,8 @@ jobs:
         - ubuntu-latest
         python-version:
         - 3.11.0
-        - '3.14'
-        - 3.14t
+        - '3.15'
+        - 3.15t
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -157,7 +165,7 @@ jobs:
       matrix:
         python-version:
         - '3.11'
-        - '3.14'
+        - '3.15'
         typechecker:
         - mypy
         - pyright
@@ -197,7 +205,7 @@ jobs:
 
     - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       with:
-        python-version: '3.13'
+        python-version: '3.15'
         enable-cache: true
         cache-suffix: test
     - run: uv sync --frozen --all-packages --no-editable --group test
