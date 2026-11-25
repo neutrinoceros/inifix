@@ -83,6 +83,7 @@ def _normalize_data(data: StrLike) -> list[str]:
 
 
 _TOKEN = re.compile(r"""'[^']*'|"[^"]*"|\S+""")
+_TOKEN = re.compile(r"""(?P<opener>['"]?)\S*(?P=opener)""")
 
 
 def split_tokens(data: str) -> list[str]:
